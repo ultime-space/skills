@@ -1,0 +1,14 @@
+{
+  "name": "{{id}}",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "src"
+  ],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "check": "codecraft check --pack library"
+  }
+}

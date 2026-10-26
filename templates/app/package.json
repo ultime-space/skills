@@ -1,0 +1,8 @@
+{
+  "name": "{{id}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "codecraft check --pack app"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "pack": "auto",
+  "gates": [
+    {
+      "name": "typecheck",
+      "run": "pnpm typecheck",
+      "timeoutMs": 120000
+    },
+    {
+      "name": "kit",
+      "run": "pnpm kit:check",
+      "timeoutMs": 120000
+    }
+  ]
+}
