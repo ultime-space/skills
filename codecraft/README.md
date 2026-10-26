@@ -75,6 +75,12 @@ npx codecraft check --root .
 
 如果确实要把 `SKILL.md` 复制到 agent 的 skills 目录，必须让 `docs/`、`scenarios/`、`prompts/` 与该文件保持 `../../` 的相对位置（符号链接即可），否则入口里的路径会失效。
 
+### 4. 让 AI 怎么说
+
+可直接复制的提示词见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)：审计、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System 审计。
+
+提示词只负责「怎么说」；模式、范围和规则仍以 `docs/` 为准。
+
 ## 三种模式
 
 | 模式 | 是否改文件 | 对应命令 |
@@ -182,7 +188,7 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
 ## 目录
 
 ```text
-docs/         宪法、族卡、AI 契约、风格总图、模式、架构、门禁
+docs/         宪法、族卡、AI 契约、风格总图、模式、架构、AI 提示词、门禁
 scenarios/    新项目 / 旧项目审计 / 只出报告 / 重构评审
 adapters/     generic / Trae / Claude 入口
 prompts/      输出格式
