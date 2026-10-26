@@ -3,7 +3,7 @@
 > 语言无关的代码规范，作为可安装的 skill 包。
 > 让 AI 和人在新项目、旧项目、评审中按同一套约束工作，并能按版本引入。
 
-- 版本：`1.0.0`（[VERSION](./VERSION)）
+- 版本：见 [VERSION](./VERSION)
 - npm：[@ultime/codecraft](https://www.npmjs.com/package/@ultime/codecraft)
 - 许可：MIT（[LICENSE](./LICENSE)）
 - 环境：Node.js >= 20；零运行时依赖
@@ -37,7 +37,7 @@ node /path/to/codecraft/bin/codecraft.mjs check --root /path/to/project
 
 ```bash
 npx @ultime/codecraft check --root .
-npx @ultime/codecraft@1.0.0 check --root .
+npx @ultime/codecraft@latest check --root .
 ```
 
 安装为项目依赖：
@@ -51,7 +51,7 @@ npx codecraft check --root .
 
 ```bash
 npm pack
-npm i -D /path/to/ultime-codecraft-1.0.0.tgz
+npm i -D /path/to/ultime-codecraft-<version>.tgz
 npx codecraft check --root .
 ```
 
@@ -194,7 +194,7 @@ evals/        golden tasks（人工回归）
 
 ## 版本与稳定承诺
 
-- semver；当前 `1.0.0`。
+- semver；当前版本见 [VERSION](./VERSION)。
 - 规则 ID `A1–A21` 稳定；增删规则属于 minor 以上的变更。
 - 报告始终携带版本号；跨版本对比以 JSON 为准。
 

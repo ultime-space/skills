@@ -1,6 +1,6 @@
 {
   "name": "@ultime/codecraft",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Language-agnostic code standard as an installable skill package.",
   "keywords": [
     "ai",
