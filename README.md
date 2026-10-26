@@ -12,10 +12,10 @@
 
 以 Codecraft 为例：
 
-1. 把入口接到 agent：`.trae/rules/codecraft.md`、`CLAUDE.md` 或 `AGENTS.md`。
+1. 安装：`npx @ultime/codecraft install`（或 `npm i -D @ultime/codecraft skills-npm && npx skills-npm setup`）
 2. 对 AI 说：`用 Codecraft 审计本项目，只读，不改文件。`
 
-完整步骤见 [Codecraft 的 5 分钟上手](./codecraft/README.md#5-分钟上手)。
+完整安装方式见 [Codecraft 的安装](./codecraft/README.md#安装)。
 
 ## 约定
 

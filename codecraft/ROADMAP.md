@@ -1,7 +1,7 @@
 # Roadmap
 
 > 用途：Codecraft 后续版本的公开计划与交接说明，供人和其它 agent 窗口继续开发。
-> 状态：1.0.3 已发布；以下为计划，不构成发布承诺。
+> 状态：1.1.0 已发布；以下为计划，不构成发布承诺。
 > 关系：规则正文见 `docs/`；发布流程见 `CONTRIBUTING.md`；变更记录见 `CHANGELOG.md`。
 
 ## 1. 版本策略
@@ -12,18 +12,21 @@
 - **major**：规则 ID、配置格式或 JSON 输出结构的破坏性变更。
 - 文档大版本（当前 `v1`）与包版本解耦；宪法 / 族卡整体重写时才升 `v2`。
 
-## 2. 当前状态（1.0.3）
+## 2. 当前状态（1.1.0）
 
 - 文档：宪法 v1、族卡 v1、AI 契约 v1、风格总图、模式、架构、门禁、AI 提示词。
-- CLI：`check` / `audit` / `plan` / `init` / `version`；packs：`app` / `library` / `design-system` / `auto`。
+- 安装：根 `SKILL.md`；支持 `skills-npm` 同步与 `codecraft install`。
+- CLI：`check` / `audit` / `plan` / `init` / `install` / `version`；packs：`app` / `library` / `design-system` / `auto`。
 - 内置检查：A2 / A11 / A17 / A21。
 - 适配器：generic / Trae / Claude。
-- 测试：26 个；npm 发布走 Trusted Publishing（OIDC）。
+- 测试：`npm test` 覆盖 CLI、install、规则、gates 与 init；npm 发布走 Trusted Publishing（OIDC）。
 
 ## 3. 下一步
 
 ### P0 · 1.1.0 可用性
 
+- [x] 新增根 `SKILL.md`，兼容 Agent Skills / `skills-npm`。
+- [x] `codecraft install`：自动检测 Claude / Trae / Cursor，支持 `--global` / `--dest` / `--force` / `--dry-run`。
 - [ ] 配置支持例外：`ignore: [{ rule, file, reason, expires }]`，落地 A12 的例外登记；报告单列 ignored。
 - [ ] `--format sarif`：接入 GitHub Code Scanning。
 - [ ] `--changed` / `--since <ref>`：只检查改动文件，适合 CI。

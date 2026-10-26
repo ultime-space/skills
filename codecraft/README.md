@@ -19,29 +19,47 @@
 
 规则正文只在 [`docs/`](./docs/)；其它位置只放入口与指针，避免第二份真源。
 
-> 第一次用：直接看 [5 分钟上手](#5-分钟上手)。
+> 第一次用：直接看 [安装](#安装) 和 [第一次使用](#第一次使用)。
 
-## 5 分钟上手
+## 安装
 
-Codecraft 有两种用法：**让 AI 按规范工作**（skill）和**在本地跑检查**（CLI）。先完成第 1、2 步就能用起来。
+### 方式 A：npm + skills-npm（推荐，多项目 / 团队）
 
-### 第 1 步：把入口接到 agent
+```bash
+npm i -D @ultime/codecraft skills-npm
+npx skills-npm setup
+```
 
-Codecraft 不是装完 npm 包就自动出现在 agent 里。选一种方式接入：
+之后每次 `npm install` 都会把 `node_modules/@ultime/codecraft` 里的 skill 同步到 agent 目录：`.agents/skills/codecraft`，以及检测到的 Claude / Trae / Cursor 目录。需要 Node.js >= 22.20（`skills-npm` 的要求）。
 
-**方式 A：指针式（推荐）**
+### 方式 B：Codecraft 自带安装器（单次，无额外依赖）
 
-在项目规则里留一行，让 agent 做代码任务时来读：
+```bash
+npx @ultime/codecraft install
+```
 
-- Trae：项目 `.trae/rules/codecraft.md`
-- Claude：项目 `CLAUDE.md` 或 `~/.claude/CLAUDE.md`
-- 其他 agent：项目 `AGENTS.md`
+自动检测当前项目的 agent，把 `SKILL.md`、`docs/`、`scenarios/`、`prompts/` 复制到 `.agents/skills/codecraft` 和对应 agent 目录（`.claude/skills`、`.trae/skills`、`.cursor/skills`）。
+
+```bash
+npx @ultime/codecraft install --agent claude          # 指定 agent，可逗号分隔
+npx @ultime/codecraft install --global --agent claude # 装到用户目录
+npx @ultime/codecraft install --dry-run               # 只看计划
+npx @ultime/codecraft install --force                 # 覆盖已有目录
+```
+
+### 方式 C：手动指针
+
+不复制文件，只在项目规则里留一行：
+
+- Trae：`.trae/rules/codecraft.md`
+- Claude：`CLAUDE.md` 或 `~/.claude/CLAUDE.md`
+- 其他：`AGENTS.md`
 
 ```md
 代码任务先读 <Codecraft 路径>/codecraft/adapters/trae/SKILL.md
 ```
 
-平台对应的入口文件：
+平台入口：
 
 | 平台 | 入口文件 |
 |---|---|
@@ -49,11 +67,7 @@ Codecraft 不是装完 npm 包就自动出现在 agent 里。选一种方式接�
 | Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
 | Claude | [`adapters/claude/SKILL.md`](./adapters/claude/SKILL.md) |
 
-**方式 B：复制到 skills 目录**
-
-把对应平台的入口文件放进 agent 的 skills 目录。必须让 `docs/`、`scenarios/`、`prompts/` 与该文件保持 `../../` 的相对位置（符号链接即可），否则入口里的路径会失效。
-
-### 第 2 步：对 AI 说第一句话
+## 第一次使用
 
 ```text
 用 Codecraft 审计本项目，只读，不改文件。
@@ -63,18 +77,11 @@ Codecraft 不是装完 npm 包就自动出现在 agent 里。选一种方式接�
 
 更多场景（只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
 
-### 第 3 步：需要本地检查时再装 CLI
+需要本地检查时再装 CLI：
 
 ```bash
 npx @ultime/codecraft check --root .
-npx @ultime/codecraft@latest check --root .
-```
-
-安装为项目依赖：
-
-```bash
-npm i -D @ultime/codecraft
-npx codecraft check --root .
+npx codecraft check --root .        # 已安装为项目依赖时
 ```
 
 本地开发 / 未发布时用 tarball：
@@ -84,8 +91,6 @@ npm pack
 npm i -D /path/to/ultime-codecraft-<version>.tgz
 npx codecraft check --root .
 ```
-
-也可以 `pnpm link --global /path/to/codecraft`，之后在任意目录使用 `codecraft`。
 
 ## 模式
 
@@ -107,6 +112,7 @@ codecraft <command> [options]
 | `audit` | 内置规则 + `codecraft.config.json` 里的 gates，出只读报告 |
 | `plan` | 把 findings 转成只读升级计划；默认不跑 gates |
 | `init` | 生成 app / library 骨架；默认 dry-run |
+| `install` | 把 skill 安装到 agent skills 目录；默认写入，`--dry-run` 只看计划 |
 | `version` | 输出版本号 |
 
 ### 常用
@@ -121,6 +127,9 @@ codecraft audit --config codecraft.config.json --fail-fast
 codecraft plan --root . --with-gates
 codecraft init --root . --name demo              # dry-run
 codecraft init --root . --name demo --apply      # 写盘
+codecraft install                                # 自动检测并安装
+codecraft install --agent trae,claude --force
+codecraft install --dry-run
 ```
 
 ### 参数
@@ -138,13 +147,18 @@ codecraft init --root . --name demo --apply      # 写盘
 | `--with-gates` | — | 关 | `plan` 执行 gates |
 | `--name <name>` | 字符串 | — | `init` 的 app / package 名称；`--apply` 时必填 |
 | `--apply` | — | 关 | `init` 写盘；已存在路径跳过，不覆盖 |
+| `--agent <list>` | `auto` / `claude` / `trae` / `cursor` / `generic` | `auto` | `install` 目标，可逗号分隔 |
+| `--global` | — | 关 | `install` 写入用户目录 |
+| `--dest <path>` | 目录 | — | `install` 的显式目标 |
+| `--force` | — | 关 | `install` 覆盖已有 codecraft 目录 |
+| `--dry-run` | — | 关 | `install` 只输出计划，不写盘 |
 
 ### 退出码
 
 | 码 | 含义 |
 |---|---|
 | `0` | 通过；warning 不阻断 |
-| `1` | 有 error findings，或有 gate 失败 |
+| `1` | 有 error findings、install 失败，或有 gate 失败 |
 | `2` | 用法错误、root 不存在、配置非法 |
 
 ### 输出
@@ -194,11 +208,12 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
 ## 目录
 
 ```text
+SKILL.md      标准 agent skill 入口（skills-npm / install 使用）
 docs/         宪法、族卡、AI 契约、风格总图、模式、架构、AI 提示词、门禁
 scenarios/    新项目 / 旧项目审计 / 只出报告 / 重构评审
-adapters/     generic / Trae / Claude 入口
+adapters/     generic / Trae / Claude 手动指针
 prompts/      输出格式
-src/ + bin/   CLI
+src/ + bin/   CLI（含 install）
 tests/        node:test 用例
 templates/    init --apply 的 app / library 骨架
 evals/        golden tasks（人工回归）

@@ -66,3 +66,18 @@ void test('cli: init --apply requires --name', () => {
     fs.rmSync(root, { recursive: true, force: true })
   }
 })
+
+void test('cli: install --dry-run does not write the skill', () => {
+  const root = tempRoot()
+  try {
+    const result = run(['install', '--root', root, '--agent', 'generic', '--dry-run', '--format', 'json'])
+
+    assert.equal(result.status, 0)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.plan.length, 1)
+    assert.equal(report.dryRun, true)
+    assert.ok(!fs.existsSync(path.join(root, '.agents', 'skills', 'codecraft')))
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})

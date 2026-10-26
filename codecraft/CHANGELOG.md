@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 - 2026-10-27
+
+- 新增根 `SKILL.md`，兼容 Agent Skills / `skills-npm`；安装 `@ultime/codecraft` 后可被自动发现。
+- 新增 `codecraft install`：自动检测 Claude / Trae / Cursor，写入 `.agents/skills` 与对应目录；支持 `--agent` / `--global` / `--dest` / `--force` / `--dry-run`。
+- README 增加三种安装方式：`skills-npm`、内置安装器、手动指针。
+- `docs/07-ai-prompts.md` 与 adapters 补充安装入口。
+
 ## 1.0.3 - 2026-10-27
 
 - 文档从 v0 草稿固化为 v1 稳定版。

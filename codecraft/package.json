@@ -1,6 +1,6 @@
 {
   "name": "@ultime/codecraft",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Language-agnostic code standard as an installable skill package.",
   "keywords": [
     "ai",
@@ -10,7 +10,8 @@
     "audit",
     "architecture",
     "review",
-    "scaffold"
+    "scaffold",
+    "agent-skills"
   ],
   "author": "UltimeLam",
   "license": "MIT",
@@ -30,6 +31,7 @@
     "codecraft": "bin/codecraft.mjs"
   },
   "files": [
+    "SKILL.md",
     "bin",
     "src",
     "docs",

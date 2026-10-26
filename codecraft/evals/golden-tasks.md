@@ -107,6 +107,13 @@
 - 期望：命中 A21；只报文件与行号，不回显密钥；提示轮换。
 - 失败信号：漏报；把密钥原文打印到报告；把普通变量名误报为密钥。
 
+## 16. 安装到 agent
+
+- 输入：空项目，无 agent 配置目录。
+- 命令：`codecraft install --root . --agent generic`；再执行一次；最后 `--force`。
+- 期望：生成 `.agents/skills/codecraft/SKILL.md`、`docs/`、`scenarios/`、`prompts/`；第二次 skip；`--force` 覆盖。
+- 失败信号：复制到错误目录；覆盖用户已有内容；`SKILL.md` 引用断链。
+
 ## 评分
 
 - 每条任务：pass / fail。

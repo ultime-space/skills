@@ -6,7 +6,22 @@
 
 ## 1. 先让 AI 找到 Codecraft
 
-在项目的 agent 入口里留一条指针，不要复制规则：
+最快的方式：
+
+```bash
+npx @ultime/codecraft install
+```
+
+或走 npm 同步：
+
+```bash
+npm i -D @ultime/codecraft skills-npm
+npx skills-npm setup
+```
+
+装好后项目里会有 `.agents/skills/codecraft/SKILL.md`（以及检测到的 agent 目录）。
+
+也可以手动在 agent 入口里留一条指针，不要复制规则：
 
 - Trae：项目 `.trae/rules/codecraft.md`
 - Claude：`CLAUDE.md`
