@@ -27,9 +27,15 @@ export function loadConfig(root, configPath) {
   return { file, config }
 }
 
-export function runGates(root, gates) {
+export function runGates(root, gates, options = {}) {
   if (!Array.isArray(gates)) throw new Error('gates must be an array')
-  return gates.map((gate) => runGate(root, gate))
+  const results = []
+  for (const gate of gates) {
+    const result = runGate(root, gate)
+    results.push(result)
+    if (options.failFast && result.exitCode !== 0) break
+  }
+  return results
 }
 
 function runGate(root, gate) {

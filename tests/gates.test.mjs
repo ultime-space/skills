@@ -76,3 +76,23 @@ void test('runGates: captures exit codes and output', () => {
     fs.rmSync(root, { recursive: true, force: true })
   }
 })
+
+void test('runGates: failFast stops after the first failure', () => {
+  const root = tempRoot()
+  try {
+    const gates = runGates(
+      root,
+      [
+        { name: 'ok', run: 'node -e "process.exit(0)"' },
+        { name: 'fail', run: 'node -e "process.exit(1)"' },
+        { name: 'out', run: 'node -e "console.log(\'gate-ok\')"' },
+      ],
+      { failFast: true },
+    )
+
+    assert.equal(gates.length, 2)
+    assert.equal(gates[1].exitCode, 1)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})

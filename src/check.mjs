@@ -5,8 +5,11 @@ const SKIP_DIRS = new Set([
   'node_modules',
   'dist',
   'build',
+  'target',
   '.git',
   '.local',
+  '.venv',
+  'venv',
   'coverage',
   '.next',
   '.nuxt',
@@ -20,6 +23,33 @@ const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue'
 const GENERATED_EXTENSIONS = new Set(['.ts', '.js', '.css', '.json', '.md'])
 const ALLOWED_SEGMENTS = new Set(['external', 'generated', 'api', 'adapters'])
 const GENERATED_MARKER = /生成物|generated|do not edit|勿手改|auto-generated|派生/i
+const SECRET_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.json',
+  '.md',
+  '.yml',
+  '.yaml',
+  '.sh',
+  '.toml',
+  '.ini',
+])
+const SECRET_SKIP_FILES = new Set(['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock'])
+/** 文档里公开的示例值，不当作真实凭据。 */
+const SECRET_ALLOW = new Set(['AKIAIOSFODNN7EXAMPLE'])
+const SECRET_PATTERNS = [
+  { id: 'private key', re: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/ },
+  { id: 'AWS access key', re: /\bAKIA[0-9A-Z]{16}\b/ },
+  { id: 'GitHub token', re: /\bgh[pousr]_[A-Za-z0-9]{20,}\b/ },
+  { id: 'Slack token', re: /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/ },
+  { id: 'API secret key', re: /\bsk-[A-Za-z0-9]{20,}\b/ },
+]
+/** 只认内部文档特征：向上一级找根 docs，或 Ultime 的内部目录名；包自带的 docs/ 不算。 */
+const DOC_PATH = /(?:^|[\s(`'"])(?:(?:\.\.\/)+docs\/|(?:docs\/)?(?:开发计划|设计系统|工程机制)\/)/
 
 const IMPORT_PATTERNS = [
   /\bfrom\s+['"]([^'"]+)['"]/g,
@@ -31,6 +61,7 @@ export function check(root, options = {}) {
   const absRoot = path.resolve(root)
   const pack = options.pack ?? 'app'
   if (pack === 'library') return checkLibrary(absRoot)
+  if (pack === 'design-system') return checkDesignSystem(absRoot)
   return checkApp(absRoot)
 }
 
@@ -38,10 +69,19 @@ function checkApp(root) {
   const files = collectAppFiles(root)
   const findings = []
   for (const file of files) findings.push(...scanAppFile(file, root))
+  findings.push(...scanSecrets(root))
   return { root, files: files.length, findings }
 }
 
 function checkLibrary(root) {
+  return checkPackages(root, { docPaths: false })
+}
+
+function checkDesignSystem(root) {
+  return checkPackages(root, { docPaths: true })
+}
+
+function checkPackages(root, options) {
   const packages = findPackages(root)
   const manifests = packages.map((pkg) => readJson(path.join(pkg, 'package.json')))
   const workspaceNames = new Set(manifests.map((manifest) => manifest?.name).filter(Boolean))
@@ -52,8 +92,10 @@ function checkLibrary(root) {
     const result = checkPackage(packages[i], manifests[i], workspaceNames)
     files += result.files
     findings.push(...result.findings)
+    if (options.docPaths) findings.push(...scanPackageDocs(packages[i]))
   }
 
+  findings.push(...scanSecrets(root))
   return { root, files, findings }
 }
 
@@ -236,7 +278,7 @@ function scanAppFile(file, root) {
       severity: 'warn',
       file: path.relative(root, file),
       line,
-      message: `imports external type "${spec}"; only Wrapper/API may import external/generated (A4/A17)`,
+      message: `imports external type "${spec}"; only Wrapper/API may import external/generated (A17)`,
     })
   }
   return findings
@@ -284,6 +326,87 @@ function isExternalSpec(spec) {
 
 function isTestFile(file) {
   return /(^|[/\\])(__tests__|tests?)[/\\]/.test(file) || /\.(test|spec)\.[^.]+$/.test(file)
+}
+
+function scanSecrets(root) {
+  const findings = []
+  for (const file of collectScanFiles(root)) {
+    if (SECRET_SKIP_FILES.has(path.basename(file))) continue
+    const text = read(file)
+    if (text == null) continue
+    for (const pattern of SECRET_PATTERNS) {
+      const match = pattern.re.exec(text)
+      if (!match) continue
+      if (SECRET_ALLOW.has(match[0])) continue
+      findings.push({
+        rule: 'A21',
+        severity: 'warn',
+        file: path.relative(root, file),
+        line: lineAt(text, match.index ?? 0),
+        message: `possible ${pattern.id}; remove it and rotate the credential (A21)`,
+      })
+    }
+  }
+  return findings
+}
+
+function collectScanFiles(root) {
+  const files = []
+  walkScan(root, files, new Set())
+  return files
+}
+
+function walkScan(dir, files, seen) {
+  if (seen.has(dir)) return
+  seen.add(dir)
+
+  let entries
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true })
+  } catch {
+    return
+  }
+
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (!SKIP_DIRS.has(entry.name)) walkScan(full, files, seen)
+      continue
+    }
+    if (!entry.isFile()) continue
+    if (SECRET_EXTENSIONS.has(path.extname(entry.name))) files.push(full)
+  }
+}
+
+function scanPackageDocs(pkg) {
+  const findings = []
+  const files = ['README.md', 'USAGE.md', 'CHANGELOG.md', 'compat.md']
+    .map((name) => path.join(pkg, name))
+    .filter((file) => fs.existsSync(file))
+
+  const src = path.join(pkg, 'src')
+  if (isDir(src)) {
+    const contracts = []
+    walkGenerated(src, contracts, new Set())
+    files.push(...contracts.filter((file) => path.basename(file) === 'contract.md'))
+  }
+
+  for (const file of files) {
+    const text = read(file)
+    if (text == null) continue
+    text.split('\n').forEach((line, index) => {
+      if (!DOC_PATH.test(line)) return
+      findings.push({
+        rule: 'A21',
+        severity: 'warn',
+        file: path.relative(pkg, file),
+        line: index + 1,
+        message: 'public package doc references internal docs; keep it self-contained (A21)',
+      })
+    })
+  }
+
+  return findings
 }
 
 function stripComments(text) {

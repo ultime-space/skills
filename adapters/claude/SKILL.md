@@ -10,8 +10,9 @@ description: Language-agnostic code standard for designing, auditing, reviewing,
 1. 项目 `AGENTS.md` / `rules/`
 2. `../../docs/00-constitution.md`
 3. 只读相关族卡：`../../docs/01-family-cards.md`
-4. 需要选型时：`../../docs/05-patterns.md`
-5. 选场景：`../../scenarios/`
+4. 设计架构时：`../../docs/06-architecture.md`
+5. 需要选型时：`../../docs/05-patterns.md`
+6. 选场景：`../../scenarios/`
 
 ## 模式
 

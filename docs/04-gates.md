@@ -34,7 +34,7 @@
 }
 ```
 
-- `pack`：`app` / `library` / `auto`；CLI `--pack` 优先。
+- `pack`：`app` / `library` / `design-system` / `auto`；CLI `--pack` 优先。
 - `gates`：数组；每项必须有 `run`，可选 `name` / `timeoutMs`。
 - 配置文件默认 `codecraft.config.json`；可用 `--config` 指定。
 
@@ -42,10 +42,22 @@
 
 | 项目类型 | 通用 | 业务 |
 |---|---|---|
-| **App** | A4 / A17 | typecheck、单测、e2e、视觉回归 |
-| **Library** | A2 / A11 | build、单测、exports 检查、依赖对账 |
-| **Design System** | A2 / A11 | `kit:check`、契约快照、视觉回归、a11y |
+| **App** | A17 / A21（A4 人工评审） | typecheck、单测、e2e、视觉回归 |
+| **Library** | A2 / A11 / A21 | build、单测、exports 检查、依赖对账 |
+| **Design System** | A2 / A11 / A21 | `kit:check`、契约快照、视觉回归、a11y |
 | **Docs** | A21 | 死链、三线头、交付白名单 |
+
+### 4.1 内置规则
+
+| Rule | Pack | 检查 |
+|---|---|---|
+| A2 | library / design-system | 包不 import apps；相对路径不逃逸；workspace 依赖必须声明 |
+| A11 | library / design-system | 生成物必须有“勿手改 / 派生”标记 |
+| A17 | app | `pages / components / behavior` 不 import `external/` / `generated/` |
+| A21 | all | 高置信密钥模式（私钥 / AWS / GitHub / Slack / API key） |
+| A21 | design-system | 包内公开文档（README / USAGE / CHANGELOG / contract）不引用内部 `docs/` |
+
+A4（单一收口）是结构判断，仍由 review / 项目门禁负责，不由静态扫描替代。
 
 ## 5. 执行顺序
 
@@ -56,7 +68,7 @@
 5. 视觉 / e2e；
 6. 交付检查。
 
-失败策略：默认继续跑完再汇总；`--fail-fast` 可后续加。
+失败策略：默认继续跑完再汇总；`--fail-fast` 遇到第一个失败即停止。
 
 ## 6. 安全
 

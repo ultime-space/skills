@@ -145,3 +145,35 @@ void test('library A11: marker passes', () => {
     fs.rmSync(root, { recursive: true, force: true })
   }
 })
+
+void test('A21: flags high-confidence secrets', () => {
+  const root = tempRoot()
+  try {
+    const key = ['AKIA', 'Z'.repeat(16)].join('')
+    write(root, 'src/config.ts', `const key = '${key}'\n`)
+
+    const result = check(root)
+    const findings = result.findings.filter((finding) => finding.rule === 'A21')
+
+    assert.equal(findings.length, 1)
+    assert.equal(findings[0].file, 'src/config.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('design-system A21: package docs must not reference internal docs', () => {
+  const root = tempRoot()
+  try {
+    write(root, 'packages/ui/package.json', JSON.stringify({ name: '@x/ui' }))
+    write(root, 'packages/ui/README.md', '见 `docs/开发计划/x.md`\n见 `../docs/guide.md`\n自带文档：`docs/guide.md`\n')
+
+    const designSystem = check(root, { pack: 'design-system' }).findings
+    const library = check(root, { pack: 'library' }).findings
+
+    assert.equal(designSystem.filter((finding) => finding.rule === 'A21').length, 2)
+    assert.equal(library.filter((finding) => finding.rule === 'A21').length, 0)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})

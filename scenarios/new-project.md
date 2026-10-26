@@ -17,7 +17,8 @@
 2. `../docs/00-constitution.md`
 3. `../docs/01-family-cards.md`（只读相关族）
 4. `../docs/03-style-map.md`
-5. 需要选型时：`../docs/05-patterns.md`
+5. `../docs/06-architecture.md`（档位 / 七步法 / 边界 / ADR）
+6. 需要选型时：`../docs/05-patterns.md`
 
 ## 步骤
 

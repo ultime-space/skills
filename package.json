@@ -1,6 +1,6 @@
 {
   "name": "@ultime/codecraft",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Language-agnostic code standard as an installable skill package.",
   "keywords": [
@@ -9,7 +9,7 @@
     "lint",
     "skill"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bin": {
     "codecraft": "./bin/codecraft.mjs"
   },
@@ -22,6 +22,11 @@
     "prompts",
     "evals",
     "templates",
+    "VERSION",
+    "CHANGELOG.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "codecraft.config.example.json"
   ],
   "type": "module",

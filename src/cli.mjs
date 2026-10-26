@@ -19,10 +19,11 @@ Commands:
 
 Options:
   --root <path>            Project root (default: cwd)
-  --pack app|library|auto  Rule pack (default: auto)
+  --pack app|library|design-system|auto  Rule pack (default: auto)
   --config <path>          Config file (default: codecraft.config.json)
   --no-gates               Skip gates in audit / plan
   --with-gates             Run configured gates in plan
+  --fail-fast              Stop gates after the first failure
   --name <name>            Scaffold name (required with --apply)
   --apply                  Write the scaffold; existing paths are skipped
   --format md|json         Output format (default: md)
@@ -32,8 +33,10 @@ Options:
   --version, -v
 
 Packs:
-  app      A4 / A17 — pages / components / behavior must not import external or generated
-  library  A2 / A11 — package boundaries and generated-file markers
+  app            A17 / A21 — pages / components / behavior must not import external or generated;
+                 high-confidence secrets are always scanned
+  library        A2 / A11 / A21 — package boundaries, generated-file markers, secret scan
+  design-system  A2 / A11 / A21 — library rules + public docs must not reference internal docs
 `
 
 export function main(argv) {
@@ -78,7 +81,7 @@ export function main(argv) {
       console.error('codecraft: init --apply requires --name <name>')
       return 2
     }
-    const plan = buildInitPlan(root, pack, args.name)
+    const plan = buildInitPlan(root, pack === 'design-system' ? 'library' : pack, args.name)
     const applied = args.apply ? applyInitPlan(root, plan) : null
     const meta = {
       version: VERSION,
@@ -103,7 +106,9 @@ export function main(argv) {
   const result = check(root, { pack })
   const severity = args.ci ? 'error' : args.severity
   const findings = result.findings.map((finding) => ({ ...finding, severity }))
-  const gates = shouldRunGates(command, args) ? runGates(root, config.config.gates ?? []) : []
+  const gates = shouldRunGates(command, args)
+    ? runGates(root, config.config.gates ?? [], { failFast: args.failFast })
+    : []
   const plan = command === 'plan' ? buildPlan(findings) : []
   const meta = {
     version: VERSION,
@@ -112,7 +117,7 @@ export function main(argv) {
     root,
     config: config.file,
     severity,
-    rules: pack === 'library' ? ['A2', 'A11'] : ['A4', 'A17'],
+    rules: pack === 'app' ? ['A17', 'A21'] : ['A2', 'A11', 'A21'],
     files: result.files,
     findings: findings.length,
     plan: plan.length,
@@ -159,7 +164,7 @@ function shouldRunGates(command, args) {
 function resolvePack(cliPack, configPack, root) {
   if (cliPack !== 'auto') return cliPack
   if (configPack && configPack !== 'auto') {
-    return ['app', 'library'].includes(configPack) ? configPack : null
+    return ['app', 'library', 'design-system'].includes(configPack) ? configPack : null
   }
   return detectPack(root)
 }
@@ -172,6 +177,7 @@ function parseArgs(argv) {
     config: '',
     noGates: false,
     withGates: false,
+    failFast: false,
     name: '',
     apply: false,
     format: 'md',
@@ -188,6 +194,7 @@ function parseArgs(argv) {
     else if (arg === '--ci') args.ci = true
     else if (arg === '--no-gates') args.noGates = true
     else if (arg === '--with-gates') args.withGates = true
+    else if (arg === '--fail-fast') args.failFast = true
     else if (arg === '--apply') args.apply = true
     else if (arg === '--name') args.name = argv[++i] ?? ''
     else if (arg === '--root') args.root = argv[++i] ?? '.'
@@ -199,7 +206,7 @@ function parseArgs(argv) {
     else fail(`unknown option: ${arg}`)
   }
 
-  if (!['app', 'library', 'auto'].includes(args.pack)) fail(`invalid --pack: ${args.pack}`)
+  if (!['app', 'library', 'design-system', 'auto'].includes(args.pack)) fail(`invalid --pack: ${args.pack}`)
   if (args.format !== 'md' && args.format !== 'json') fail(`invalid --format: ${args.format}`)
   if (args.severity !== 'warn' && args.severity !== 'error') {
     fail(`invalid --severity: ${args.severity}`)
