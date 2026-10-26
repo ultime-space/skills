@@ -202,6 +202,7 @@ src/ + bin/   CLI
 tests/        node:test 用例
 templates/    init --apply 的 app / library 骨架
 evals/        golden tasks（人工回归）
+ROADMAP.md    后续版本计划与交接说明
 ```
 
 ## 版本与稳定承诺
@@ -209,6 +210,7 @@ evals/        golden tasks（人工回归）
 - semver；当前版本见 [VERSION](./VERSION)。
 - 规则 ID `A1–A21` 稳定；增删规则属于 minor 以上的变更。
 - 报告始终携带版本号；跨版本对比以 JSON 为准。
+- 后续计划：[ROADMAP.md](https://github.com/ultime-space/skills/blob/main/codecraft/ROADMAP.md)。
 
 ## 边界
 
