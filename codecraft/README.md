@@ -19,21 +19,51 @@
 
 规则正文只在 [`docs/`](./docs/)；其它位置只放入口与指针，避免第二份真源。
 
-## 快速开始
+> 第一次用：直接看 [5 分钟上手](#5-分钟上手)。
 
-### 1. 直接运行
+## 5 分钟上手
 
-```bash
-# 在 codecraft 目录内
-node bin/codecraft.mjs check --root .
+Codecraft 有两种用法：**让 AI 按规范工作**（skill）和**在本地跑检查**（CLI）。先完成第 1、2 步就能用起来。
 
-# 检查任意项目
-node /path/to/codecraft/bin/codecraft.mjs check --root /path/to/project
+### 第 1 步：把入口接到 agent
+
+Codecraft 不是装完 npm 包就自动出现在 agent 里。选一种方式接入：
+
+**方式 A：指针式（推荐）**
+
+在项目规则里留一行，让 agent 做代码任务时来读：
+
+- Trae：项目 `.trae/rules/codecraft.md`
+- Claude：项目 `CLAUDE.md` 或 `~/.claude/CLAUDE.md`
+- 其他 agent：项目 `AGENTS.md`
+
+```md
+代码任务先读 <Codecraft 路径>/codecraft/adapters/trae/SKILL.md
 ```
 
-### 2. 安装 / 运行
+平台对应的入口文件：
 
-包名 `@ultime/codecraft`，命令 `codecraft`。发布到 npm 后可直接运行：
+| 平台 | 入口文件 |
+|---|---|
+| 通用（读 `AGENTS.md`） | [`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md) |
+| Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
+| Claude | [`adapters/claude/SKILL.md`](./adapters/claude/SKILL.md) |
+
+**方式 B：复制到 skills 目录**
+
+把对应平台的入口文件放进 agent 的 skills 目录。必须让 `docs/`、`scenarios/`、`prompts/` 与该文件保持 `../../` 的相对位置（符号链接即可），否则入口里的路径会失效。
+
+### 第 2 步：对 AI 说第一句话
+
+```text
+用 Codecraft 审计本项目，只读，不改文件。
+```
+
+只启用 skill、不说 Codecraft 时，agent 可能按普通项目分析处理，不保证走 Audit 模式。带上名字最稳。
+
+更多场景（只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
+
+### 第 3 步：需要本地检查时再装 CLI
 
 ```bash
 npx @ultime/codecraft check --root .
@@ -55,33 +85,9 @@ npm i -D /path/to/ultime-codecraft-<version>.tgz
 npx codecraft check --root .
 ```
 
-也可以直接 `pnpm link --global /path/to/codecraft`，之后在任意目录使用 `codecraft`。
+也可以 `pnpm link --global /path/to/codecraft`，之后在任意目录使用 `codecraft`。
 
-### 3. 接入 agent（作为 skill）
-
-适配器只做入口，不复制规则：
-
-| 平台 | 入口文件 |
-|---|---|
-| 通用（读 `AGENTS.md`） | [`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md) |
-| Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
-| Claude | [`adapters/claude/SKILL.md`](./adapters/claude/SKILL.md) |
-
-推荐**指针式接入**——不复制规则，升级只需更新仓库：
-
-- Trae：在项目 `.trae/rules/codecraft.md` 写一行「代码任务先读 `<本仓库绝对路径>/adapters/trae/SKILL.md`」。
-- Claude：在 `~/.claude/CLAUDE.md` 或项目 `CLAUDE.md` 加同一行。
-- 其他 agent：在项目 `AGENTS.md` 加同一行。
-
-如果确实要把 `SKILL.md` 复制到 agent 的 skills 目录，必须让 `docs/`、`scenarios/`、`prompts/` 与该文件保持 `../../` 的相对位置（符号链接即可），否则入口里的路径会失效。
-
-### 4. 让 AI 怎么说
-
-可直接复制的提示词见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)：审计、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System 审计。
-
-提示词只负责「怎么说」；模式、范围和规则仍以 `docs/` 为准。
-
-## 三种模式
+## 模式
 
 | 模式 | 是否改文件 | 对应命令 |
 |---|---|---|
@@ -174,7 +180,7 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
   "pack": "auto",
   "gates": [
     { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
-    { "name": "kit", "run": "pnpm kit:check", "timeoutMs": 120000 }
+    { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
   ]
 }
 ```

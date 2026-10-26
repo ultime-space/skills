@@ -6,8 +6,8 @@
 
 | 层 | 负责 | 例子 | 是否内置 |
 |---|---|---|---|
-| **Universal（通用）** | Codecraft | A2 / A4 / A11 / A17、密钥扫描、文档路径 | 是 |
-| **Business（业务）** | 项目 | typecheck、单测、`kit:check`、契约测试、视觉回归、迁移检查 | 否，通过 config 调用 |
+| **Universal（通用）** | Codecraft | A2 / A11 / A17、密钥扫描、文档路径 | 是 |
+| **Business（业务）** | 项目 | typecheck、单测、lint、契约测试、视觉回归、迁移检查 | 否，通过 config 调用 |
 
 原则：**通用规则内置，业务门禁编排。** 不复制项目门禁，避免第二套实现。
 
@@ -29,7 +29,7 @@
   "pack": "auto",
   "gates": [
     { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
-    { "name": "kit", "run": "pnpm kit:check", "timeoutMs": 120000 }
+    { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
   ]
 }
 ```
@@ -44,7 +44,7 @@
 |---|---|---|
 | **App** | A17 / A21（A4 人工评审） | typecheck、单测、e2e、视觉回归 |
 | **Library** | A2 / A11 / A21 | build、单测、exports 检查、依赖对账 |
-| **Design System** | A2 / A11 / A21 | `kit:check`、契约快照、视觉回归、a11y |
+| **Design System** | A2 / A11 / A21 | 构建、契约快照、视觉回归、a11y |
 | **Docs** | A21 | 死链、三线头、交付白名单 |
 
 ### 4.1 内置规则

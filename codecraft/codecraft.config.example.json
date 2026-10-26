@@ -7,8 +7,8 @@
       "timeoutMs": 120000
     },
     {
-      "name": "kit",
-      "run": "pnpm kit:check",
+      "name": "test",
+      "run": "pnpm test",
       "timeoutMs": 120000
     }
   ]

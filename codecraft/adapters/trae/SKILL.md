@@ -1,6 +1,6 @@
 ---
 name: codecraft
-description: Language-agnostic code standard for designing, auditing, reviewing, and refactoring code. Use when the user asks to design a project architecture, audit an existing project, produce a code review, or scaffold code under a project's code constitution.
+description: 语言无关的代码规范（Codecraft）。用于项目代码审计与分析、架构设计、重构评审、代码规范检查和脚手架。Language-agnostic code standard for auditing, reviewing, designing, and scaffolding code.
 ---
 
 # Codecraft（代码手艺）

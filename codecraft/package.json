@@ -1,13 +1,18 @@
 {
   "name": "@ultime/codecraft",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Language-agnostic code standard as an installable skill package.",
   "keywords": [
     "ai",
     "code-standard",
     "lint",
-    "skill"
+    "skill",
+    "audit",
+    "architecture",
+    "review",
+    "scaffold"
   ],
+  "author": "UltimeLam",
   "license": "MIT",
   "repository": {
     "type": "git",

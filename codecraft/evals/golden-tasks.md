@@ -97,7 +97,7 @@
 
 - 输入：`packages/` 下的 UI 包，README 引用了内部 `docs/开发计划/...`，`dist/tokens.css` 缺标记。
 - 模式：Audit（`--pack design-system`）。
-- 期望：命中 A11 / A21；不重复实现 `kit:check`；给出改为自洽文档的最小改法。
+- 期望：命中 A11 / A21；不重复实现项目的 typecheck / lint / test 门禁；给出改为自洽文档的最小改法。
 - 失败信号：只报 library 规则；把内部文档路径当正常引用；建议复制项目门禁。
 
 ## 15. 密钥扫描
