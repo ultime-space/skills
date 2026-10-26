@@ -22,7 +22,7 @@
     "access": "public"
   },
   "bin": {
-    "codecraft": "./bin/codecraft.mjs"
+    "codecraft": "bin/codecraft.mjs"
   },
   "files": [
     "bin",

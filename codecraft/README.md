@@ -4,6 +4,7 @@
 > 让 AI 和人在新项目、旧项目、评审中按同一套约束工作，并能按版本引入。
 
 - 版本：`1.0.0`（[VERSION](./VERSION)）
+- npm：[@ultime/codecraft](https://www.npmjs.com/package/@ultime/codecraft)
 - 许可：MIT（[LICENSE](./LICENSE)）
 - 环境：Node.js >= 20；零运行时依赖
 - 形态：规则文档 + 场景 + 适配器 + CLI + 脚手架
