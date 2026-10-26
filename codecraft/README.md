@@ -30,15 +30,26 @@ node bin/codecraft.mjs check --root .
 node /path/to/codecraft/bin/codecraft.mjs check --root /path/to/project
 ```
 
-### 2. 安装命令
+### 2. 安装 / 运行
 
-包名 `@ultime/codecraft`，命令 `codecraft`。
+包名 `@ultime/codecraft`，命令 `codecraft`。发布到 npm 后可直接运行：
 
 ```bash
-# 生成可分发 tarball（包是 private，不发布到 registry）
-npm pack
+npx @ultime/codecraft check --root .
+npx @ultime/codecraft@1.0.0 check --root .
+```
 
-# 在目标项目安装
+安装为项目依赖：
+
+```bash
+npm i -D @ultime/codecraft
+npx codecraft check --root .
+```
+
+本地开发 / 未发布时用 tarball：
+
+```bash
+npm pack
 npm i -D /path/to/ultime-codecraft-1.0.0.tgz
 npx codecraft check --root .
 ```

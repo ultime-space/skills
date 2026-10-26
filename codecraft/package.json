@@ -1,7 +1,6 @@
 {
   "name": "@ultime/codecraft",
   "version": "1.0.0",
-  "private": true,
   "description": "Language-agnostic code standard as an installable skill package.",
   "keywords": [
     "ai",
@@ -10,6 +9,18 @@
     "skill"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ultime-space/skills.git",
+    "directory": "codecraft"
+  },
+  "homepage": "https://github.com/ultime-space/skills/tree/main/codecraft",
+  "bugs": {
+    "url": "https://github.com/ultime-space/skills/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "codecraft": "./bin/codecraft.mjs"
   },
@@ -31,7 +42,8 @@
   ],
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "prepublishOnly": "npm test"
   },
   "engines": {
     "node": ">=20"

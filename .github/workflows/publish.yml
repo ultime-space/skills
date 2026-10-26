@@ -1,0 +1,40 @@
+name: publish-codecraft
+
+on:
+  push:
+    tags:
+      - 'codecraft-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: codecraft
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Check tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          node -e 'const v=require("./package.json").version; const tag=process.env.GITHUB_REF_NAME; if (tag !== "codecraft-v" + v) { console.error("tag " + tag + " does not match codecraft-v" + v); process.exit(1) }'
+
+      - name: Test
+        run: npm test
+
+      # First publish: use NPM_TOKEN. After the package exists, switch to
+      # npm Trusted Publishing (OIDC) and remove NODE_AUTH_TOKEN.
+      - name: Publish
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
