@@ -158,24 +158,6 @@ void test('cli: warns and exits 2 when no source files are scanned', () => {
   }
 })
 
-void test('cli: --list-agents includes project agents', () => {
-  const root = tempRoot()
-  try {
-    fs.writeFileSync(
-      path.join(root, 'codecraft.agents.json'),
-      JSON.stringify({ agents: { 'my-agent': { project: '.my/skills', markers: ['.my'] } } }),
-    )
-
-    const result = run(['--list-agents', '--root', root, '--format', 'json'])
-
-    assert.equal(result.status, 0)
-    const report = JSON.parse(result.stdout)
-    assert.ok(report.agents.some((agent) => agent.name === 'my-agent' && agent.source === 'project'))
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true })
-  }
-})
-
 void test('cli: init --apply requires --name', () => {
   const root = tempRoot()
   try {
@@ -183,21 +165,6 @@ void test('cli: init --apply requires --name', () => {
 
     assert.equal(result.status, 2)
     assert.match(result.stderr, /requires --name/)
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true })
-  }
-})
-
-void test('cli: install --dry-run does not write the skill', () => {
-  const root = tempRoot()
-  try {
-    const result = run(['install', '--root', root, '--agent', 'generic', '--dry-run', '--format', 'json'])
-
-    assert.equal(result.status, 0)
-    const report = JSON.parse(result.stdout)
-    assert.equal(report.plan.length, 1)
-    assert.equal(report.dryRun, true)
-    assert.ok(!fs.existsSync(path.join(root, '.agents', 'skills', 'codecraft')))
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }

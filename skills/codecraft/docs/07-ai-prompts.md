@@ -10,8 +10,10 @@
 最快的方式：
 
 ```bash
-npx @ultime/codecraft install
+npx skills add ultime-space/skills --skill codecraft
 ```
+
+交互选择 agent；非交互用 `-a <agent>`，全局加 `-g`。
 
 或走 npm 同步：
 
@@ -24,12 +26,12 @@ npx skills-npm setup
 
 也可以手动在 agent 入口里留一条指针，不要复制规则：
 
-- Trae：项目 `.trae/rules/codecraft.md`
-- Claude：`CLAUDE.md`
 - 通用：`AGENTS.md`
+- Claude：`CLAUDE.md`
+- Trae：项目 `.trae/rules/codecraft.md`
 
 ```md
-代码任务先读 <Codecraft 仓库路径>/codecraft/adapters/<平台>/...
+代码任务先读 <Codecraft 仓库路径>/skills/codecraft/adapters/<平台>/...
 ```
 
 平台对应：Trae → `adapters/trae/SKILL.md`，Claude → `adapters/claude/SKILL.md`，其他 → `adapters/generic/AGENTS.md`。
@@ -39,7 +41,7 @@ npx skills-npm setup
 任何任务都可以先用这段，再补场景：
 
 ```text
-使用 Codecraft（<Codecraft 仓库路径>/codecraft）。
+使用 Codecraft（<Codecraft 仓库路径>/skills/codecraft）。
 模式：Audit / Plan / Apply。
 范围：<目录 / 包 / 文件 / diff>。
 任务：<一句话>。

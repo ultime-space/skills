@@ -43,62 +43,33 @@
 
 ## 安装
 
-### 方式 A：npm + skills-npm（推荐，多项目 / 团队）
+### 方式 A：skills CLI（推荐）
+
+```bash
+npx skills add ultime-space/skills --skill codecraft
+```
+
+不传 `-a` 时，CLI 会检测本机 agent 并让你多选；`-g` 装到用户目录，`-a` 指定 agent。agent 支持由 `skills` CLI 维护，本 skill 不枚举。
+
+### 方式 B：npm + skills-npm（多项目 / 团队）
 
 ```bash
 npm i -D @ultime/codecraft skills-npm
 npx skills-npm setup
 ```
 
-之后每次 `npm install` 都会把 `node_modules/@ultime/codecraft` 里的 skill 同步到 agent 目录：`.agents/skills/codecraft`，以及检测到的 Claude / Trae / Cursor 目录。需要 Node.js >= 22.20（`skills-npm` 的要求）。
-
-### 方式 B：Codecraft 自带安装器（单次，无额外依赖）
-
-```bash
-npx @ultime/codecraft install
-```
-
-自动检测当前项目的 agent，把 `SKILL.md`、`docs/`、`scenarios/`、`prompts/` 复制到 `.agents/skills/codecraft` 和对应 agent 目录（`.claude/skills`、`.cursor/skills`、`.trae/skills`、`.trae-cn/skills`）。不传 `--agent` 时只按检测结果安装，不优先任何一家。
-
-```bash
-npx @ultime/codecraft install --agent generic          # 指定 agent，可逗号分隔
-npx @ultime/codecraft install --global --agent claude  # 装到用户目录
-npx @ultime/codecraft install --global --agent trae-cn # Trae CN 的全局目录
-npx @ultime/codecraft install --global --dest .trae-cn/skills  # 自定义目录
-npx @ultime/codecraft install --dry-run                # 只看计划
-npx @ultime/codecraft install --force                  # 覆盖已有目录
-```
-
-可选内置 agent：`generic` / `claude` / `cursor` / `trae` / `trae-cn`；用 `--list-agents` 查看实际路径与检测结果。
-
-自定义 agent 放在项目级 `codecraft.agents.json` 或用户级 `~/.codecraft/agents.json`（项目级覆盖用户级）：
-
-```json
-{
-  "agents": {
-    "my-agent": {
-      "project": ".my/skills",
-      "global": ".my/skills",
-      "markers": [".my"]
-    }
-  }
-}
-```
-
-- `project` / `global`：项目内与全局的目标目录；`global` 省略时复用 `project`。
-- `markers`：`auto` 检测用的目录或文件；不填则只能显式 `--agent my-agent`。
-- 未知或临时目录仍可用 `--dest`，不必先写配置。
+之后每次 `npm install` 都会把 `node_modules/@ultime/codecraft` 里的 skill 同步到 agent 目录：`.agents/skills/codecraft`，以及检测到的 agent 目录。需要 Node.js >= 22.20（`skills-npm` 的要求）。
 
 ### 方式 C：手动指针
 
 不复制文件，只在项目规则里留一行：
 
-- Trae：`.trae/rules/codecraft.md`
+- 通用：`AGENTS.md`
 - Claude：`CLAUDE.md` 或 `~/.claude/CLAUDE.md`
-- 其他：`AGENTS.md`
+- Trae：`.trae/rules/codecraft.md`
 
 ```md
-代码任务先读 <Codecraft 路径>/codecraft/adapters/trae/SKILL.md
+代码任务先读 <Codecraft 仓库路径>/skills/codecraft/adapters/trae/SKILL.md
 ```
 
 平台入口：
@@ -106,8 +77,8 @@ npx @ultime/codecraft install --force                  # 覆盖已有目录
 | 平台 | 入口文件 |
 |---|---|
 | 通用（读 `AGENTS.md`） | [`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md) |
-| Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
 | Claude | [`adapters/claude/SKILL.md`](./adapters/claude/SKILL.md) |
+| Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
 
 ## 第一次使用
 
@@ -154,7 +125,6 @@ codecraft <command> [options]
 | `audit` | 内置规则 + `codecraft.config.json` 里的 gates，出只读报告 |
 | `plan` | 把 findings 转成只读升级计划；默认不跑 gates |
 | `init` | 生成 app / library 骨架；默认 dry-run |
-| `install` | 把 skill 安装到 agent skills 目录；默认写入，`--dry-run` 只看计划 |
 | `version` | 输出版本号 |
 
 ### 常用
@@ -169,9 +139,6 @@ codecraft audit --config codecraft.config.json --fail-fast
 codecraft plan --root . --with-gates
 codecraft init --root . --name demo              # dry-run
 codecraft init --root . --name demo --apply      # 写盘
-codecraft install                                # 自动检测并安装
-codecraft install --agent trae,claude --force
-codecraft install --dry-run
 ```
 
 ### 参数
@@ -189,18 +156,13 @@ codecraft install --dry-run
 | `--with-gates` | — | 关 | `plan` 执行 gates |
 | `--name <name>` | 字符串 | — | `init` 的 app / package 名称；`--apply` 时必填 |
 | `--apply` | — | 关 | `init` 写盘；已存在路径跳过，不覆盖 |
-| `--agent <list>` | `auto` / `claude` / `trae` / `cursor` / `generic` | `auto` | `install` 目标，可逗号分隔 |
-| `--global` | — | 关 | `install` 写入用户目录 |
-| `--dest <path>` | 目录 | — | `install` 的显式目标 |
-| `--force` | — | 关 | `install` 覆盖已有 codecraft 目录 |
-| `--dry-run` | — | 关 | `install` 只输出计划，不写盘 |
 
 ### 退出码
 
 | 码 | 含义 |
 |---|---|
 | `0` | 通过；warning 不阻断 |
-| `1` | 有 error findings、install 失败，或有 gate 失败 |
+| `1` | 有 error findings，或有 gate 失败 |
 | `2` | 用法错误、root 不存在、配置非法 |
 
 ### 输出
@@ -265,7 +227,7 @@ docs/         宪法、族卡、AI 契约、风格总图、模式、架构、AI 
 scenarios/    新项目 / 旧项目审计 / 只出报告 / 重构评审
 adapters/     generic / Trae / Claude 手动指针
 prompts/      输出格式
-src/ + bin/   CLI（含 install）
+src/ + bin/   CLI（check / audit / plan / init）
 tests/        node:test 用例
 templates/    init --apply 的 app / library 骨架
 evals/        golden tasks（人工回归）
@@ -281,14 +243,13 @@ ROADMAP.md    后续版本计划与交接说明
 - 不按「感觉重要」升 major；`2.0` 不设时间表。
 - 规则 ID `A1–A21` 稳定；增删规则属于 minor 以上的变更。
 - 报告始终携带版本号；跨版本对比以 JSON 为准。
-- 后续计划：[ROADMAP.md](https://github.com/ultime-space/skills/blob/main/codecraft/ROADMAP.md)。
+- 后续计划：[ROADMAP.md](https://github.com/ultime-space/skills/blob/main/skills/codecraft/ROADMAP.md)。
 
 ## FAQ
 
 - **静态检查误报怎么办？** 在 `codecraft.config.json` 的 `ignore` 里登记 `rule` + `file` + `reason`，必要时加 `expires`；不要直接删规则。
 - **`Files: 0` 是什么意思？** 没有扫到源文件，命令会输出警告并以 2 退出；用 `--pack app|library` 指定正确类型，或检查 `--root`。
-- **Trae CN 装到哪？** 用 `--agent trae-cn`（`~/.trae-cn/skills`）；未知目录用 `--dest`。
-- **怎么支持新的 agent？** 在 `codecraft.agents.json` 里加 `project` / `global` / `markers`，再跑 `--list-agents` 确认；不需要等 Codecraft 发版。
+- **怎么装到指定 agent？** `npx skills add ultime-space/skills --skill codecraft`；交互选 agent，或用 `-a <agent>` 非交互。安装路径由 `skills` CLI 维护，本 skill 不枚举。
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
 - **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app 依赖或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。

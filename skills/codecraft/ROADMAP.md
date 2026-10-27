@@ -1,7 +1,7 @@
 # Roadmap
 
 > 用途：Codecraft 后续版本的公开计划与交接说明，供人和其它 agent 窗口继续开发。
-> 状态：1.3.0 已发布；以下为计划，不构成发布承诺。
+> 状态：1.4.0 已发布；以下为计划，不构成发布承诺。
 > 关系：规则正文见 `docs/`；发布流程见 `CONTRIBUTING.md`；变更记录见 `CHANGELOG.md`。
 
 ## 1. 版本策略
@@ -13,18 +13,18 @@
 - 不按「感觉重要」升 major；`2.0` 只用于破坏性变更，不设时间表。
 - 文档大版本（当前 `v1`）与包版本解耦；宪法 / 族卡整体重写时才升 `v2`。
 
-## 2. 当前状态（1.3.0）
+## 2. 当前状态（1.4.0）
 
 - 范围：JS/TS；默认 Web 前端；示例原生优先（TS / Web API），框架只给 Vue 3 / React；Node 后端只复用结构规则；其它语言不在计划。
 - 文档：宪法 v1、族卡 v1、AI 契约 v1、风格总图、模式、架构、门禁、AI 提示词。
-- 安装：根 `SKILL.md`；支持 `skills-npm` 同步与 `codecraft install`；agent 注册表含 generic / claude / cursor / trae / trae-cn，可用 `--list-agents` 查看。
-- 自定义 agent：项目级 `codecraft.agents.json` / 用户级 `~/.codecraft/agents.json`，字段 `project` / `global` / `markers`。
+- 安装：交给 [`skills`](https://github.com/vercel-labs/skills) CLI（`npx skills add ultime-space/skills --skill codecraft`）或 `skills-npm`；skill 内不再维护安装器与 agent 列表。
+- 目录：集合布局 `skills/<name>/SKILL.md`，可被 `skills` CLI 直接发现。
 - pack 自动判定：识别 Nuxt 2 / 3、uni-app、Taro 与 workspace 内的嵌套应用；0 源文件时警告并退出 2。
-- CLI：`check` / `audit` / `plan` / `init` / `install` / `version`；packs：`app` / `library` / `design-system` / `auto`。
+- CLI：`check` / `audit` / `plan` / `init` / `version`；packs：`app` / `library` / `design-system` / `auto`。
 - 例外登记：`ignore`（`rule` / `file` / `reason` / 可选 `expires`），报告单列 ignored 与过期项。
 - 内置检查：A2 / A11 / A17 / A21。
-- 适配器：generic / Claude / Trae / Trae CN。
-- 测试：`npm test` 覆盖 CLI、install、规则、gates 与 init；npm 发布走 Trusted Publishing（OIDC）。
+- 适配器：generic / Claude / Trae。
+- 测试：`npm test` 覆盖 CLI、规则、gates 与 init；npm 发布走 Trusted Publishing（OIDC）。
 
 ## 3. 下一步
 
@@ -34,21 +34,25 @@
 - [x] `trae-cn` 安装目标；agent 顺序改为 generic / claude / cursor / trae / trae-cn。
 - [x] 0 源文件扫描时输出警告并以 2 退出。
 
-### 1.3.0 安装与适配（已发布）
+### 1.4.0 集合结构（已发布）
 
-- [x] agent 注册表 + `--list-agents`；内置 generic / claude / cursor / trae / trae-cn。
-- [x] 项目级 / 用户级自定义 agent（`project` / `global` / `markers`），项目级覆盖用户级。
-- [x] `auto` 检测全部匹配 agent，不优先任何一家；同目标去重。
+- [x] 仓库改为 `skills/codecraft` 标准集合布局，可被 `skills` CLI 发现。
+- [x] 移除 `codecraft install`、agent 注册表与自定义 agent；安装统一走 `skills` CLI / `skills-npm`。
+- [x] 发布 workflow、README 与适配器路径同步。
+
+### 1.3.0 安装与适配（已回退）
+
+- 1.3.0 的 agent 注册表与 `--list-agents` 在 1.4.0 移除；保留记录供追溯。
 
 ### P0 · 1.2.0 可用性
 
 - [x] 新增根 `SKILL.md`，兼容 Agent Skills / `skills-npm`。
-- [x] `codecraft install`：自动检测 agent，支持 `--global` / `--dest` / `--force` / `--dry-run`。
+- [x] `codecraft install`：自动检测 agent（1.2.0 引入，1.4.0 移除，改走 `skills` CLI）。
 - [x] 配置支持例外：`ignore: [{ rule, file, reason, expires }]`，落地 A12 的例外登记；报告单列 ignored。
 - [x] 错误信息补下一步：root 不存在、config 非法、pack 不匹配。
 - [x] README 增加常见问题（FAQ）。
 
-### P1 · 1.4.0 检查深度
+### P1 · 1.5.0 检查深度
 
 - [ ] `--format sarif`：接入 GitHub Code Scanning。
 - [ ] `--changed` / `--since <ref>`：只检查改动文件，适合 CI。
@@ -59,7 +63,7 @@
 - [ ] 规则误报评估：在 2–3 个真实仓库跑，记录误报率与豁免方式。
 - [ ] 为每条新规则补正例 / 反例 fixture。
 
-### P2 · 1.5.0 评估与适配
+### P2 · 1.6.0 评估与适配
 
 - [ ] 可执行 evals：`evals/run.mjs` 读取 golden tasks，输出通过率与失败原因。
 - [ ] CI 增加 eval job：不阻断发布，失败只提醒。

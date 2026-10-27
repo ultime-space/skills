@@ -5,7 +5,6 @@ import { loadConfig, runGates } from './gates.mjs'
 import { buildPlan, summarizePlan } from './plan.mjs'
 import { applyInitPlan, buildInitPlan } from './init.mjs'
 import { applyIgnores } from './ignore.mjs'
-import { applyInstallPlan, buildInstallPlan, listAgents, loadAgents, parseAgents } from './install.mjs'
 
 const PACKAGE = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const VERSION = PACKAGE.version
@@ -17,19 +16,12 @@ Commands:
   audit       check + configured gates; read-only report
   plan        Read-only upgrade plan from findings
   init        Scaffold an app or package (dry-run unless --apply)
-  install     Install the skill into agent skills directories
   version     Print version
 
 Options:
   --root <path>            Project root (default: cwd)
   --pack app|library|design-system|auto  Rule pack (default: auto)
   --config <path>          Config file (default: codecraft.config.json)
-  --agent <name>[,<name>]  Install target (default: auto; see --list-agents)
-  --list-agents            List registered agents, paths and detection
-  --global                 Install into the home directory
-  --dest <path>            Explicit destination (relative to root / home), e.g. .trae-cn/skills
-  --force                  Replace an existing codecraft skill directory
-  --dry-run                Show the install plan without writing
   --no-gates               Skip gates in audit / plan
   --with-gates             Run configured gates in plan
   --fail-fast              Stop gates after the first failure
@@ -60,7 +52,7 @@ export function main(argv) {
   }
 
   const command = args.command || 'check'
-  if (!['check', 'audit', 'plan', 'init', 'install'].includes(command)) {
+  if (!['check', 'audit', 'plan', 'init'].includes(command)) {
     console.error(`codecraft: unknown command "${command}"\n  next: run codecraft --help`)
     return 2
   }
@@ -69,59 +61,6 @@ export function main(argv) {
   if (!fs.existsSync(root)) {
     console.error(`codecraft: root not found: ${root}\n  next: pass --root <project> or run from the project directory`)
     return 2
-  }
-
-  if (args.listAgents) {
-    try {
-      const agents = listAgents(root, { global: args.global })
-      if (args.format === 'json') {
-        console.log(JSON.stringify({ version: VERSION, agents }, null, 2))
-      } else {
-        console.log(formatAgents(agents))
-      }
-      return 0
-    } catch (error) {
-      console.error(`codecraft: ${error.message}`)
-      return 2
-    }
-  }
-
-  if (command === 'install') {
-    let agents
-    let registry
-    try {
-      registry = loadAgents(root, { global: args.global })
-      agents = parseAgents(args.agent, [...registry.keys()])
-    } catch (error) {
-      console.error(`codecraft: ${error.message}`)
-      return 2
-    }
-    try {
-      const plan = buildInstallPlan(root, { agents, global: args.global, dest: args.dest, registry })
-      const applied = args.dryRun ? null : applyInstallPlan(plan, { force: args.force })
-      const meta = {
-        version: VERSION,
-        mode: 'install',
-        root,
-        scope: args.global ? 'global' : 'project',
-        agent: args.agent,
-        dest: args.dest || null,
-        dryRun: args.dryRun,
-        targets: plan.length,
-        created: applied?.created.length ?? 0,
-        replaced: applied?.replaced.length ?? 0,
-        skipped: applied?.skipped.length ?? 0,
-      }
-      if (args.format === 'json') {
-        console.log(JSON.stringify({ ...meta, plan, applied }, null, 2))
-      } else {
-        console.log(formatInstall(meta, plan, applied))
-      }
-      return plan.length ? 0 : 1
-    } catch (error) {
-      console.error(`codecraft: ${error.message}`)
-      return 1
-    }
   }
 
   let config
@@ -261,12 +200,6 @@ function parseArgs(argv) {
     failFast: false,
     name: '',
     apply: false,
-    agent: 'auto',
-    global: false,
-    dest: '',
-    force: false,
-    dryRun: false,
-    listAgents: false,
     format: 'md',
     severity: 'warn',
     ci: false,
@@ -283,13 +216,7 @@ function parseArgs(argv) {
     else if (arg === '--with-gates') args.withGates = true
     else if (arg === '--fail-fast') args.failFast = true
     else if (arg === '--apply') args.apply = true
-    else if (arg === '--global') args.global = true
-    else if (arg === '--force') args.force = true
-    else if (arg === '--dry-run') args.dryRun = true
-    else if (arg === '--list-agents') args.listAgents = true
     else if (arg === '--name') args.name = argv[++i] ?? ''
-    else if (arg === '--agent') args.agent = argv[++i] ?? 'auto'
-    else if (arg === '--dest') args.dest = argv[++i] ?? ''
     else if (arg === '--root') args.root = argv[++i] ?? '.'
     else if (arg === '--pack') args.pack = argv[++i] ?? 'auto'
     else if (arg === '--config') args.config = argv[++i] ?? ''
@@ -519,67 +446,6 @@ function formatInit(meta, plan, applied) {
   )
 
   return lines.filter((line, index) => !(line === '' && lines[index - 1] === '')).join('\n')
-}
-
-function formatAgents(agents) {
-  const lines = [
-    '# Codecraft Agents',
-    '',
-    `- Version: ${VERSION}`,
-    '',
-    '| Name | Source | Project | Global | Detected |',
-    '|---|---|---|---|---|',
-  ]
-  for (const agent of agents) {
-    const detected =
-      [agent.detected.project ? 'project' : '', agent.detected.global ? 'global' : ''].filter(Boolean).join(', ') ||
-      '—'
-    lines.push(`| ${agent.name} | ${agent.source} | ${agent.project} | ${agent.global} | ${detected} |`)
-  }
-  return lines.join('\n')
-}
-
-function formatInstall(meta, plan, applied) {
-  const lines = [
-    '# Codecraft Install',
-    '',
-    `- Version: ${meta.version}`,
-    `- Mode: install`,
-    `- Scope: ${meta.scope}`,
-    `- Agent: ${meta.agent}`,
-    `- Root: ${meta.root}`,
-    `- Dest: ${meta.dest ?? '（auto）'}`,
-    `- Dry run: ${meta.dryRun}`,
-    `- Targets: ${meta.targets}`,
-  ]
-
-  if (applied) {
-    lines.push(
-      `- Created: ${meta.created}`,
-      `- Replaced: ${meta.replaced}`,
-      `- Skipped: ${meta.skipped}`,
-    )
-  }
-
-  if (!plan.length) {
-    lines.push('', '未找到可安装的目标；请用 `--agent` 指定，或先创建 agent 配置目录。')
-  } else {
-    lines.push('', '## Plan', '', '| Agent | Target | Action |', '|---|---|---|')
-    for (const entry of plan) {
-      lines.push(`| ${entry.agent} | ${entry.target} | ${entry.action} |`)
-    }
-  }
-
-  lines.push(
-    '',
-    '## Next',
-    '',
-    meta.dryRun
-      ? '- Re-run without `--dry-run` to write the skill.'
-      : '- Restart the agent or reload skills；然后说：`用 Codecraft 审计本项目，只读，不改文件。`',
-  )
-
-  return lines.join('\n')
 }
 
 function header(meta) {
