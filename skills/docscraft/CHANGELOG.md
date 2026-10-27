@@ -6,4 +6,4 @@
 - 提供 audit / reorganize / write-adr / review-rules 四个场景。
 - 提供 AGENTS / rules / ADR 模板与 golden tasks。
 - 入口示例统一使用通用 `.agents/rules/`，不绑定单一 agent。
-- 新增 npm 包元数据（`@ultime/docscraft`）、结构测试与 CI / 发布流水线占位。
+- 新增 npm 包元数据（`@ultime/docscraft`）、结构测试与 CI / 发布流水线。

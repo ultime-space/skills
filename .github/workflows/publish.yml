@@ -43,6 +43,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Eval
+        run: npm run eval
+
       # Requires npm Trusted Publishing configured for ultime-space/skills + publish.yml.
       - name: Publish
         run: npm publish --access public --provenance
