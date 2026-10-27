@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 - 2026-10-27
+
+- 新增 agent 注册表：内置 generic / claude / cursor / trae / trae-cn，`--list-agents` 查看项目 / 全局路径与检测结果。
+- 支持项目级 `codecraft.agents.json` 与用户级 `~/.codecraft/agents.json` 自定义 agent（project / global / markers），项目级覆盖用户级。
+- `auto` 按注册表检测所有匹配的 agent，不优先任何一家；重复目标的 agent 自动合并，避免重复复制。
+- 仍保留 `--dest` 作为临时目录逃生口。
+
 ## 1.2.1 - 2026-10-27
 
 - 修复 pack 自动判定：识别 Nuxt 2 的 `pages/`、Nuxt 3 的 `app/`、uni-app 的 `manifest.json + pages.json`、Taro / uni-app 依赖，以及 workspace 内的嵌套应用。
