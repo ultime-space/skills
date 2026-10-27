@@ -22,6 +22,19 @@ void test('install plan: explicit agent maps to the expected directory', () => {
   }
 })
 
+void test('install plan: explicit trae-cn maps to the Trae CN directory', () => {
+  const root = tempRoot()
+  try {
+    const plan = buildInstallPlan(root, { agents: ['trae-cn'] })
+
+    assert.equal(plan.length, 1)
+    assert.equal(plan[0].agent, 'trae-cn')
+    assert.equal(plan[0].target, path.join(root, '.trae-cn', 'skills', 'codecraft'))
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('install plan: auto detects trae and always includes generic', () => {
   const root = tempRoot()
   try {

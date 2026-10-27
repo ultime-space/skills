@@ -8,17 +8,19 @@ const SKILL_FILES = ['SKILL.md']
 const SKILL_DIRS = ['docs', 'scenarios', 'prompts']
 
 const AGENT_DIRS = {
-  claude: '.claude/skills',
-  trae: '.trae/skills',
-  cursor: '.cursor/skills',
   generic: '.agents/skills',
+  claude: '.claude/skills',
+  cursor: '.cursor/skills',
+  trae: '.trae/skills',
+  'trae-cn': '.trae-cn/skills',
 }
 
 const AGENT_MARKERS = {
-  claude: ['.claude', 'CLAUDE.md'],
-  trae: ['.trae'],
-  cursor: ['.cursor'],
   generic: ['.agents'],
+  claude: ['.claude', 'CLAUDE.md'],
+  cursor: ['.cursor'],
+  trae: ['.trae'],
+  'trae-cn': ['.trae-cn'],
 }
 
 export const AGENTS = Object.keys(AGENT_DIRS)

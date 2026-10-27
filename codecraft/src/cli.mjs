@@ -24,9 +24,9 @@ Options:
   --root <path>            Project root (default: cwd)
   --pack app|library|design-system|auto  Rule pack (default: auto)
   --config <path>          Config file (default: codecraft.config.json)
-  --agent auto|claude|trae|cursor|generic  Install target, comma-separated (default: auto)
+  --agent auto|generic|claude|cursor|trae|trae-cn  Install target, comma-separated (default: auto)
   --global                 Install into the home directory
-  --dest <path>            Explicit destination (relative to root / home)
+  --dest <path>            Explicit destination (relative to root / home), e.g. .trae-cn/skills
   --force                  Replace an existing codecraft skill directory
   --dry-run                Show the install plan without writing
   --no-gates               Skip gates in audit / plan
@@ -154,6 +154,11 @@ export function main(argv) {
   const findings = result.findings.map((finding) => ({ ...finding, severity }))
   const filtered = applyIgnores(findings, config.config.ignore ?? [])
   const activeFindings = filtered.findings
+  const warnings = []
+  if (result.files === 0 && result.findings.length === 0) {
+    warnings.push(`0 source files scanned under ${root}; pass --pack app|library or check --root`)
+    console.error(`codecraft: warning: ${warnings[0]}`)
+  }
   const gates = shouldRunGates(command, args)
     ? runGates(root, config.config.gates ?? [], { failFast: args.failFast })
     : []
@@ -170,6 +175,7 @@ export function main(argv) {
     findings: activeFindings.length,
     ignored: filtered.ignored.length,
     expired: filtered.expired.length,
+    warnings,
     plan: plan.length,
     gates: gates.length,
   }
@@ -207,6 +213,7 @@ export function main(argv) {
   const failed =
     activeFindings.some((finding) => finding.severity === 'error') ||
     gates.some((gate) => gate.exitCode !== 0)
+  if (warnings.length) return 2
   return failed ? 1 : 0
 }
 
@@ -281,11 +288,81 @@ function parseArgs(argv) {
   return args
 }
 
-function detectPack(root) {
-  if (isDir(path.join(root, 'apps')) || isDir(path.join(root, 'src', 'pages'))) return 'app'
+export function detectPack(root) {
+  if (isDir(path.join(root, 'apps'))) return 'app'
+  if (hasAppMarkers(root)) return 'app'
   if (isDir(path.join(root, 'packages'))) return 'library'
+  if (hasNestedApp(root)) return 'app'
+  if (isDir(path.join(root, 'src'))) return 'library'
   if (fs.existsSync(path.join(root, 'package.json'))) return 'library'
   return 'app'
+}
+
+const APP_DIR_MARKERS = ['src/pages', 'pages', 'app', 'src/app']
+const APP_FILE_MARKERS = [
+  'nuxt.config.js',
+  'nuxt.config.ts',
+  'nuxt.config.mjs',
+  'app.config.js',
+  'app.config.ts',
+  'src/app.config.js',
+  'src/app.config.ts',
+  'taro.config.js',
+  'taro.config.ts',
+]
+const APP_DEPS = ['nuxt', '@tarojs/taro', '@dcloudio/uni-app', 'uni-app', 'next']
+
+function hasAppMarkers(root) {
+  if (APP_DIR_MARKERS.some((dir) => isDir(path.join(root, dir)))) return true
+  if (APP_FILE_MARKERS.some((file) => isFile(path.join(root, file)))) return true
+  if (hasUniAppFiles(root)) return true
+  return hasAppDependency(root)
+}
+
+function hasNestedApp(root) {
+  let entries
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true })
+  } catch {
+    return false
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue
+    if (['node_modules', 'dist', 'build', 'target', '.git', '.nuxt', '.output', 'coverage'].includes(entry.name)) {
+      continue
+    }
+    const child = path.join(root, entry.name)
+    if (APP_DIR_MARKERS.some((dir) => isDir(path.join(child, dir)))) return true
+    if (APP_FILE_MARKERS.some((file) => isFile(path.join(child, file)))) return true
+    if (hasUniAppFiles(child)) return true
+    if (hasAppDependency(child)) return true
+  }
+  return false
+}
+
+function hasUniAppFiles(root) {
+  const atRoot = isFile(path.join(root, 'manifest.json')) && isFile(path.join(root, 'pages.json'))
+  const atSrc = isFile(path.join(root, 'src', 'manifest.json')) && isFile(path.join(root, 'src', 'pages.json'))
+  return atRoot || atSrc
+}
+
+function hasAppDependency(root) {
+  let manifest
+  try {
+    manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
+  } catch {
+    return false
+  }
+  const deps = { ...(manifest.dependencies ?? {}), ...(manifest.devDependencies ?? {}) }
+  return APP_DEPS.some((dep) => dep in deps)
+}
+
+function isFile(target) {
+  try {
+    return fs.statSync(target).isFile()
+  } catch {
+    return false
+  }
 }
 
 function fail(message) {
@@ -482,6 +559,7 @@ function header(meta) {
     `- Findings: ${meta.findings}`,
     `- Ignored: ${meta.ignored ?? 0}`,
     `- Expired exceptions: ${meta.expired ?? 0}`,
+    `- Warnings: ${meta.warnings?.length ?? 0}`,
     `- Gates: ${meta.gates}`,
     '',
   ]

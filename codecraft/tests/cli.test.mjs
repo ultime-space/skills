@@ -141,6 +141,23 @@ void test('cli: markdown output lists ignored findings', () => {
   }
 })
 
+void test('cli: warns and exits 2 when no source files are scanned', () => {
+  const root = tempRoot()
+  try {
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'empty' }))
+
+    const result = run(['check', '--root', root, '--format', 'json'])
+
+    assert.equal(result.status, 2)
+    assert.match(result.stderr, /0 source files scanned/)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.files, 0)
+    assert.equal(report.warnings.length, 1)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('cli: init --apply requires --name', () => {
   const root = tempRoot()
   try {

@@ -58,14 +58,18 @@ npx skills-npm setup
 npx @ultime/codecraft install
 ```
 
-自动检测当前项目的 agent，把 `SKILL.md`、`docs/`、`scenarios/`、`prompts/` 复制到 `.agents/skills/codecraft` 和对应 agent 目录（`.claude/skills`、`.trae/skills`、`.cursor/skills`）。
+自动检测当前项目的 agent，把 `SKILL.md`、`docs/`、`scenarios/`、`prompts/` 复制到 `.agents/skills/codecraft` 和对应 agent 目录（`.claude/skills`、`.cursor/skills`、`.trae/skills`、`.trae-cn/skills`）。不传 `--agent` 时只按检测结果安装，不优先任何一家。
 
 ```bash
-npx @ultime/codecraft install --agent claude          # 指定 agent，可逗号分隔
-npx @ultime/codecraft install --global --agent claude # 装到用户目录
-npx @ultime/codecraft install --dry-run               # 只看计划
-npx @ultime/codecraft install --force                 # 覆盖已有目录
+npx @ultime/codecraft install --agent generic          # 指定 agent，可逗号分隔
+npx @ultime/codecraft install --global --agent claude  # 装到用户目录
+npx @ultime/codecraft install --global --agent trae-cn # Trae CN 的全局目录
+npx @ultime/codecraft install --global --dest .trae-cn/skills  # 自定义目录
+npx @ultime/codecraft install --dry-run                # 只看计划
+npx @ultime/codecraft install --force                  # 覆盖已有目录
 ```
+
+可选 agent：`generic` / `claude` / `cursor` / `trae` / `trae-cn`；未知目录用 `--dest`。
 
 ### 方式 C：手动指针
 
@@ -264,9 +268,11 @@ ROADMAP.md    后续版本计划与交接说明
 ## FAQ
 
 - **静态检查误报怎么办？** 在 `codecraft.config.json` 的 `ignore` 里登记 `rule` + `file` + `reason`，必要时加 `expires`；不要直接删规则。
+- **`Files: 0` 是什么意思？** 没有扫到源文件，命令会输出警告并以 2 退出；用 `--pack app|library` 指定正确类型，或检查 `--root`。
+- **Trae CN 装到哪？** 用 `--agent trae-cn`（`~/.trae-cn/skills`）；未知目录用 `--dest`。
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
-- **monorepo 为什么被判成 library？** 有 `packages/` 或根 `package.json` 即按 library；可用 `--pack` 显式覆盖。
+- **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app 依赖或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
 - **支持哪些文件？** 只扫 JS/TS 相关扩展名与 `package.json`；其它语言不覆盖。
 
 ## 边界
