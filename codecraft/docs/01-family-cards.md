@@ -1,7 +1,10 @@
-# 代码族卡 v1（11 个环节）
+# 代码族卡 v1（11 个环节 · JS/TS）
 
 > 2026-10-27 · v1 稳定版。
 > 用途：把《代码宪法 v1》落到每个代码族（环节）；不同族可以不同形状，族内必须同形。
+> 形状与示例原生优先：TS + 原生 Web API（DOM / fetch / CustomEvent）为默认；框架示例只给 Vue 3 / React。
+> 其它框架不预建，先在 §12 扩展位登记。
+> 前端专用族：Page / Component；Node 后端只复用结构与边界类族。
 > 术语：English（中文）。
 
 ## 0. 卡模板
@@ -10,11 +13,29 @@
 
 > 族是「环节」，不是必须模块；项目没有这个职责时，这一族可以不存在。
 
-## 1. Page（页面）
+## 0.1 适用范围
+
+| 族 | 前端 | Node 后端 | 备注 |
+|---|---|---|---|
+| Page | ✅ | ❌ | 后端无对应物，不要硬造 |
+| Component | ✅ | ❌ | 同上 |
+| Behavior | ✅ | ⚠️ | 对应 domain service；core 不依赖框架仍成立 |
+| Transport | ✅ | ✅ | 后端是 client / adapter |
+| Wrapper | ✅ | ✅ | 防腐层，规则一致 |
+| Type | ✅ | ✅ | 联合类型等验收项按语言替换 |
+| Package | ✅ | ✅ | 包边界、版本、public API 规则通用 |
+| State | ✅ | ⚠️ | 状态机 / 领域状态可用；computed 换成同义派生 |
+| Util | ✅ | ✅ | 纯函数，规则一致 |
+| Script | ✅ | ✅ | 脚本通用 |
+| Test | ✅ | ✅ | 分层测试策略通用 |
+
+> ✅ 直接用；⚠️ 思路可用、形状要按项目重写；❌ 不适用。
+
+## 1. Page（页面）· 前端专用
 
 - **职责**：组合根；路由入口；只做编排、布局、状态展示；不承载业务规则。
-- **形状**：`pages/<domain>/index.vue` + `index.config.ts`；页面级类 `page-*`；页面骨架固定为顶栏 / 内容 / 底栏 / 弹层四插槽（组件名按项目命名）。
-- **命名**：目录 kebab-case；组件 PascalCase；页面级类 `page-*`（标作用域，不做装饰）。
+- **形状**：`pages/<domain>/index.html` + `index.ts`（原生）；`index.vue`（Vue）；`index.tsx`（React）。页面级类 `page-*`；页面骨架固定为顶栏 / 内容 / 底栏 / 弹层四插槽（组件名按项目命名）。
+- **命名**：目录 kebab-case；页面级类 `page-*`（标作用域，不做装饰）；组件名原生用 kebab-case 自定义元素，Vue / React 用 PascalCase。
 - **契约**：接收路由参数；调用 Behavior Layer（行为层）；渲染 loading / empty / error / success；不直接 import api。
 - **状态与错误**：页面状态由 Behavior Layer 提供；页面只持有纯 UI 状态（弹窗、tab）；错误必须可见。
 - **测试**：集成 / 视觉回归；纯 UI 不写单元测试。
@@ -22,22 +43,22 @@
 - **反例**：页面直接 import api；页面里写请求与转换；多个互斥布尔。
 - **验收**：lint「pages 不 import `@/api`」；路由 / 页面清单；视觉回归。
 
-## 2. Behavior Layer（行为层）
+## 2. Behavior Layer（行为层）· 前端为主
 
 - **职责**：页面无关的行为；状态转移、校验、编排；不放 UI、不放平台细节。
-- **形状**：Vue3 `composables/<domain>/<verb>.ts`；React `hooks/<domain>/<verb>.ts`；需要跨框架时拆 `behavior/<domain>/core.ts` + `useXxx.ts`。
-- **命名**：`useXxx` 适配器；`xxxCore` / `xxxBehavior` 核心；一个文件一个动词；同族一种前缀。
+- **形状**：默认 `behavior/<domain>/<verb>.ts`（纯 TS，不依赖框架）；需要框架绑定时再加薄适配 `useXxx.ts`（Vue composable / React hook）。
+- **命名**：`xxxCore` / `xxxBehavior` 核心；`useXxx` 适配器；一个文件一个动词；同族一种前缀。
 - **契约**：入参 / 选项明确；返回状态 + 动作；不藏模块级单例；core 不 import 框架。
-- **状态与错误**：状态用联合类型；派生用 computed / selector；预期失败用 Result / 域变体。
+- **状态与错误**：状态用联合类型；派生用纯函数（Vue `computed` / React selector）；预期失败用 Result / 域变体。
 - **测试**：core 属性测试；适配器集成测试。
-- **正例**：`useList` / `refreshList(state, fetchPage)` / `useFilterList`。
-- **反例**：composable 直接 toast / 跳转；模块级可变状态；为一次性页面逻辑硬抽 composable。
-- **验收**：依赖规则「behavior core 不 import vue / react / uni / taro」；状态转移测试；`any` lint。
+- **正例**：`listBehavior` + `useList`（适配层）；`refreshList(state, fetchPage)`。
+- **反例**：适配层直接 toast / 跳转；模块级可变状态；为一次性页面逻辑硬抽 composable。
+- **验收**：依赖规则「behavior core 不 import vue / react 或其它框架运行时」；状态转移测试；`any` lint。
 
 ## 3. Transport（传输层）
 
 - **职责**：网络、HTTP、取消；原样透传；不解释业务 code。401 / 日志是可选环节；外部契约转换在 Wrapper（包装层）。
-- **形状**：`api/` 或 `request/`；`adapter/` / `interceptors/` / `modules/`；`pending/` / `console/` 是可选环节，不是必须目录。
+- **形状**：`api/` 或 `request/`；`adapter/` / `interceptors/` / `modules/`；默认用原生 `fetch` + `AbortController`，框架封装只作可选实现；`pending/` / `console/` 是可选环节，不是必须目录。
 - **命名**：API 文件 snake_case 且与 URL 同名；一 URL 一文件。新代码推荐 `api/<domain>/<action>.ts` + `fetchXxx` / `getXxx`；旧项目可保留 `api_` 前缀（防重名、可搜索、标层）；同族不要混用。
 - **契约**：返回 raw response 或传输层结果；不产出域类型；错误只做传输层归一。
 - **状态与错误**：无 UI 状态；401 单一收口；超时 / 取消 / 网络错误；不弹业务 toast。
@@ -99,12 +120,12 @@
 - **反例**：`utils` 包；工具包 import 应用；包内混入业务页面。
 - **验收**：`boundaries`；包 build / test；`exports` 检查；兼容矩阵。
 
-## 7. Component（组件）
+## 7. Component（组件）· 前端专用
 
 - **职责**：UI 展示与交互；只消费 props / emit；不取数、不放业务规则；可复用、可组合。
-- **形状**：目录式 `components/<Name>/index.vue` + `index.scss`；全局原语放 `app-ui/`；页面私有组件放页面目录。
-- **命名**：PascalCase 目录 / 组件；`app-` 用于全局原语；角色后缀 `XxxCard / XxxList / XxxForm / XxxModal / XxxPage`；类型 `XxxProps / XxxEmits`。
-- **契约**：props 下行、emit 上行；不 import api / behavior；不读业务 store（仅全局身份 / 权限例外）；样式 scoped / BEM；可访问性（键盘 / ARIA / 对比度）。
+- **形状**：`components/<Name>/index.html` + `index.css`（+ 可选 `index.ts`）；Vue `index.vue`；React `index.tsx`；全局原语放 `app-ui/`；页面私有组件放页面目录。
+- **命名**：原生自定义元素 kebab-case；Vue / React 组件 PascalCase；`app-` 用于全局原语；角色后缀 `XxxCard / XxxList / XxxForm / XxxModal / XxxPage`；类型 `XxxProps / XxxEmits`（Vue / React）。
+- **契约**：attributes / properties 下行、`CustomEvent` 上行（Vue / React 对应 props / emit）；不 import api / behavior；不读业务 store（仅全局身份 / 权限例外）；样式 scoped / BEM；可访问性（键盘 / ARIA / 对比度）。
 - **状态与错误**：只持有纯 UI 状态（open / hover / focus）；loading / empty / error 由 props 传入；不吞错。
 - **测试**：示例页 / Storybook；交互测试；视觉回归；a11y。
 - **正例**：页面骨架组件、`XxxCard`、`XxxGrid`。
@@ -114,12 +135,12 @@
 ## 8. State（状态）
 
 - **职责**：领域状态建模；状态是数据，不是布尔堆；转移通过事件 / 动作。
-- **形状**：`types/<domain>` 的联合类型；`behavior/<domain>/core.ts` 的 reducer / state machine；store 只存数据 + setter。
+- **形状**：默认纯 TS：`types/<domain>` 的联合类型 + `behavior/<domain>/core.ts` 的 reducer / state machine；store 只存数据 + setter，框架只做订阅与派生。
 - **命名**：`XxxState` / `XxxStatus` / `XxxEvent` / `XxxAction`；通用 `AsyncState / ListState` 放 `types/common`。
-- **契约**：状态用联合类型；非法状态不可表示；`success` 有 data，`error` 有 error；派生用 selector / computed。
+- **契约**：状态用联合类型；非法状态不可表示；`success` 有 data，`error` 有 error；派生用纯函数（Vue `computed` / React selector）。
 - **错误**：错误分类；预期失败用 Result / 域变体；空 catch 为零。
 - **测试**：状态转移表 / 属性测试；关键流程。
-- **正例**：`useList` 的 status；auth machine；form state。
+- **正例**：`listBehavior` 的 status；auth machine；form state。
 - **反例**：`loading / error / data` 三个布尔；store 放请求逻辑；派生状态另存一份。
 - **验收**：`assertNever`；`satisfies Record<Union, T>`；状态转移测试。
 
@@ -150,7 +171,7 @@
 ## 11. Test（测试）
 
 - **职责**：保护契约与关键路径；不是追覆盖率。
-- **形状**：`tests/` 或 `__tests__/`；fixture 单独；命名 `<unit>.test.ts`。
+- **形状**：`tests/` 或 `__tests__/`；fixture 单独；命名 `<unit>.test.ts`；默认 `node:test`，组件交互 / 视觉测试再按项目选工具。
 - **命名**：`describe('<unit> · <behavior>')`、`it('does X when Y')`；中英文随项目，保持一致。
 - **契约**：
   - Pure core → 属性测试 / 单元测试；
@@ -166,4 +187,6 @@
 
 ## 12. 扩展位
 
-新的族先在这里登记，不预建结构。
+当前收录的框架示例：Vue 3、React；其它框架不预建目录与示例，先在这里登记。
+
+登记时补四项：入口形状、状态派生方式、组件契约（props / events）、测试工具。

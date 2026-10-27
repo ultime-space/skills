@@ -2,15 +2,16 @@
 
 > 2026-10-27 · v1 稳定版。
 > 用途：所有模型 / agent 生成或修改代码前先读；与《代码宪法 v1》《代码族卡 v1》配套。
+> 范围：JS/TS 项目，默认前端。示例原生优先（TS / Web API），框架只给 Vue 3 / React；Node 后端只套用结构与安全规则，Page / Component 等前端族不适用。
 > 术语：English（中文）。
 
 ## 1. 先读
 
-1. 《代码宪法 v1》
-2. 相关《代码族卡 v1》
-3. 设计架构时：`06-architecture.md`（档位 / 七步法 / 边界 / ADR）
-4. 需要选型时：`05-patterns.md`（按力选，不按名字选）
-5. 项目覆盖：`AGENTS.md` / `rules/` / `README`
+1. 项目覆盖：`AGENTS.md` / `rules/` / `README`
+2. 《代码宪法 v1》
+3. 设计或评审架构：`06-architecture.md`（档位 / 七步法 / 边界 / ADR）
+4. 只读相关《代码族卡 v1》（前端项目才读 Page / Component）
+5. 需要选型时：`05-patterns.md`（按力选，不按名字选）
 6. 相关契约 / 类型 / 测试 / 示例
 
 ## 2. 禁止
@@ -57,7 +58,7 @@
 
 ## 6. Review Checklist（评审清单）
 
-- [ ] 族形正确（Page / Behavior / Transport）
+- [ ] 族形正确（Page / Behavior / Transport；Node 后端跳过 Page / Component）
 - [ ] 依赖向内
 - [ ] 状态穷尽
 - [ ] 错误可见

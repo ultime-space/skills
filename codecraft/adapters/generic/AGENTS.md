@@ -1,5 +1,7 @@
 # Codecraft Adapter（通用）
 
+> 方向：JS/TS（默认前端）。Node 后端只复用模块边界与依赖规则；Page / Component 不适用。
+
 当任务涉及写代码、重构、评审、审计或脚手架时：
 
 1. 读项目 `AGENTS.md` / `rules/`。

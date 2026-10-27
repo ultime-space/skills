@@ -1,6 +1,7 @@
 # AI 使用提示词（Prompts）
 
 > 用途：给使用者一份可以直接复制的说法，让 AI 按 Codecraft 的模式工作。
+> 范围：提示词按 JS/TS 项目写；Node 后端只复用审计 / 架构 / 评审类提示词。
 > 读法：先看「最小开场」，再按场景复制；提示词不替代规则，规则正文仍在 `docs/`。
 > 关系：入口见 `adapters/`；输出格式见 `prompts/output.md`；约束见 `02-ai-contract.md`。
 

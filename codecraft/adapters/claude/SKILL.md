@@ -1,9 +1,11 @@
 ---
 name: codecraft
-description: 语言无关的代码规范（Codecraft）。用于项目代码审计与分析、架构设计、重构评审、代码规范检查和脚手架。Language-agnostic code standard for auditing, reviewing, designing, and scaffolding code.
+description: 面向 JS/TS 的代码规范与架构设计（Codecraft）。默认 Web 前端，Node 后端可复用结构规则；用于审计、架构设计、重构评审、规范检查与脚手架。
 ---
 
 # Codecraft（代码手艺）
+
+> 方向：JS/TS（默认前端）。后端只复用结构规则；Page / Component 等前端族不套用到后端。
 
 ## 先读
 

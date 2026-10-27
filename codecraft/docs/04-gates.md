@@ -1,6 +1,7 @@
 # Gates（两层门禁）
 
 > Codecraft 只内置“规范性通用门禁”；业务门禁由项目实现，Codecraft 负责编排与汇总。
+> 示例命令按 JS/TS 生态（`pnpm`）书写；gate 契约本身与语言无关，Node 项目同样适用。
 
 ## 1. 两层模型
 
@@ -30,12 +31,16 @@
   "gates": [
     { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
     { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
+  ],
+  "ignore": [
+    { "rule": "A17", "file": "src/pages/legacy/**", "reason": "legacy page", "expires": "2026-12-31" }
   ]
 }
 ```
 
 - `pack`：`app` / `library` / `design-system` / `auto`；CLI `--pack` 优先。
 - `gates`：数组；每项必须有 `run`，可选 `name` / `timeoutMs`。
+- `ignore`：例外登记（A12）；`rule` / `file` / `reason` 必填，`expires` 可选。过期条目不生效，报告中单列；安全规则 `A21` 不可豁免。
 - 配置文件默认 `codecraft.config.json`；可用 `--config` 指定。
 
 ## 4. 按项目类型选门禁

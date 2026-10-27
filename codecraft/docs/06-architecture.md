@@ -2,6 +2,7 @@
 
 > 用途：系统级 / 模块级 / 演进级的决策方法；代码级模式见 `05-patterns.md`。
 > 原则：**方法先于模式；约束先于图；边界先于抽象。**
+> 范围：方法本身与语言无关，可用于 JS/TS 前端与 Node 后端；文中目录与框架取舍以 JS/TS 为准。
 > 术语：English（中文）。
 
 ## 0. 先分开六个词
@@ -104,6 +105,7 @@ src/
 ```
 
 - 依赖只能向下；同层不互相 import；跨模块只走 public API。
+- 结构默认与框架无关：原生能表达的先写原生，Vue / React 只作页面与组件的落点。
 - `shared/api` + adapter + interceptors 是承重墙，不塞进 feature。
 - server state 与 client state 分开：server state 用 query 层；client state 用 store / 状态机。
 - 测试分层：纯 core 单测 → feature 行为测试 → 页面 smoke → API 契约测试。
