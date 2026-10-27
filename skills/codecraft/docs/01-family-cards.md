@@ -57,7 +57,7 @@
 
 ## 3. Transport（传输层）
 
-- **职责**：网络、HTTP、取消；原样透传；不解释业务 code。401 / 日志是可选环节；外部契约转换在 Wrapper（包装层）。
+- **职责**：网络、HTTP、取消；原样透传；不解释业务 code。401 / 日志是可选环节；外部契约转换在 Wrapper。
 - **形状**：`api/` 或 `request/`；`adapter/` / `interceptors/` / `modules/`；默认用原生 `fetch` + `AbortController`，框架封装只作可选实现；`pending/` / `console/` 是可选环节，不是必须目录。
 - **命名**：API 文件 snake_case 且与 URL 同名；一 URL 一文件。新代码推荐 `api/<domain>/<action>.ts` + `fetchXxx` / `getXxx`；旧项目可保留 `api_` 前缀（防重名、可搜索、标层）；同族不要混用。
 - **契约**：返回 raw response 或传输层结果；不产出域类型；错误只做传输层归一。
@@ -69,7 +69,7 @@
 - **反例**：传输层把业务 code 解析成域变体；transport import store / UI；全局单例藏副作用。
 - **验收**：lint「transport 不 import UI / store」；401 / pending 测试；契约测试。
 
-## 4. Wrapper（包装层）
+## 4. Wrapper
 
 - **职责**：外部契约适配；把后端 / 第三方的类型、字段、code 转成内部类型 / 错误；不放业务规则、不放 UI。
 - **形状**：`adapters/<source>/` 或 `api/<domain>/<source>.ts`；一个外部来源一个适配器。

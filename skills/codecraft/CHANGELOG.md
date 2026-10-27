@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0 - 2026-10-27
+
+- 新增代码架构分析报告场景与模板：`scenarios/architecture-report.md`、`templates/architecture-report.md`。
+- README 增加「适用场景」与不适用清单；明确 Codecraft 只做代码架构，不含业务架构。
+- `docs/06-architecture.md` 收口为「代码架构设计方法」；`prompts/output.md` 增加架构报告输出指引。
+- 统一术语写法：AI 面向文档英文裸写，`README` / 对外报告首次出现标注中文，名字类不附中文；新增 `docs/09-glossary.md` 与 `tests/docs.test.mjs`。
+
 ## 1.5.0 - 2026-10-27
 
 - 新增 `--exclude <glob>`（可重复）：扫描级排除，用于 fixture / 第三方目录；报告头与 JSON 记录 exclude 模式。

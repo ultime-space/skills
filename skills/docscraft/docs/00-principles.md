@@ -9,7 +9,7 @@
 
 - 指针：路径 / 链接 / 一句定位
 - 差异：本项目与上游不同之处
-- 决策：为什么选这个方案（放 ADR）
+- 决策：ADR 记录为什么选这个方案
 
 判断方法：如果同一个事实可以在两处被修改，它就已经漂移了。
 
@@ -107,6 +107,12 @@ rg -n "pattern" src
 - 放本地目录（如 `.local/notes/`），不进 git
 - 结论进入 `docs/` / `rules/` 后，本地只留出处与推导
 - 不把客户名、内部路径、个人工具路径带进公开文档
+
+## 11. 术语与命名写法
+
+- AI 面向文档（`docs/` / `scenarios/` / `prompts/` / `templates/`）英文裸写；`README`、对外报告首次出现用 `English（中文）`。
+- 名字类不附中文：产品 / 文件 / 命令 / 语言 / 框架 / 标准名 / 代码标识（如 Docscraft、README.md、npm、JS/TS、JSON）。
+- 术语表见 `07-glossary.md`；`tests/terms.test.mjs` 检查术语表与 README 首次出现，漏加即失败。
 
 ## 每个文档先回答三问
 

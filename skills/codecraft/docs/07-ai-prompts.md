@@ -89,7 +89,7 @@ npx skills-npm setup
 
 ```text
 使用 Codecraft（<路径>/codecraft）。
-模式：Review（只评审）或 Apply（执行）。
+模式：Review（只评审）或 Apply。
 范围：<diff / 文件 / 模块>。
 任务：按 scenarios/refactor-review.md 评审。
 要求：先列问题（边界 / 状态 / 错误 / 命名 / 注释 / 生成物），再给最小改动计划；能不改就不改；Apply 后跑门禁。
@@ -146,6 +146,16 @@ npx @ultime/codecraft check --pack design-system --root .
 范围：packages/。
 任务：按 design-system pack 审计包依赖、生成物标记、密钥和公开文档路径。
 要求：不要改文件；按 A2 / A11 / A21 归类；给最小修复计划。
+```
+
+### 3.9 代码架构分析报告
+
+```text
+使用 Codecraft（<路径>/codecraft）。
+模式：Audit（老项目）/ Plan（新项目），只读。
+范围：<仓库 / 目录 / 包>。
+任务：按 scenarios/architecture-report.md 出一份代码架构分析报告。
+要求：按 templates/architecture-report.md 的结构；只做代码架构，不做业务架构；先不画图，用表格 / 列表；每条结论给文件:行号或命令；A17 / A21 写明盲区；0 findings 只写“静态未命中”；未知项单列。
 ```
 
 ## 4. 说法上的要点

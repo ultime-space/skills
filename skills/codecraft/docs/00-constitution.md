@@ -96,7 +96,7 @@
 | 内部查询 | `UserQuery` | `UserSearchModel` |
 | 内部输入 | `UserInput` | `UserSetModel` |
 | 内部视图模型 | `UserView` | 无 |
-| 外部类型（后端 / 第三方） | 只存在于 `external/` 或 Wrapper（包装层）；不参与内部命名 | 生成物原名 |
+| 外部类型（后端 / 第三方） | 只存在于 `external/` 或 Wrapper；不参与内部命名 | 生成物原名 |
 | UI 原语 | `app-` | 同左 |
 | 页面类 | `page-*` | 同左 |
 | 表 | `statusMap` / `apiMap` | 同左 |
@@ -160,7 +160,7 @@
 ### 3.2 内外边界（Inside/Outside Boundary）
 
 - 前端规范只管**内部代码**；后端 API、第三方 API 的契约风格不在规范内。
-- 外部内容只在 **Wrapper（包装层）** 出现；Wrapper 负责把外部类型 / 字段 / code 转成内部类型 / 错误。
+- 外部内容只在 **Wrapper** 出现；Wrapper 负责把外部类型 / 字段 / code 转成内部类型 / 错误。
 - 内部代码不 import 外部类型；Wrapper 是唯一入口。
 - Wrapper 可自由适配，但必须：类型安全、错误归一、不泄漏外部字段、可插拔。
 - 换后端 / 第三方 = 换 Wrapper，不改内部。
@@ -298,7 +298,7 @@ repo/
 
 ## 5. 使用方式
 
-- **人**：review 时按 A1–A21 检查；新规则先写 ADR（Architecture Decision Record，架构决策记录）。
+- **人**：review 时按 A1–A21 检查；新规则先写 ADR。
 - **AI**：先读本宪法 + 相关《代码族卡》+ 项目覆盖；输出按 A15，安全按 A21。
 - **修改**：一次变更一个状态；契约类改动全仓原子提交。
 

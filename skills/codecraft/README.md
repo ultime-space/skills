@@ -1,6 +1,6 @@
-# Codecraft（代码手艺）
+# Codecraft
 
-> 面向 JS/TS 的代码规范与架构设计，作为可安装的 skill 包。
+> 面向 JS/TS 的代码规范与代码架构设计（不含业务架构），作为可安装的 skill 包。
 > 默认 Web 前端；示例原生优先（TS / 原生 Web API），框架只给 Vue 3 / React；Node 后端只复用结构规则；其它语言不在范围。
 
 - 版本：见 [VERSION](./VERSION)
@@ -16,18 +16,41 @@
 | 一套可执行的代码宪法（A1–A21）与代码族卡 | 业务组件库 |
 | 面向 AI 的固定入口与输出格式 | 某个框架的编码风格指南 |
 | 通用规则的静态检查 + 项目门禁编排 | 替代 typecheck / 单测 / e2e |
+| 代码架构分析与报告 | 业务架构 / 角色 / 流程 / 领域建模 |
 
 规则正文只在 [`docs/`](./docs/)；其它位置只放入口与指针，避免第二份真源。
 
 > 第一次用：直接看 [安装](#安装) 和 [第一次使用](#第一次使用)。
+
+## 适用场景
+
+按「新建 / 接手 / 演进 / 日常」分组，选一个入口即可：
+
+| 分组 | 场景 | 典型任务 | 产出 | 模式 |
+|---|---|---|---|---|
+| 新建 | 架构设计 | 定档位、边界、依赖规则 | 目标架构 / ADR（架构决策记录） | Plan（计划） |
+| 新建 | 脚手架 | app / library 骨架 | 目录、配置、门禁 | Apply（执行） |
+| 接手 | 代码架构报告 | 把现有结构讲清楚 | 架构分析文档 | Audit（审计） |
+| 接手 | 老项目审计 | A1–A21 体检 | 报告、差距、升级计划 | Audit |
+| 接手 | 重构 / 迁移评审 | 现状 → 目标、回退点 | 迁移计划 | Plan |
+| 演进 | 包 / monorepo（单仓多包）边界 | 拆包、依赖方向修正 | 边界计划 | Plan |
+| 演进 | 生成物 / 契约链 | 单一生成链、diff 门禁 | 治理方案 | Plan |
+| 演进 | 错误 / 状态模型 | Result、状态穷尽、失败可见 | 重构方案 | Plan |
+| 日常 | PR / 增量审计 | 只看变更范围 | findings | Audit |
+| 日常 | 规范落地 | 宪法 → 项目 `rules/` + 门禁 | 规则与门禁映射 | Apply |
+| 日常 | Design System（设计系统） / 组件库 | 包边界、公共 API、文档自包含 | 审计报告 | Audit |
+| 日常 | 只出报告 | 只读汇报 | 报告 | Audit |
+
+不适用：业务能力地图、角色与业务流程、领域建模、UI / 交互设计、运行时性能、渗透测试、数据库调优。
 
 ## 范围与分层
 
 | 项 | 内容 |
 |---|---|
 | 覆盖 | JS/TS 项目；Web 前端为默认场景（示例原生优先，框架仅 Vue 3 / React） |
+| 代码架构 | 系统 / 容器 / 模块 / 组件边界、依赖方向、关键链路、生成物、演进 |
 | 可复用 | Node 后端：模块边界、依赖方向、内外分离、生成物、门禁与文档规则 |
-| 不适用 | Page / Component 等前端族；数据库、缓存、并发、事务等后端专项 |
+| 不适用 | 业务架构、角色 / 流程 / 领域建模；Page / Component 等前端族；数据库、缓存、并发、事务等后端专项 |
 | 不在范围 | Java / Go / Python 等其它语言；后端专项另立体系 |
 
 内容分三层，按需取用：
@@ -79,9 +102,16 @@ npx skills-npm setup
 用 Codecraft 审计本项目，只读，不改文件。
 ```
 
+需要一份能读的代码架构文档：
+
+```text
+用 Codecraft 按 scenarios/architecture-report.md 出一份代码架构分析报告。
+只读，不改文件；不做业务架构，先不画图。
+```
+
 只启用 skill、不说 Codecraft 时，agent 可能按普通项目分析处理，不保证走 Audit 模式。带上名字最稳。
 
-更多场景（只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
+更多场景（代码架构报告、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
 
 需要本地检查时再装 CLI：
 
@@ -165,7 +195,7 @@ codecraft init --root . --name demo --apply      # 写盘
 
 ### 输出
 
-- 默认 Markdown：头部元信息 + Findings 表 + Gates 表。
+- 默认 Markdown：头部元信息 + Findings 表 + Gates（门禁）表。
 - `--format json`：包含 `version` / `mode` / `pack` / `rules` / `exclude` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
 - `--format sarif`：SARIF 2.1.0，可直接上传 GitHub Code Scanning。
 - `--changed` / `--since` 只过滤 findings，底层仍做全量扫描；JSON 的 `scope` 为 `changed`，`changed` 为变更文件数。
@@ -230,13 +260,13 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 
 ```text
 SKILL.md      标准 agent skill 入口（skills add / skills-npm 使用）
-docs/         宪法、族卡、AI 契约、审计契约、风格总图、模式、架构、AI 提示词、门禁
-scenarios/    新项目 / 旧项目审计 / 只出报告 / 重构评审
+docs/         宪法、族卡、AI 契约、审计契约、风格总图、模式、架构、AI 提示词、门禁、术语表
+scenarios/    新项目 / 旧项目审计 / 代码架构报告 / 只出报告 / 重构评审
 adapters/     generic 手动指针（其它 agent 统一指向 SKILL.md）
 prompts/      输出格式
 src/ + bin/   CLI（check / audit / plan / init）
 tests/        node:test 用例
-templates/    init --apply 的 app / library 骨架
+templates/    init --apply 的 app / library 骨架 + 架构报告模板
 evals/        CLI eval fixtures + golden tasks（人工回归）
 ```
 

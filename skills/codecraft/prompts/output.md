@@ -24,6 +24,10 @@
 ## 下一步
 ```
 
+## 架构报告
+
+代码架构分析报告按 [`../templates/architecture-report.md`](../templates/architecture-report.md) 输出；默认不画图，用表格 / 列表表达结构；证据、局限与 `0 findings` 口径同 Audit。
+
 ## 规则
 
 - A1–A21 全部出现；不适用写 `na` 并说明原因。

@@ -46,7 +46,8 @@ docscraft/
 │   ├── 03-ai-context.md
 │   ├── 04-drift-guards.md
 │   ├── 05-rule-types.md
-│   └── 06-adr.md
+│   ├── 06-adr.md
+│   └── 07-glossary.md
 ├── scenarios/
 │   ├── audit-docs.md
 │   ├── reorganize-docs.md
@@ -58,7 +59,7 @@ docscraft/
 │   ├── rules.md
 │   └── adr.md
 ├── evals/golden-tasks.md
-├── tests/structure.test.mjs
+├── tests/                 结构与术语测试
 ├── package.json
 ├── VERSION
 └── CHANGELOG.md
@@ -76,7 +77,7 @@ npm pack --dry-run    # 检查发布内容
 ## 三条底线
 
 1. **单一真源**：一条事实只留一份正文；其它地方只放指针。
-2. **读者分层**：README 给人，AGENTS 给 agent，rules 给细则，docs 给交付，ADR 给决策。
+2. **读者分层**：README 给人，AGENTS 给 agent，rules 给细则，docs 给交付，ADR（架构决策记录）给决策。
 3. **可验证**：能用命令 / 链接 / 生成物 / 示例验证的，不靠记忆。
 
 ## 参考与方法来源
@@ -85,11 +86,11 @@ Docscraft 是内部方法整理，不复制外部正文。设计时对照过：
 
 - Diátaxis（文档按用户需求分类）
 - Write the Docs · Docs as Code（文档同仓、同评审、自动化检查）
-- Kubernetes 文档内容指南（canonical link、反双份正文）
+- Kubernetes 文档内容指南：canonical link（规范链接）、反双份正文
 - ADR（决策与理由分离）
 - AGENTS.md / Agent Skills（人机入口分离、渐进披露）
 - GitHub Spec Kit（规格 → 计划 → 任务 → 实现 → 收敛）
-- Anthropic Context Engineering / Claude Code Best Practices（上下文有限、先探索再计划、给验证手段）
+- Anthropic Context Engineering（上下文工程） / Claude Code Best Practices（上下文有限、先探索再计划、给验证手段）
 - Vale / lychee（术语与死链检查）
 
 只借机制，不复制文本、目录或示例。

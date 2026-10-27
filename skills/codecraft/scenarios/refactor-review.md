@@ -6,7 +6,7 @@
 
 ## 模式
 
-Apply（执行）或 Review（只评审）。
+Apply 或 Review（只评审）。
 
 ## 步骤
 

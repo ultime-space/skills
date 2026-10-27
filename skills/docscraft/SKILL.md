@@ -3,7 +3,7 @@ name: docscraft
 description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraft）。用于审计文档分层、整理 README / AGENTS / rules / docs、写 ADR、检查文档漂移与规则过期；不写代码架构。Documentation organization and AI context governance for JS/TS repositories.
 ---
 
-# Docscraft（文档手艺）
+# Docscraft
 
 > 方向：JS/TS 仓库，默认前端 / Node；文档分层与规则治理不绑定框架，其它技术栈可复用结构与判据。
 > 定位：让文档成为可维护的真源，而不是 AI 的第二次猜测。
@@ -32,16 +32,16 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 
 1. 项目 `README.md`、`AGENTS.md`、各端 `rules/`
 2. `docs/00-principles.md`
-3. 按任务读 `docs/01`–`06`
+3. 按任务读 `docs/01`–`07`；术语写法见 `docs/07-glossary.md`（AI 文档英文裸写；`README` / 对外报告首次出现标注中文）
 4. 相关 `scenarios/`
 5. 项目现有 `docs/` 与 ADR
 6. 输出按 `prompts/output.md`
 
 ## 模式
 
-- **Audit（审计）**：只读；找重复真源、入口缺失、规则过期、链接与事实漂移。
-- **Plan（计划）**：只读；给迁移 / 合并 / 拆分方案与回滚点。
-- **Apply（执行）**：改文档；每次只动一个主题，改完跑检查。
+- **Audit**：只读；找重复真源、入口缺失、规则过期、链接与事实漂移。
+- **Plan**：只读；给迁移 / 合并 / 拆分方案与回滚点。
+- **Apply**：改文档；每次只动一个主题，改完跑检查。
 
 ## 工作流
 

@@ -3,8 +3,8 @@
 - 状态：proposed | accepted | superseded | deprecated
 - 日期：YYYY-MM-DD
 - Owner：<人 / 角色>
-- 取代：ADR-0000（可选）
-- 被取代：ADR-0003（可选）
+- 取代：`ADR-0000`（可选）
+- 被取代：`ADR-0003`（可选）
 
 ## 背景
 

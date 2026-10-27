@@ -39,7 +39,7 @@ npx skills add ultime-space/skills --skill='*' -g
 
 | Skill | 说明 | 入口 |
 |---|---|---|
-| **Codecraft** | 面向 JS/TS 的代码规范与架构设计（前端默认）：审计、计划、架构、脚手架与门禁编排 | [README](./skills/codecraft/README.md) · [SKILL.md](./skills/codecraft/SKILL.md) · [VERSION](./skills/codecraft/VERSION) |
+| **Codecraft** | 面向 JS/TS 的代码规范与代码架构设计（不含业务架构）：审计、架构报告、代码架构设计、脚手架与门禁编排 | [README](./skills/codecraft/README.md) · [SKILL.md](./skills/codecraft/SKILL.md) · [VERSION](./skills/codecraft/VERSION) |
 | **Docscraft** | 文档组织与 AI 上下文治理：分层、单一真源、规则治理、ADR、文档漂移检查 | [README](./skills/docscraft/README.md) · [SKILL.md](./skills/docscraft/SKILL.md) · [VERSION](./skills/docscraft/VERSION) |
 
 ---
@@ -86,17 +86,17 @@ skills/
 └── skills/
     ├── codecraft/       代码规范与架构
     │   ├── SKILL.md     agent skill 标准入口
-    │   ├── docs/        宪法、族卡、AI 契约、风格、模式、架构、门禁
-    │   ├── scenarios/   新项目 / 旧项目审计 / 只出报告 / 重构评审
+    │   ├── docs/        宪法、族卡、AI 契约、审计契约、风格、模式、架构、门禁、术语表
+    │   ├── scenarios/   新项目 / 旧项目审计 / 代码架构报告 / 只出报告 / 重构评审
     │   ├── adapters/    generic 手动指针（其它 agent 统一指向 SKILL.md）
     │   ├── prompts/     输出格式
     │   ├── src/ + bin/  CLI（check / audit / plan / init）
-    │   ├── templates/   init --apply 的骨架
+    │   ├── templates/   init --apply 的骨架 + 架构报告模板
     │   ├── tests/       node:test 用例
     │   └── evals/       CLI eval fixtures + golden tasks（人工回归）
     └── docscraft/       文档组织与 AI 上下文治理
         ├── SKILL.md
-        ├── docs/        原则、分层、类型、AI 上下文、防漂移、规则治理、ADR
+        ├── docs/        原则、分层、类型、AI 上下文、防漂移、规则治理、ADR、术语表
         ├── scenarios/   文档审计 / 重整 / 写 ADR / 复查规则
         ├── prompts/     输出格式
         ├── templates/   AGENTS / rules / ADR

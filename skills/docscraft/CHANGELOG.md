@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2026-10-27
+
+- 统一术语写法：AI 面向文档英文裸写，`README` / 对外报告首次出现标注中文；新增 `docs/07-glossary.md` 与 `tests/terms.test.mjs`；README / SKILL 的名字去掉中文别名。
+
 ## 0.1.1 - 2026-10-27
 
 - 验证 npm Trusted Publishing 发布链路；无内容变更。
