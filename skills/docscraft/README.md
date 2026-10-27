@@ -18,6 +18,40 @@ npx skills add ultime-space/skills --skill docscraft
 
 交互选择 agent；非交互用 `-a <agent>`，全局加 `-g`。安装路径由 `skills` CLI 维护，本 skill 不枚举 agent。
 
+## 常用场景怎么说
+
+先说模式（Audit（审计）/ Plan（计划）/ Apply（执行））、范围、读者。下面可以直接复制。
+
+**文档审计**
+
+```text
+用 Docscraft 审计本仓库文档，Audit 模式，只读。
+范围：根 README / AGENTS / rules / docs；重点找重复真源、入口缺失、过期规则和死链。
+```
+
+**重整文档结构**
+
+```text
+用 Docscraft 按 scenarios/reorganize-docs.md 给迁移计划，Plan 模式，只读。
+范围：<目录>；先给目标分层和迁移表，确认后再改。
+```
+
+**写 ADR（架构决策记录）**
+
+```text
+用 Docscraft 按 scenarios/write-adr.md 写一份 ADR。
+背景：<...>；候选：<A / B>；要求写取舍、后果和验证，不复制规范全文。
+```
+
+**治理规则 / 检查 AI 入口**
+
+```text
+用 Docscraft 按 scenarios/review-rules.md 治理规则，Audit 模式。
+重点：事实 / 约束 / 判断分类、owner 与复核日期、入口是否只做索引。
+```
+
+更多场景见 [`scenarios/`](./scenarios/) 与 [`prompts/output.md`](./prompts/output.md)。
+
 ## 适用
 
 - 仓库已有 README，但 agent 仍经常读错规则

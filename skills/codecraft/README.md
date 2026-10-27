@@ -113,6 +113,46 @@ npx skills-npm setup
 
 更多场景（代码架构报告、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
 
+## 常用场景怎么说
+
+说清三件事：模式、范围、产出。下面可以直接复制。
+
+**老项目审计**
+
+```text
+用 Codecraft 审计本项目，只读，不改文件。
+范围：client/ 和 admin/；重点看边界、错误模型、生成物。
+产出：按 prompts/output.md 出报告，A1–A21 逐条给证据。
+```
+
+**代码架构分析报告**
+
+```text
+用 Codecraft 按 scenarios/architecture-report.md 出一份代码架构分析报告。
+范围：<目录 / 包>；只读；不做业务架构，先不画图；按 templates/architecture-report.md 输出。
+```
+
+**新项目架构设计**
+
+```text
+用 Codecraft 按 scenarios/new-project.md 设计架构，Plan 模式，只读。
+输入：<端 / 团队 / 约束>；先定档位和边界，再给分阶段计划，不要直接写代码。
+```
+
+**重构 / PR 评审**
+
+```text
+用 Codecraft 评审 <diff / 目录>，Audit 模式，只读。
+重点看边界、依赖方向、错误模型、生成物；给最小改动计划，不改文件。
+```
+
+**Design System 审计**
+
+```text
+用 Codecraft 审计 packages/，Audit 模式，只读。
+按 design-system pack 检查包边界、生成物标记、公开文档路径和密钥；给最小修复计划。
+```
+
 需要本地检查时再装 CLI：
 
 ```bash
