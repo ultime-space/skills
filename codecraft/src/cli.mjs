@@ -5,7 +5,7 @@ import { loadConfig, runGates } from './gates.mjs'
 import { buildPlan, summarizePlan } from './plan.mjs'
 import { applyInitPlan, buildInitPlan } from './init.mjs'
 import { applyIgnores } from './ignore.mjs'
-import { applyInstallPlan, buildInstallPlan, parseAgents } from './install.mjs'
+import { applyInstallPlan, buildInstallPlan, listAgents, loadAgents, parseAgents } from './install.mjs'
 
 const PACKAGE = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const VERSION = PACKAGE.version
@@ -24,7 +24,8 @@ Options:
   --root <path>            Project root (default: cwd)
   --pack app|library|design-system|auto  Rule pack (default: auto)
   --config <path>          Config file (default: codecraft.config.json)
-  --agent auto|generic|claude|cursor|trae|trae-cn  Install target, comma-separated (default: auto)
+  --agent <name>[,<name>]  Install target (default: auto; see --list-agents)
+  --list-agents            List registered agents, paths and detection
   --global                 Install into the home directory
   --dest <path>            Explicit destination (relative to root / home), e.g. .trae-cn/skills
   --force                  Replace an existing codecraft skill directory
@@ -70,16 +71,33 @@ export function main(argv) {
     return 2
   }
 
+  if (args.listAgents) {
+    try {
+      const agents = listAgents(root, { global: args.global })
+      if (args.format === 'json') {
+        console.log(JSON.stringify({ version: VERSION, agents }, null, 2))
+      } else {
+        console.log(formatAgents(agents))
+      }
+      return 0
+    } catch (error) {
+      console.error(`codecraft: ${error.message}`)
+      return 2
+    }
+  }
+
   if (command === 'install') {
     let agents
+    let registry
     try {
-      agents = parseAgents(args.agent)
+      registry = loadAgents(root, { global: args.global })
+      agents = parseAgents(args.agent, [...registry.keys()])
     } catch (error) {
       console.error(`codecraft: ${error.message}`)
       return 2
     }
     try {
-      const plan = buildInstallPlan(root, { agents, global: args.global, dest: args.dest })
+      const plan = buildInstallPlan(root, { agents, global: args.global, dest: args.dest, registry })
       const applied = args.dryRun ? null : applyInstallPlan(plan, { force: args.force })
       const meta = {
         version: VERSION,
@@ -248,6 +266,7 @@ function parseArgs(argv) {
     dest: '',
     force: false,
     dryRun: false,
+    listAgents: false,
     format: 'md',
     severity: 'warn',
     ci: false,
@@ -267,6 +286,7 @@ function parseArgs(argv) {
     else if (arg === '--global') args.global = true
     else if (arg === '--force') args.force = true
     else if (arg === '--dry-run') args.dryRun = true
+    else if (arg === '--list-agents') args.listAgents = true
     else if (arg === '--name') args.name = argv[++i] ?? ''
     else if (arg === '--agent') args.agent = argv[++i] ?? 'auto'
     else if (arg === '--dest') args.dest = argv[++i] ?? ''
@@ -499,6 +519,24 @@ function formatInit(meta, plan, applied) {
   )
 
   return lines.filter((line, index) => !(line === '' && lines[index - 1] === '')).join('\n')
+}
+
+function formatAgents(agents) {
+  const lines = [
+    '# Codecraft Agents',
+    '',
+    `- Version: ${VERSION}`,
+    '',
+    '| Name | Source | Project | Global | Detected |',
+    '|---|---|---|---|---|',
+  ]
+  for (const agent of agents) {
+    const detected =
+      [agent.detected.project ? 'project' : '', agent.detected.global ? 'global' : ''].filter(Boolean).join(', ') ||
+      '—'
+    lines.push(`| ${agent.name} | ${agent.source} | ${agent.project} | ${agent.global} | ${detected} |`)
+  }
+  return lines.join('\n')
 }
 
 function formatInstall(meta, plan, applied) {

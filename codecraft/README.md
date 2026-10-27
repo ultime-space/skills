@@ -69,7 +69,25 @@ npx @ultime/codecraft install --dry-run                # 只看计划
 npx @ultime/codecraft install --force                  # 覆盖已有目录
 ```
 
-可选 agent：`generic` / `claude` / `cursor` / `trae` / `trae-cn`；未知目录用 `--dest`。
+可选内置 agent：`generic` / `claude` / `cursor` / `trae` / `trae-cn`；用 `--list-agents` 查看实际路径与检测结果。
+
+自定义 agent 放在项目级 `codecraft.agents.json` 或用户级 `~/.codecraft/agents.json`（项目级覆盖用户级）：
+
+```json
+{
+  "agents": {
+    "my-agent": {
+      "project": ".my/skills",
+      "global": ".my/skills",
+      "markers": [".my"]
+    }
+  }
+}
+```
+
+- `project` / `global`：项目内与全局的目标目录；`global` 省略时复用 `project`。
+- `markers`：`auto` 检测用的目录或文件；不填则只能显式 `--agent my-agent`。
+- 未知或临时目录仍可用 `--dest`，不必先写配置。
 
 ### 方式 C：手动指针
 
@@ -270,6 +288,7 @@ ROADMAP.md    后续版本计划与交接说明
 - **静态检查误报怎么办？** 在 `codecraft.config.json` 的 `ignore` 里登记 `rule` + `file` + `reason`，必要时加 `expires`；不要直接删规则。
 - **`Files: 0` 是什么意思？** 没有扫到源文件，命令会输出警告并以 2 退出；用 `--pack app|library` 指定正确类型，或检查 `--root`。
 - **Trae CN 装到哪？** 用 `--agent trae-cn`（`~/.trae-cn/skills`）；未知目录用 `--dest`。
+- **怎么支持新的 agent？** 在 `codecraft.agents.json` 里加 `project` / `global` / `markers`，再跑 `--list-agents` 确认；不需要等 Codecraft 发版。
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
 - **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app 依赖或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
