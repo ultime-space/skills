@@ -27,7 +27,34 @@ export function loadConfig(root, configPath) {
     }
   }
 
-  return { file, config: { ...config, ignore: validateIgnore(config.ignore, file) } }
+  return {
+    file,
+    config: {
+      ...config,
+      ignore: validateIgnore(config.ignore, file),
+      ...(config.boundaries ? { boundaries: validateBoundaries(config.boundaries, file) } : {}),
+    },
+  }
+}
+
+function validateBoundaries(value, file) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`invalid config ${file}: "boundaries" must be an object with external / generated arrays`)
+  }
+  const boundaries = {}
+  for (const key of ['external', 'generated']) {
+    if (value[key] == null) continue
+    if (!Array.isArray(value[key])) {
+      throw new Error(`invalid config ${file}: boundaries.${key} must be an array of import prefixes or globs`)
+    }
+    boundaries[key] = value[key].map((item) => {
+      if (typeof item !== 'string' || !item.trim()) {
+        throw new Error(`invalid config ${file}: boundaries.${key} entries must be non-empty strings`)
+      }
+      return item.trim()
+    })
+  }
+  return boundaries
 }
 
 export function runGates(root, gates, options = {}) {

@@ -34,22 +34,27 @@
   ],
   "ignore": [
     { "rule": "A17", "file": "src/pages/legacy/**", "reason": "legacy page", "expires": "2026-12-31" }
-  ]
+  ],
+  "boundaries": {
+    "external": ["@/types/external"],
+    "generated": ["@/types/project"]
+  }
 }
 ```
 
 - `pack`：`app` / `library` / `design-system` / `auto`；CLI `--pack` 优先。
 - `gates`：数组；每项必须有 `run`，可选 `name` / `timeoutMs`。
 - `ignore`：例外登记（A12）；`rule` / `file` / `reason` 必填，`expires` 可选。过期条目不生效，报告中单列；安全规则 `A21` 不可豁免。
+- `boundaries`：A17 的补充路径；生成类型优先按文件头识别，`external` / `generated` 填 import 前缀或 glob，覆盖头部无标记或路径不在约定内的项目。
 - 配置文件默认 `codecraft.config.json`；可用 `--config` 指定。
 
 ## 4. 按项目类型选门禁
 
 | 项目类型 | 通用 | 业务 |
 |---|---|---|
-| **App** | A17 / A21（A4 人工评审） | typecheck、单测、e2e、视觉回归 |
-| **Library** | A2 / A11 / A21 | build、单测、exports 检查、依赖对账 |
-| **Design System** | A2 / A11 / A21 | 构建、契约快照、视觉回归、a11y |
+| **App** | A6 / A17 / A21（A4 人工评审） | typecheck、单测、e2e、视觉回归 |
+| **Library** | A2 / A6 / A11 / A21 | build、单测、exports 检查、依赖对账 |
+| **Design System** | A2 / A6 / A11 / A21 | 构建、契约快照、视觉回归、a11y |
 | **Docs** | A21 | 死链、三线头、交付白名单 |
 
 ### 4.1 内置规则
@@ -57,12 +62,22 @@
 | Rule | Pack | 检查 |
 |---|---|---|
 | A2 | library / design-system | 包不 import apps；相对路径不逃逸；workspace 依赖必须声明 |
+| A6 | all | 空 catch / 静默失败 |
 | A11 | library / design-system | 生成物必须有“勿手改 / 派生”标记 |
-| A17 | app | `pages / components / behavior` 不 import `external/` / `generated/` |
-| A21 | all | 高置信密钥模式（私钥 / AWS / GitHub / Slack / API key） |
+| A17 | app | `pages / components / behavior` 不 import `external/` / `generated/`；生成类型按文件头（`本文件由…生成` / `勿手改` / `@generated`）自动识别；自定义路径用 `boundaries` 补充 |
+| A21 | all | 高置信密钥模式（私钥 / AWS / 阿里云 `LTAI` / GitHub / Slack / API key）；配置与后端源码中的明文 `password` / `secret` / `apiKey` / `accessKey` 赋值；环境变量引用与占位符不报 |
 | A21 | design-system | 包内公开文档（README / USAGE / CHANGELOG / contract）不引用内部 `docs/` |
 
 A4（单一收口）是结构判断，仍由 review / 项目门禁负责，不由静态扫描替代。
+
+### 4.2 CI 用法
+
+```bash
+codecraft check --changed --ci                  # PR 只拦变更文件
+codecraft check --changed --format sarif > codecraft.sarif
+```
+
+`--changed` / `--since` 只过滤 findings；底层仍做全量扫描。SARIF 可直接上传 GitHub Code Scanning。
 
 ## 5. 执行顺序
 

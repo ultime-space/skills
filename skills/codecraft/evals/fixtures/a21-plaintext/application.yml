@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    password: demo-pass-123
+  redis:
+    password: ${REDIS_PASSWORD}

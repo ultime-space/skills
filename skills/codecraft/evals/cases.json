@@ -1,0 +1,110 @@
+[
+  {
+    "name": "a17-default",
+    "root": "a17-default",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A17": 1 } }
+  },
+  {
+    "name": "a17-boundaries",
+    "root": "a17-boundaries",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A17": 1 } }
+  },
+  {
+    "name": "a6-empty-catch",
+    "root": "a6-empty-catch",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A6": 1 } }
+  },
+  {
+    "name": "ignore-active",
+    "root": "ignore-active",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": {}, "ignored": 1 }
+  },
+  {
+    "name": "ignore-expired",
+    "root": "ignore-expired",
+    "args": ["--pack", "app", "--format", "json", "--ci"],
+    "expect": { "exit": 1, "findings": { "A17": 1 }, "expired": 1 }
+  },
+  {
+    "name": "library-a11",
+    "root": "library-a11",
+    "args": ["--pack", "library", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A11": 1 } }
+  },
+  {
+    "name": "zero-files",
+    "root": "zero-files",
+    "args": ["--pack", "library", "--format", "json"],
+    "expect": { "exit": 2, "findings": {}, "warnings": 1 }
+  },
+  {
+    "name": "a17-generated-header",
+    "root": "a17-generated-header",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A17": 1 } }
+  },
+  {
+    "name": "a21-plaintext",
+    "root": "a21-plaintext",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A21": 2 } }
+  },
+  {
+    "name": "a2-workspace",
+    "root": "a2-workspace",
+    "args": ["--pack", "library", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A2": 1 } }
+  },
+  {
+    "name": "a2-declared",
+    "root": "a2-declared",
+    "args": ["--pack", "library", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a6-clean",
+    "root": "a6-clean",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a11-marker",
+    "root": "a11-marker",
+    "args": ["--pack", "library", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a17-local",
+    "root": "a17-local",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a17-generated-data",
+    "root": "a17-generated-data",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a21-placeholders",
+    "root": "a21-placeholders",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": {} }
+  },
+  {
+    "name": "a21-doc-paths",
+    "root": "a21-doc-paths",
+    "args": ["--pack", "design-system", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A21": 2 } }
+  },
+  {
+    "name": "sarif",
+    "root": "a17-default",
+    "args": ["--pack", "app", "--format", "sarif"],
+    "expect": { "exit": 0, "sarif": { "version": "2.1.0", "rule": "A17" } }
+  }
+]

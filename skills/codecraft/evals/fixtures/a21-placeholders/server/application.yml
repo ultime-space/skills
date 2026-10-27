@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    password: ${DB_PASSWORD}
+  redis:
+    password: ${REDIS_PASSWORD}
+jwt:
+  secret: change-me
+  apiKey: your-key-here
+  accessKey: <ACCESS_KEY>

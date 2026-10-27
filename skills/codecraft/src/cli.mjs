@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { spawnSync } from 'node:child_process'
 import { check } from './check.mjs'
 import { loadConfig, runGates } from './gates.mjs'
 import { buildPlan, summarizePlan } from './plan.mjs'
@@ -22,12 +23,15 @@ Options:
   --root <path>            Project root (default: cwd)
   --pack app|library|design-system|auto  Rule pack (default: auto)
   --config <path>          Config file (default: codecraft.config.json)
+  --changed                Only report findings in changed / untracked files
+  --since <ref>            Only report findings changed since a git ref (e.g. origin/main)
+  --exclude <glob>         Skip files when scanning (repeatable; e.g. "evals/fixtures/**")
   --no-gates               Skip gates in audit / plan
   --with-gates             Run configured gates in plan
   --fail-fast              Stop gates after the first failure
   --name <name>            Scaffold name (required with --apply)
   --apply                  Write the scaffold; existing paths are skipped
-  --format md|json         Output format (default: md)
+  --format md|json|sarif   Output format (default: md)
   --severity warn|error    Reported severity (default: warn)
   --ci                     Treat findings as errors
   --help, -h
@@ -106,9 +110,28 @@ export function main(argv) {
     return 0
   }
 
-  const result = check(root, { pack })
+  const result = check(root, {
+    pack,
+    boundaries: config.config.boundaries,
+    exclude: args.exclude,
+  })
+  let changed = null
+  let scoped = result.findings
+  if (args.changed || args.since) {
+    try {
+      changed = changedFiles(root, args.since)
+    } catch (error) {
+      console.error(`codecraft: ${error.message}`)
+      return 2
+    }
+    const files = new Set(changed)
+    scoped = scoped.filter((finding) => {
+      const file = finding.file.replace(/\\/g, '/')
+      return files.has(file) || [...files].some((candidate) => candidate.endsWith(`/${file}`))
+    })
+  }
   const severity = args.ci ? 'error' : args.severity
-  const findings = result.findings.map((finding) => ({ ...finding, severity }))
+  const findings = scoped.map((finding) => ({ ...finding, severity }))
   const filtered = applyIgnores(findings, config.config.ignore ?? [])
   const activeFindings = filtered.findings
   const warnings = []
@@ -127,8 +150,11 @@ export function main(argv) {
     root,
     config: config.file,
     severity,
-    rules: pack === 'app' ? ['A17', 'A21'] : ['A2', 'A11', 'A21'],
+    rules: pack === 'app' ? ['A6', 'A17', 'A21'] : ['A2', 'A6', 'A11', 'A21'],
     files: result.files,
+    scope: args.changed || args.since ? 'changed' : 'full',
+    changed: changed?.length ?? null,
+    exclude: args.exclude,
     findings: activeFindings.length,
     ignored: filtered.ignored.length,
     expired: filtered.expired.length,
@@ -161,6 +187,8 @@ export function main(argv) {
         2,
       ),
     )
+  } else if (args.format === 'sarif') {
+    console.log(formatSarif(meta, activeFindings))
   } else if (command === 'plan') {
     console.log(formatPlan(meta, activeFindings, plan, gates))
   } else {
@@ -200,6 +228,9 @@ function parseArgs(argv) {
     failFast: false,
     name: '',
     apply: false,
+    changed: false,
+    since: '',
+    exclude: [],
     format: 'md',
     severity: 'warn',
     ci: false,
@@ -216,6 +247,13 @@ function parseArgs(argv) {
     else if (arg === '--with-gates') args.withGates = true
     else if (arg === '--fail-fast') args.failFast = true
     else if (arg === '--apply') args.apply = true
+    else if (arg === '--changed') args.changed = true
+    else if (arg === '--since') args.since = argv[++i] ?? ''
+    else if (arg === '--exclude') {
+      const pattern = argv[++i] ?? ''
+      if (!pattern) fail('--exclude needs a path or glob (e.g. "evals/fixtures/**")')
+      args.exclude.push(pattern)
+    }
     else if (arg === '--name') args.name = argv[++i] ?? ''
     else if (arg === '--root') args.root = argv[++i] ?? '.'
     else if (arg === '--pack') args.pack = argv[++i] ?? 'auto'
@@ -227,12 +265,47 @@ function parseArgs(argv) {
   }
 
   if (!['app', 'library', 'design-system', 'auto'].includes(args.pack)) fail(`invalid --pack: ${args.pack}`)
-  if (args.format !== 'md' && args.format !== 'json') fail(`invalid --format: ${args.format}`)
+  if (args.format !== 'md' && args.format !== 'json' && args.format !== 'sarif') {
+    fail(`invalid --format: ${args.format}`)
+  }
   if (args.severity !== 'warn' && args.severity !== 'error') {
     fail(`invalid --severity: ${args.severity}`)
   }
 
   return args
+}
+
+function changedFiles(root, since) {
+  const top = git(root, ['rev-parse', '--show-toplevel'])
+  if (top == null) {
+    throw new Error('not a git repository; --changed / --since need git (run inside a git repo or drop the flag)')
+  }
+
+  const lists = [git(root, ['diff', '--name-only', '--diff-filter=ACMRT', 'HEAD'])]
+  if (since) lists.push(git(root, ['diff', '--name-only', '--diff-filter=ACMRT', `${since}...HEAD`]))
+  lists.push(git(root, ['ls-files', '--others', '--exclude-standard']))
+
+  const realRoot = fs.realpathSync(root)
+  const files = new Set()
+  for (const list of lists) {
+    if (!list) continue
+    for (const line of list.split('\n')) {
+      const file = line.trim()
+      if (!file) continue
+      const relative = path.relative(realRoot, path.resolve(top, file)).split(path.sep).join('/')
+      if (relative && !relative.startsWith('..')) files.add(relative)
+    }
+  }
+  return [...files]
+}
+
+function git(root, args) {
+  const result = spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' })
+  if (result.status !== 0) {
+    const message = (result.stderr || '').trim()
+    throw new Error(`git ${args.join(' ')} failed${message ? `: ${message}` : ''}`)
+  }
+  return result.stdout.trim()
 }
 
 export function detectPack(root) {
@@ -256,13 +329,28 @@ const APP_FILE_MARKERS = [
   'src/app.config.ts',
   'taro.config.js',
   'taro.config.ts',
+  'vue.config.js',
+  'vue.config.ts',
 ]
 const APP_DEPS = ['nuxt', '@tarojs/taro', '@dcloudio/uni-app', 'uni-app', 'next']
+/** 单页 Web 应用入口；库的 demo 页通常不具备「框架依赖 + 入口 + html」三件套。 */
+const WEB_ENTRIES = [
+  'src/main.ts',
+  'src/main.js',
+  'src/main.tsx',
+  'src/main.jsx',
+  'src/index.ts',
+  'src/index.js',
+  'src/index.tsx',
+  'src/index.jsx',
+]
+const WEB_DEPS = ['vue', 'react', 'react-dom', 'react-scripts', 'svelte', 'solid-js', 'preact', '@angular/core']
 
 function hasAppMarkers(root) {
   if (APP_DIR_MARKERS.some((dir) => isDir(path.join(root, dir)))) return true
   if (APP_FILE_MARKERS.some((file) => isFile(path.join(root, file)))) return true
   if (hasUniAppFiles(root)) return true
+  if (hasWebEntry(root)) return true
   return hasAppDependency(root)
 }
 
@@ -282,6 +370,7 @@ function hasNestedApp(root) {
     if (APP_DIR_MARKERS.some((dir) => isDir(path.join(child, dir)))) return true
     if (APP_FILE_MARKERS.some((file) => isFile(path.join(child, file)))) return true
     if (hasUniAppFiles(child)) return true
+    if (hasWebEntry(child)) return true
     if (hasAppDependency(child)) return true
   }
   return false
@@ -294,14 +383,25 @@ function hasUniAppFiles(root) {
 }
 
 function hasAppDependency(root) {
+  return dependencyNames(root).some((dep) => APP_DEPS.includes(dep))
+}
+
+/** 框架依赖 + html + 入口；三者齐全才按单页应用处理，避免把带 demo 的库判成 app。 */
+function hasWebEntry(root) {
+  const html = isFile(path.join(root, 'index.html')) || isFile(path.join(root, 'public', 'index.html'))
+  if (!html) return false
+  if (!dependencyNames(root).some((dep) => WEB_DEPS.includes(dep))) return false
+  return WEB_ENTRIES.some((file) => isFile(path.join(root, file)))
+}
+
+function dependencyNames(root) {
   let manifest
   try {
     manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
   } catch {
-    return false
+    return []
   }
-  const deps = { ...(manifest.dependencies ?? {}), ...(manifest.devDependencies ?? {}) }
-  return APP_DEPS.some((dep) => dep in deps)
+  return Object.keys({ ...(manifest.dependencies ?? {}), ...(manifest.devDependencies ?? {}) })
 }
 
 function isFile(target) {
@@ -315,6 +415,55 @@ function isFile(target) {
 function fail(message) {
   console.error(`codecraft: ${message}\n\n${HELP}`)
   process.exit(2)
+}
+
+function formatSarif(meta, findings) {
+  const rules = meta.rules.map((id) => ({
+    id,
+    name: SARIF_RULES[id]?.name ?? id,
+    shortDescription: { text: SARIF_RULES[id]?.short ?? id },
+  }))
+  return JSON.stringify(
+    {
+      $schema: 'https://json.schemastore.org/sarif-2.1.0.json',
+      version: '2.1.0',
+      runs: [
+        {
+          tool: {
+            driver: {
+              name: 'codecraft',
+              informationUri: 'https://github.com/ultime-space/skills',
+              version: meta.version,
+              rules,
+            },
+          },
+          results: findings.map((finding) => ({
+            ruleId: finding.rule,
+            level: finding.severity === 'error' ? 'error' : 'warning',
+            message: { text: finding.message },
+            locations: [
+              {
+                physicalLocation: {
+                  artifactLocation: { uri: finding.file.replace(/\\/g, '/') },
+                  region: { startLine: finding.line },
+                },
+              },
+            ],
+          })),
+        },
+      ],
+    },
+    null,
+    2,
+  )
+}
+
+const SARIF_RULES = {
+  A2: { name: 'DependencyDirection', short: 'Dependencies must point inward' },
+  A6: { name: 'EmptyCatch', short: 'Empty catch swallows failures' },
+  A11: { name: 'GeneratedReadOnly', short: 'Generated files must be read-only and marked' },
+  A17: { name: 'ExternalBoundary', short: 'Internal layers must not import external or generated types' },
+  A21: { name: 'SecretScan', short: 'No secrets or internal paths in repository' },
 }
 
 function formatReport(meta, findings, ignored, expired, gates) {
@@ -457,6 +606,7 @@ function header(meta) {
     `- Pack: ${meta.pack}`,
     `- Root: ${meta.root}`,
     `- Config: ${meta.config ?? '（none）'}`,
+    `- Exclude: ${meta.exclude?.length ? meta.exclude.join(', ') : '（none）'}`,
     `- Rules: ${meta.rules.join(' / ')}`,
     `- Severity: ${meta.severity}`,
     `- Files: ${meta.files}`,

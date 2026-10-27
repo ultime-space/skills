@@ -1,0 +1,48 @@
+name: publish-docscraft
+
+on:
+  push:
+    tags:
+      - 'docscraft-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skills/docscraft
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Upgrade npm for Trusted Publishing
+        run: npm install -g npm@11
+
+      - name: Check tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          node -e 'const v=require("./package.json").version; const tag=process.env.GITHUB_REF_NAME; if (tag !== "docscraft-v" + v) { console.error("tag " + tag + " does not match docscraft-v" + v); process.exit(1) }'
+
+      - name: Check version is not published
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if npm view "@ultime/docscraft@$version" version >/dev/null 2>&1; then
+            echo "::error::@ultime/docscraft@$version is already published; bump the version first."
+            exit 1
+          fi
+
+      - name: Test
+        run: npm test
+
+      # Requires npm Trusted Publishing configured for ultime-space/skills + publish-docscraft.yml.
+      - name: Publish
+        run: npm publish --access public --provenance

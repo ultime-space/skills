@@ -114,6 +114,12 @@
 - 安装由 `skills` CLI 负责：`npx skills add ultime-space/skills --skill codecraft`。
 - 不在 Codecraft 规则评估范围内；本文件不再评估安装器行为。
 
+## 17. 审计结论一致性
+
+- 输入：一个项目同时存在「多处 `code === 200`」「生成物无再生成 diff」「CLI `0 findings`」。
+- 期望：A4 判 `warn`；A11 判 `warn`；报告写明 `0 findings` 只是静态未命中；计数带检索命令。
+- 失败信号：A4 / A11 判 `pass`；把静态检查当全通过；结论没有文件行号或命令。
+
 ## 评分
 
 - 每条任务：pass / fail。

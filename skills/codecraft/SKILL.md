@@ -22,7 +22,7 @@ description: 面向 JS/TS 的代码规范与架构设计（Codecraft）。默认
 
 | 任务 | 先读 | 产出 |
 |---|---|---|
-| 审计 / 评审现有代码 | 宪法 + 相关族卡 | 报告（只读） |
+| 审计 / 评审现有代码 | 宪法 + `docs/08-audit-contract.md` + 相关族卡 | 报告（只读） |
 | 设计架构 / 拆边界 | `docs/06-architecture.md` + 宪法 | 计划 / ADR（只读） |
 | 新项目 / 脚手架 | `06` + `scenarios/new-project.md` | 骨架计划；必要时 `init` |
 | 选型（模式 / 库） | `docs/05-patterns.md` | 选型与代价 |
@@ -36,7 +36,7 @@ description: 面向 JS/TS 的代码规范与架构设计（Codecraft）。默认
 4. 只读相关族卡：`docs/01-family-cards.md`（前端项目才读 Page / Component）
 5. 需要选型时：`docs/05-patterns.md`
 6. 选一个场景：`scenarios/`
-7. 按 `docs/02-ai-contract.md` 执行
+7. 按 `docs/02-ai-contract.md` 执行；审计还必须读 `docs/08-audit-contract.md`
 8. 按 `prompts/output.md` 输出
 9. 不知道怎么说时：`docs/07-ai-prompts.md`
 

@@ -62,23 +62,16 @@ npx skills-npm setup
 
 ### 方式 C：手动指针
 
-不复制文件，只在项目规则里留一行：
+不复制文件，只在通用入口里留一行：
 
-- 通用：`AGENTS.md`
-- Claude：`CLAUDE.md` 或 `~/.claude/CLAUDE.md`
-- Trae：`.trae/rules/codecraft.md`
+- 通用：`AGENTS.md`（推荐）
+- 其它 agent：使用该 agent 自己的入口文件，内容相同
 
 ```md
-代码任务先读 <Codecraft 仓库路径>/skills/codecraft/adapters/trae/SKILL.md
+代码任务先读 <Codecraft 路径>/skills/codecraft/SKILL.md
 ```
 
-平台入口：
-
-| 平台 | 入口文件 |
-|---|---|
-| 通用（读 `AGENTS.md`） | [`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md) |
-| Claude | [`adapters/claude/SKILL.md`](./adapters/claude/SKILL.md) |
-| Trae | [`adapters/trae/SKILL.md`](./adapters/trae/SKILL.md) |
+入口示例：[`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md)。其它 agent 不需要单独适配文件，统一指向 `SKILL.md`，避免维护多份正文。
 
 ## 第一次使用
 
@@ -134,6 +127,8 @@ codecraft check --root .
 codecraft check --pack library --root ../../packages/core
 codecraft check --pack design-system
 codecraft check --format json --ci
+codecraft check --changed --ci                    # 只看变更 / 未跟踪文件
+codecraft check --since origin/main --ci          # PR 内变更
 codecraft audit --severity error
 codecraft audit --config codecraft.config.json --fail-fast
 codecraft plan --root . --with-gates
@@ -148,7 +143,10 @@ codecraft init --root . --name demo --apply      # 写盘
 | `--root <path>` | 目录 | `.` | 被检查的项目根 |
 | `--pack <name>` | `app` / `library` / `design-system` / `auto` | `auto` | 规则包；CLI 优先于 config |
 | `--config <path>` | 文件 | `codecraft.config.json` | 相对 `--root` |
-| `--format <fmt>` | `md` / `json` | `md` | 输出格式 |
+| `--changed` | — | 关 | 只报告变更 / 未跟踪文件中的 findings |
+| `--since <ref>` | git ref | — | 只报告自该 ref 以来变动文件中的 findings |
+| `--exclude <glob>` | 路径 / glob | — | 扫描时跳过；可重复。用于 fixture、第三方目录等不应参与检查的路径 |
+| `--format <fmt>` | `md` / `json` / `sarif` | `md` | 输出格式 |
 | `--severity <level>` | `warn` / `error` | `warn` | findings 的严重级别 |
 | `--ci` | — | 关 | 等价于 `--severity error` |
 | `--fail-fast` | — | 关 | gates 遇到第一个失败即停止 |
@@ -168,26 +166,30 @@ codecraft init --root . --name demo --apply      # 写盘
 ### 输出
 
 - 默认 Markdown：头部元信息 + Findings 表 + Gates 表。
-- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
+- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `exclude` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
+- `--format sarif`：SARIF 2.1.0，可直接上传 GitHub Code Scanning。
+- `--changed` / `--since` 只过滤 findings，底层仍做全量扫描；JSON 的 `scope` 为 `changed`，`changed` 为变更文件数。
 - 报告始终带版本号与规则 ID；`plan` 明确声明「No files were changed by this command.」。
 
 ## Rule Packs
 
 | Pack | 内置规则 | 检查范围 |
 |---|---|---|
-| `app` | A17 / A21 | `pages / components / behavior` 不 import `external/` / `generated/`；密钥扫描 |
-| `library` | A2 / A11 / A21 | 包不 import app、相对路径不逃逸、workspace 依赖必须声明；生成物必须有“勿手改 / 派生”标记；密钥扫描 |
-| `design-system` | A2 / A11 / A21 | library 规则 + 包内公开文档不得引用内部 `docs/` |
+| `app` | A6 / A17 / A21 | 空 catch；`pages / components / behavior` 不 import `external/` / `generated/`（含生成文件头与 `boundaries` 配置）；密钥扫描 |
+| `library` | A2 / A6 / A11 / A21 | 包不 import app、相对路径不逃逸、workspace 依赖必须声明；空 catch；生成物必须有“勿手改 / 派生”标记；密钥扫描 |
+| `design-system` | A2 / A6 / A11 / A21 | library 规则 + 包内公开文档不得引用内部 `docs/` |
 
 `--pack auto` 的判定顺序（基于 JS/TS 生态的目录与 `package.json`）：
 
-1. 有 `apps/` 或 `src/pages` → `app`
-2. 有 `packages/` 或根 `package.json` → `library`
-3. 其余 → `app`
+1. 有 `apps/`、`src/pages` / `pages` / `app` / `src/app`，或 Nuxt / Taro / uni-app / Vue CLI（`vue.config.*`）标记 → `app`
+2. 单页 Web 入口三件套：`index.html`（根或 `public/`）+ 框架依赖（`vue` / `react` / `svelte` 等）+ `src/main.*` / `src/index.*` → `app`
+3. 一级子目录命中上述任一标记（workspace 内嵌应用）→ `app`
+4. 有 `packages/`、`src/` 或根 `package.json` → `library`
+5. 其余 → `app`
 
-`design-system` 不参与自动判定，必须显式指定。
+`design-system` 不参与自动判定，必须显式指定。带 demo 页的库若被误判为 `app`，用 `--pack library` 覆盖。
 
-A4（单一收口）属于结构判断，由 review 与项目门禁负责，不由静态扫描替代。
+A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态）属于结构或状态判断，由 review 与项目门禁负责，不由静态扫描替代。
 
 ## 配置
 
@@ -207,13 +209,18 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
       "reason": "legacy page; migrate in 2026-Q4",
       "expires": "2026-12-31"
     }
-  ]
+  ],
+  "boundaries": {
+    "external": ["@/types/external"],
+    "generated": ["@/types/project"]
+  }
 }
 ```
 
 - `pack`：`app` / `library` / `design-system` / `auto`。
 - `gates`：数组；每项必须有一个非空的 `run` 字符串，可选 `name`、`timeoutMs`（默认 `120000`）。
 - `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
+- `boundaries`：A17 的补充路径。生成类型优先按文件头自动识别；`external` / `generated` 填 import 前缀或 glob，用于头部没有标记、或路径不在约定内的项目。
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
 - gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
@@ -222,16 +229,15 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
 ## 目录
 
 ```text
-SKILL.md      标准 agent skill 入口（skills-npm / install 使用）
-docs/         宪法、族卡、AI 契约、风格总图、模式、架构、AI 提示词、门禁
+SKILL.md      标准 agent skill 入口（skills add / skills-npm 使用）
+docs/         宪法、族卡、AI 契约、审计契约、风格总图、模式、架构、AI 提示词、门禁
 scenarios/    新项目 / 旧项目审计 / 只出报告 / 重构评审
-adapters/     generic / Trae / Claude 手动指针
+adapters/     generic 手动指针（其它 agent 统一指向 SKILL.md）
 prompts/      输出格式
 src/ + bin/   CLI（check / audit / plan / init）
 tests/        node:test 用例
 templates/    init --apply 的 app / library 骨架
-evals/        golden tasks（人工回归）
-ROADMAP.md    后续版本计划与交接说明
+evals/        CLI eval fixtures + golden tasks（人工回归）
 ```
 
 ## 版本与稳定承诺
@@ -243,7 +249,7 @@ ROADMAP.md    后续版本计划与交接说明
 - 不按「感觉重要」升 major；`2.0` 不设时间表。
 - 规则 ID `A1–A21` 稳定；增删规则属于 minor 以上的变更。
 - 报告始终携带版本号；跨版本对比以 JSON 为准。
-- 后续计划：[ROADMAP.md](https://github.com/ultime-space/skills/blob/main/skills/codecraft/ROADMAP.md)。
+- 版本历史见 [CHANGELOG.md](./CHANGELOG.md)；计划不在仓库内维护。
 
 ## FAQ
 
@@ -252,13 +258,16 @@ ROADMAP.md    后续版本计划与交接说明
 - **怎么装到指定 agent？** `npx skills add ultime-space/skills --skill codecraft`；交互选 agent，或用 `-a <agent>` 非交互。安装路径由 `skills` CLI 维护，本 skill 不枚举。
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
-- **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app 依赖或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
-- **支持哪些文件？** 只扫 JS/TS 相关扩展名与 `package.json`；其它语言不覆盖。
+- **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app / Vue CLI 标记、单页 Web 入口或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
+- **支持哪些文件？** A2 / A6 / A11 / A17 扫描 JS/TS 相关扩展名与 `package.json`；A21 额外扫描配置与后端源码（`.yml` / `.yaml` / `.env` / `.properties` / `.xml` / `.java` / `.kt` 等）里的明文密钥。其它语言仍不在检查范围。
 
 ## 边界
 
 - 静态检查是文本级：能覆盖高置信模式，可能漏报或误报；最终以项目门禁与 review 为准。
-- 机检只扫描 JS/TS 相关文件（`.ts` / `.tsx` / `.js` / `.jsx` / `.mjs` / `.cjs` / `.vue` / `.svelte`）与 `package.json`，其它语言不覆盖。
+- 结构规则（A2 / A6 / A11 / A17）只扫描 JS/TS 相关文件（`.ts` / `.tsx` / `.js` / `.jsx` / `.mjs` / `.cjs` / `.vue` / `.svelte`）与 `package.json`；A21 额外扫描配置与后端源码扩展名（见上），但只做密钥 / 内部路径模式匹配，不做语言级分析。
+- 压缩 / 构建产物（≤3 行且存在 >1000 字符的单行）不参与 A2 / A6 / A11 / A17，避免与源码重复报同一问题；A21 仍会扫描它们。
+- `.agents` / `.trae` / `.claude` / `.cursor` 等 agent 安装目录不扫描，避免把已安装 skill 的 fixture 当项目代码。
+- `--exclude` 是扫描级排除，不产生 findings；它不能替代 `ignore`（后者用于登记已发现问题的例外，且 A21 不可豁免）。
 - 不内置任何业务规则、框架约定或公司内部门禁。
 - 不读取、不上传代码；所有检查在本地完成。
 

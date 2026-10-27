@@ -1,0 +1,6 @@
+{
+  "name": "@x/core",
+  "dependencies": {
+    "@x/kit": "workspace:*"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "boundaries": {
+    "generated": ["@/types/project"]
+  }
+}

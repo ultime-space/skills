@@ -78,6 +78,41 @@ void test('detectPack: framework dependency is an app', () => {
   )
 })
 
+void test('detectPack: Vue CLI app (vue.config.js) is an app', () => {
+  assert.equal(
+    detect((root) => {
+      write(root, 'package.json', JSON.stringify({ name: 'x', dependencies: { vue: '^2.7.0' } }))
+      write(root, 'vue.config.js')
+      write(root, 'public/index.html')
+      write(root, 'src/main.js')
+      write(root, 'src/router/index.js')
+    }),
+    'app',
+  )
+})
+
+void test('detectPack: Vite SPA with framework entry is an app', () => {
+  assert.equal(
+    detect((root) => {
+      write(root, 'package.json', JSON.stringify({ name: 'x', dependencies: { vue: '^3.5.0' } }))
+      write(root, 'index.html')
+      write(root, 'src/main.ts')
+    }),
+    'app',
+  )
+})
+
+void test('detectPack: demo entry without a framework dependency stays a library', () => {
+  assert.equal(
+    detect((root) => {
+      write(root, 'package.json', JSON.stringify({ name: 'x' }))
+      write(root, 'index.html')
+      write(root, 'src/main.ts')
+    }),
+    'library',
+  )
+})
+
 void test('detectPack: package with src/ is a library', () => {
   assert.equal(
     detect((root) => {

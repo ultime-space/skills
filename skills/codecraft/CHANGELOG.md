@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.5.0 - 2026-10-27
+
+- 新增 `--exclude <glob>`（可重复）：扫描级排除，用于 fixture / 第三方目录；报告头与 JSON 记录 exclude 模式。
+- 新增 `npm run self-check`，CI 同步执行；仓库自检以 `--exclude 'evals/fixtures/**'` 达到 0 findings。
+- 修正 README 与 FAQ 的扫描范围描述：A21 额外扫描配置与后端源码扩展名，结构规则仍只扫 JS/TS。
+- pack 自动判定补齐 Vue CLI（`vue.config.*`）与单页 Web 入口（html + 框架依赖 + `src/main.*`），避免把 Vue / React 应用判成 `library`。
+- 结构规则跳过压缩 / 构建产物（A21 不受影响），减少与源码重复的 A6 / A17 findings。
+- A21 修正误报：`MYSQL_PWD="$VAR" cmd` 这类 shell 环境变量前缀不再算明文口令；引号值只取引号内内容。
+- 扫描跳过 `.agents` / `.trae` / `.claude` / `.cursor` 等 agent 安装目录，避免把已安装 skill 的 fixture 当项目代码。
+- 修复 A6 行号漂移：剥离注释时保留换行，空 catch 的行号与源码一致。
+- A17 支持按文件头识别生成类型（`本文件由…生成` / `勿手改` / `@generated`），并解析相对路径与 `@/` `~/` `#/` 别名；生成的数据 / 资源模块不触发。
+- A21 扩充：新增阿里云 `LTAI`、明文 `password` / `secret` / `apiKey` / `accessKey` 赋值扫描，覆盖 `.java` / `.kt` / `.properties` / `.xml` / `.env`；跳过环境变量、占位符与测试目录。
+- 新增单元测试与 CLI eval（`a17-generated-header` / `a21-plaintext`）。
+- 移除 `adapters/claude` / `adapters/trae` 等单 agent 入口；手动指针统一指向 `SKILL.md`，文档改用通用 `.agents` 表述。
+- 新增 `docs/08-audit-contract.md`：逐条判定、证据门槛、静态边界、A1–A21 判定矩阵、一致性检查、P0–P3 与计划表。
+- `prompts/output.md` 增加 A1–A21 全覆盖、证据 / 局限列、0 findings 声明与计数可复现要求。
+- `docs/02-ai-contract.md` 与 `scenarios/audit-existing.md` 接入审计证据门槛。
+- `SKILL.md` 路由与读法把审计指向 `08`；`README` 目录说明同步。
+- 新增 A6 空 catch 静态检查（app / library）。
+- A17 支持 `boundaries.external` / `boundaries.generated` 配置，覆盖约定外的生成类型路径。
+- 新增 `--format sarif`（SARIF 2.1.0），可直接接 GitHub Code Scanning。
+- 新增 `--changed` / `--since <ref>`：只报告变更 / 未跟踪文件中的 findings；底层仍全量扫描。
+- 新增 GitHub Actions CI：`npm test` + `npm run eval` + `npm pack --dry-run`。
+- 新增 `evals/run.mjs` + fixtures：覆盖 A6 / A17（含 boundaries）/ ignore / A11 / 0 文件 / SARIF。
+
 ## 1.4.0 - 2026-10-27
 
 - 仓库改为 `skills/codecraft` 标准集合布局，可被 `skills` CLI 直接发现。

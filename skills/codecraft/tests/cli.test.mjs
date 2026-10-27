@@ -158,6 +158,51 @@ void test('cli: warns and exits 2 when no source files are scanned', () => {
   }
 })
 
+void test('cli: sarif output includes rules and locations', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'home.ts'), "import { User } from '@/external/user'\n")
+
+    const result = run(['check', '--root', root, '--format', 'sarif'])
+
+    assert.equal(result.status, 0)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.version, '2.1.0')
+    assert.equal(report.runs[0].tool.driver.name, 'codecraft')
+    assert.equal(report.runs[0].results[0].ruleId, 'A17')
+    assert.equal(report.runs[0].results[0].locations[0].physicalLocation.artifactLocation.uri, 'src/pages/home.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: --changed only reports changed files', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'a.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'b.ts'), "import { User } from '@/external/user'\n")
+    const git = (args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' })
+    git(['init'])
+    git(['config', 'user.email', 'test@example.com'])
+    git(['config', 'user.name', 'test'])
+    git(['add', '.'])
+    git(['commit', '-m', 'init'])
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'a.ts'), "import { User } from '@/external/user'\n// changed\n")
+
+    const result = run(['check', '--root', root, '--changed', '--format', 'json'])
+
+    assert.equal(result.status, 0)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.scope, 'changed')
+    assert.equal(report.findings.length, 1)
+    assert.equal(report.findings[0].file, 'src/pages/a.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('cli: init --apply requires --name', () => {
   const root = tempRoot()
   try {
@@ -168,4 +213,33 @@ void test('cli: init --apply requires --name', () => {
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
+})
+
+void test('cli: --exclude skips files and records the pattern', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.mkdirSync(path.join(root, 'evals', 'fixtures'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'home.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(path.join(root, 'evals', 'fixtures', '.env'), 'APP_SECRET=abcdef123456\n')
+
+    const all = JSON.parse(run(['check', '--root', root, '--format', 'json']).stdout)
+    assert.equal(all.findings.length, 2)
+
+    const result = run(['check', '--root', root, '--exclude', 'evals', '--format', 'json'])
+    const report = JSON.parse(result.stdout)
+
+    assert.equal(result.status, 0)
+    assert.equal(report.findings.length, 1)
+    assert.deepEqual(report.exclude, ['evals'])
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: --exclude without a value exits 2', () => {
+  const result = run(['check', '--exclude'])
+
+  assert.equal(result.status, 2)
+  assert.match(result.stderr, /--exclude needs/)
 })

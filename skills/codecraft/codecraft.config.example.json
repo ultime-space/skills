@@ -19,5 +19,9 @@
       "reason": "legacy page; migrate in 2026-Q4",
       "expires": "2026-12-31"
     }
-  ]
+  ],
+  "boundaries": {
+    "external": ["@/types/external"],
+    "generated": ["@/types/project"]
+  }
 }

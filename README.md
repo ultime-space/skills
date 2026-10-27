@@ -40,6 +40,7 @@ npx skills add ultime-space/skills --skill='*' -g
 | Skill | 说明 | 入口 |
 |---|---|---|
 | **Codecraft** | 面向 JS/TS 的代码规范与架构设计（前端默认）：审计、计划、架构、脚手架与门禁编排 | [README](./skills/codecraft/README.md) · [SKILL.md](./skills/codecraft/SKILL.md) · [VERSION](./skills/codecraft/VERSION) |
+| **Docscraft** | 文档组织与 AI 上下文治理：分层、单一真源、规则治理、ADR、文档漂移检查 | [README](./skills/docscraft/README.md) · [SKILL.md](./skills/docscraft/SKILL.md) · [VERSION](./skills/docscraft/VERSION) |
 
 ---
 
@@ -56,25 +57,21 @@ npx skills add ultime-space/skills --skill codecraft
 ### B · npm + skills-npm（多项目 / 团队）
 
 ```bash
-npm i -D @ultime/codecraft skills-npm
+npm i -D @ultime/codecraft @ultime/docscraft skills-npm
 npx skills-npm setup
 ```
 
-每次 `npm install` 会把 `node_modules/@ultime/codecraft` 同步到 `.agents/skills/codecraft` 及检测到的 agent 目录。需要 Node.js >= 22.20。
+每次 `npm install` 会把两个包（`node_modules/@ultime/codecraft`、`node_modules/@ultime/docscraft`）同步到 `.agents/skills/` 及检测到的 agent 目录。需要 Node.js >= 22.20。
 
 ### C · 手动指针（不复制文件）
 
-在项目的规则文件里留一行，指向对应平台的入口：
-
-| 平台 | 规则文件 | 入口 |
-|---|---|---|
-| 通用 | `AGENTS.md` | [`adapters/generic/AGENTS.md`](./skills/codecraft/adapters/generic/AGENTS.md) |
-| Claude | `CLAUDE.md` / `~/.claude/CLAUDE.md` | [`adapters/claude/SKILL.md`](./skills/codecraft/adapters/claude/SKILL.md) |
-| Trae | `.trae/rules/codecraft.md` | [`adapters/trae/SKILL.md`](./skills/codecraft/adapters/trae/SKILL.md) |
+在项目通用入口 `AGENTS.md` 留一行：
 
 ```md
-代码任务先读 <Codecraft 路径>/skills/codecraft/adapters/generic/AGENTS.md
+代码任务先读 <Codecraft 路径>/skills/codecraft/SKILL.md
 ```
+
+入口示例：[`adapters/generic/AGENTS.md`](./skills/codecraft/adapters/generic/AGENTS.md)。其它 agent 使用自己的入口文件，统一指向 `SKILL.md`；不为单一 agent 维护专属文件。
 
 完整用法见 [Codecraft · 安装](./skills/codecraft/README.md#安装)。
 
@@ -87,15 +84,23 @@ skills/
 ├── README.md            本文件：集合索引与安装入口
 ├── .github/workflows/   发布流水线（tag 触发 → npm）
 └── skills/
-    └── codecraft/       一个独立 skill
-        ├── SKILL.md     agent skill 标准入口
-        ├── docs/        宪法、族卡、AI 契约、风格、模式、架构、门禁
-        ├── scenarios/   新项目 / 旧项目审计 / 只出报告 / 重构评审
-        ├── adapters/    generic / Claude / Trae 手动指针
+    ├── codecraft/       代码规范与架构
+    │   ├── SKILL.md     agent skill 标准入口
+    │   ├── docs/        宪法、族卡、AI 契约、风格、模式、架构、门禁
+    │   ├── scenarios/   新项目 / 旧项目审计 / 只出报告 / 重构评审
+    │   ├── adapters/    generic 手动指针（其它 agent 统一指向 SKILL.md）
+    │   ├── prompts/     输出格式
+    │   ├── src/ + bin/  CLI（check / audit / plan / init）
+    │   ├── templates/   init --apply 的骨架
+    │   ├── tests/       node:test 用例
+    │   └── evals/       CLI eval fixtures + golden tasks（人工回归）
+    └── docscraft/       文档组织与 AI 上下文治理
+        ├── SKILL.md
+        ├── docs/        原则、分层、类型、AI 上下文、防漂移、规则治理、ADR
+        ├── scenarios/   文档审计 / 重整 / 写 ADR / 复查规则
         ├── prompts/     输出格式
-        ├── src/ + bin/  CLI（check / audit / plan / init）
-        ├── templates/   init --apply 的骨架
-        ├── tests/       node:test 用例
+        ├── templates/   AGENTS / rules / ADR
+        ├── tests/       包结构与链接校验
         └── evals/       golden tasks（人工回归）
 ```
 
@@ -118,7 +123,13 @@ skills/
 ```bash
 cd skills/codecraft
 npm test                       # node:test，无框架依赖
+npm run eval                   # CLI fixtures：A2 / A6 / A11 / A17 / A21 / ignore / SARIF
+npm run self-check             # 仓库自检；fixtures 含故意违规样本，用 --exclude 跳过
 npm pack --dry-run             # 检查发布内容
+
+cd ../docscraft
+npm test                       # 结构、版本对齐、相对链接与路由路径
+npm pack --dry-run
 ```
 
 发布走 tag：`package.json` 版本与 tag 对齐后推送，GitHub Actions 用 npm Trusted Publishing（OIDC）发布，不存 token。
@@ -126,9 +137,12 @@ npm pack --dry-run             # 检查发布内容
 ```bash
 git tag codecraft-v<version>
 git push origin codecraft-v<version>
+
+git tag docscraft-v<version>
+git push origin docscraft-v<version>
 ```
 
-版本变更记录见 [CHANGELOG.md](./skills/codecraft/CHANGELOG.md)。
+版本变更记录见 [Codecraft CHANGELOG](./skills/codecraft/CHANGELOG.md) 与 [Docscraft CHANGELOG](./skills/docscraft/CHANGELOG.md)。
 
 ---
 
@@ -137,4 +151,4 @@ git push origin codecraft-v<version>
 - 许可：MIT，见 [LICENSE](./skills/codecraft/LICENSE)
 - 贡献流程：[CONTRIBUTING.md](./skills/codecraft/CONTRIBUTING.md)
 - 安全问题：[SECURITY.md](./skills/codecraft/SECURITY.md)
-- 路线图：[ROADMAP.md](./skills/codecraft/ROADMAP.md)
+- 版本历史：[CHANGELOG.md](./skills/codecraft/CHANGELOG.md)

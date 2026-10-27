@@ -56,7 +56,18 @@
 4. **风险 / 不确定**
 5. **后续**：owner + 到期
 
-## 6. Review Checklist（评审清单）
+Audit 报告还必须满足 `docs/08-audit-contract.md`。
+
+## 6. 审计证据门槛
+
+- A1–A21 全覆盖；不适用写 `na`。
+- 每条 `pass` 必须给文件行号或可复现命令；只有静态检查通过时写 `pass（静态）`。
+- `0 findings` 只能写成「静态检查未命中」，不能写成规则通过；必须写明 A17 / A21 等覆盖盲区。
+- 计数必须带检索式；不能复现的数字不写。
+- 出结论前做一致性检查：A4 / A8 / A11 / A17 / A21 与证据矛盾时降级。
+- 优先级按 P0–P3；计划每阶段可回滚、有验收。
+
+## 7. Review Checklist（评审清单）
 
 - [ ] 族形正确（Page / Behavior / Transport；Node 后端跳过 Page / Component）
 - [ ] 依赖向内

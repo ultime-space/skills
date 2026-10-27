@@ -65,6 +65,12 @@ void test('loadConfig: rejects invalid JSON and invalid gates', () => {
 
     write(root, 'codecraft.config.json', JSON.stringify({ ignore: [{ rule: 'A17', file: 'src/**' }] }))
     assert.throws(() => loadConfig(root), /reason/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ boundaries: [] }))
+    assert.throws(() => loadConfig(root), /boundaries/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ boundaries: { external: [1] } }))
+    assert.throws(() => loadConfig(root), /non-empty/)
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }

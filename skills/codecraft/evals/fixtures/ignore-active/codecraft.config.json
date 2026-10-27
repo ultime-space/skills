@@ -1,0 +1,5 @@
+{
+  "ignore": [
+    { "rule": "A17", "file": "src/pages/**", "reason": "eval fixture", "expires": "2099-12-31" }
+  ]
+}

@@ -1,6 +1,7 @@
 const ACTIONS = {
   A2: 'Declare the workspace dependency in package.json, or remove the import; if shared, move it to a lower-layer package.',
   A4: 'Move the external import to a Wrapper/API module; expose an internal type to the caller.',
+  A6: 'Return a Result or handle the error; never swallow it in an empty catch.',
   A11: "Regenerate the file from source and add a 'do not edit' marker; if it is not generated, move it out of generated paths.",
   A17: 'Move the external import to a Wrapper/API module; expose an internal type to the caller.',
 }
@@ -8,6 +9,7 @@ const ACTIONS = {
 const VERIFY = {
   A2: 'codecraft check --pack library',
   A4: 'codecraft check --pack app',
+  A6: 'codecraft check',
   A11: 'codecraft check --pack library',
   A17: 'codecraft check --pack app',
 }

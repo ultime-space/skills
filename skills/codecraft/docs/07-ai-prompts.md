@@ -24,17 +24,16 @@ npx skills-npm setup
 
 装好后项目里会有 `.agents/skills/codecraft/SKILL.md`（以及检测到的 agent 目录）。
 
-也可以手动在 agent 入口里留一条指针，不要复制规则：
+也可以手动在通用入口里留一条指针，不要复制规则：
 
-- 通用：`AGENTS.md`
-- Claude：`CLAUDE.md`
-- Trae：项目 `.trae/rules/codecraft.md`
+- 通用：`AGENTS.md`（推荐）
+- 其它 agent：使用该 agent 自己的入口文件，内容相同
 
 ```md
-代码任务先读 <Codecraft 仓库路径>/skills/codecraft/adapters/<平台>/...
+代码任务先读 <Codecraft 路径>/skills/codecraft/SKILL.md
 ```
 
-平台对应：Trae → `adapters/trae/SKILL.md`，Claude → `adapters/claude/SKILL.md`，其他 → `adapters/generic/AGENTS.md`。
+入口示例：`adapters/generic/AGENTS.md`。其它 agent 不需要单独适配文件，统一指向 `SKILL.md`。
 
 ## 2. 最小开场
 
