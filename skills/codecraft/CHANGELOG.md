@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.8.0 - 2026-10-28
+
+- docs 重组为 `shared/`（宪法、AI 契约、审计契约、门禁、模式、提示词、术语）、`frontend/`（前端族卡、风格、架构、审计）、`backend/`（后端族卡、风格、架构、审计）；SKILL 按端路由，AI 只读相关端。
+- 新增后端 10 个代码族：Route / Controller、Validation、Service、Repository、Database / Migration、Job / Queue、Cache、Auth、Observability、Config。
+- 新增后端架构方法与风格总图：请求链路、依赖方向、事务边界、幂等、迁移兼容、权限与配置。
+- 后端保持运行时 / 框架中立：不收录框架清单、运行时状态表或实现示例；审计只记录运行时与版本，并检查差异项。后端轨表述为 JS/TS 后端；CLI 运行时仍要求 Node.js >= 20。
+- A17 允许 `wrapper/` 目录 import 外部 / 生成类型；新增 `boundaries.allowedImporters`（相对 `--root` 的文件 / glob）与 `boundaries.generatedDirs`（生成物根目录）。
+- 新增 config `exclude`：与 `--exclude` 合并，报告记录合并后的排除列表；用于 fixture、构建产物与本地密钥文件。
+- `boundaries.external` / `boundaries.generated` 明确为 import 前缀；补充 barrel / 别名 re-export 的已知盲区，以及「局限」列的固定写法。
+- 核心概念收口：Wrapper 改为「角色 / 契约」而非层或目录，载体可以是文件、adapter、mapper、生成客户端或 BFF；转换范围扩到类型 / 字段 / 单位 / 协议 / 信封 / 错误 / 调用聚合，明确不含业务判断。
+- 族卡与风格总图同步「族是角色，不是目录」；路由 / 入口组织明确为实现自由，不单列族，入口只做参数解析、守卫与编排。
+- 术语表 `Wrapper` 中文改为「内外转换」，README 首次出现同步。
+- A6 判定补充：错误归一必须保留 `errMsg` / `cause` / status 至少一个底层原因；前端 / 后端审计矩阵与 AI 契约同步。
+- 05-patterns 新增反模式：Optimistic Write（乐观写业务状态）、Error Normalization Loses Cause（错误归一吞因）、Universal Status Check（全局状态码判定）；新增 Source Adapter 模式，补充写操作 loading 口径。
+- 前端审计增加「外部集成抽查」：成功分协议 / 信封 / 领域三层，统一结果模型与 `SourceAdapter` 接口，每个来源自己判定成功；不全局硬编码 200。凭证、目录白名单、错误透出、失败清理归 A19 / A21 / A6。
+- A3 / A4 判定补充：成功判定在来源 Adapter；多来源时「每来源一处」收口，不要求全局一个函数。
+- 审计契约拆分：`shared/08` 保留通用口径；前端 A1–A21 矩阵移到 `frontend/09`，后端解释与专项检查在 `backend/13`。A1–A21 保持跨端，不新增规则编号。
+- 新增 `scenarios/backend-audit.md`；README 补后端审计 / 架构 / PR 评审示例、前后端分开审计的 FAQ。
+- 新增测试：Wrapper 放行、文件级 allowedImporters、generatedDirs、config exclude 合并与校验；术语测试递归扫描 docs 子目录。
+- CLI 结构规则仍以前端为主；后端只把 A21 / A2 / A6 / A11 当抽样，不把 `0 findings` 当成通过。
+
 ## 1.6.1 - 2026-10-27
 
 - `docs/` 拆分为 `rules/`（宪法、族卡、风格总图）、`contracts/`（AI 契约、审计契约）、`guides/`（门禁、模式、架构、AI 提示词）；术语表移到 `docs/glossary.md`。

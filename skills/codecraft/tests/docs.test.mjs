@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const GLOSSARY = path.join(ROOT, 'docs', 'glossary.md')
+const GLOSSARY = path.join(ROOT, 'docs', 'shared', 'glossary.md')
 
 function parseGlossary() {
   const terms = []

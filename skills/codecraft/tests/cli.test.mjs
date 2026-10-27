@@ -237,6 +237,27 @@ void test('cli: --exclude skips files and records the pattern', () => {
   }
 })
 
+void test('cli: config exclude merges with --exclude', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.mkdirSync(path.join(root, 'evals', 'fixtures'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'home.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(path.join(root, 'evals', 'fixtures', '.env'), 'APP_SECRET=abcdef123456\n')
+    fs.writeFileSync(path.join(root, 'codecraft.config.json'), JSON.stringify({ exclude: ['evals'] }))
+
+    const fromConfig = JSON.parse(run(['check', '--root', root, '--format', 'json']).stdout)
+    assert.equal(fromConfig.findings.length, 1)
+    assert.deepEqual(fromConfig.exclude, ['evals'])
+
+    const merged = JSON.parse(run(['check', '--root', root, '--exclude', 'src/pages', '--format', 'json']).stdout)
+    assert.equal(merged.findings.length, 0)
+    assert.deepEqual(merged.exclude, ['evals', 'src/pages'])
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('cli: --exclude without a value exits 2', () => {
   const result = run(['check', '--exclude'])
 

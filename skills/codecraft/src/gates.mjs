@@ -6,7 +6,7 @@ import { validateIgnore } from './ignore.mjs'
 export function loadConfig(root, configPath) {
   const file = configPath ? path.resolve(root, configPath) : path.join(root, 'codecraft.config.json')
 
-  if (!fs.existsSync(file)) return { file: null, config: { ignore: [] } }
+  if (!fs.existsSync(file)) return { file: null, config: { ignore: [], exclude: [] } }
 
   let config
   try {
@@ -32,20 +32,39 @@ export function loadConfig(root, configPath) {
     config: {
       ...config,
       ignore: validateIgnore(config.ignore, file),
+      exclude: validateExclude(config.exclude, file),
       ...(config.boundaries ? { boundaries: validateBoundaries(config.boundaries, file) } : {}),
     },
   }
 }
 
+function validateExclude(value, file) {
+  if (value == null) return []
+  if (!Array.isArray(value)) {
+    throw new Error(`invalid config ${file}: "exclude" must be an array of paths or globs`)
+  }
+  return value.map((item) => {
+    if (typeof item !== 'string' || !item.trim()) {
+      throw new Error(`invalid config ${file}: "exclude" entries must be non-empty strings`)
+    }
+    return item.trim()
+  })
+}
+
 function validateBoundaries(value, file) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error(`invalid config ${file}: "boundaries" must be an object with external / generated arrays`)
+    throw new Error(
+      `invalid config ${file}: "boundaries" must be an object with external / generated / allowedImporters / generatedDirs arrays`,
+    )
   }
   const boundaries = {}
-  for (const key of ['external', 'generated']) {
+  for (const key of ['external', 'generated', 'allowedImporters', 'generatedDirs']) {
     if (value[key] == null) continue
     if (!Array.isArray(value[key])) {
-      throw new Error(`invalid config ${file}: boundaries.${key} must be an array of import prefixes or globs`)
+      const hint = ['allowedImporters', 'generatedDirs'].includes(key)
+        ? 'paths or globs relative to --root'
+        : 'import prefixes or globs'
+      throw new Error(`invalid config ${file}: boundaries.${key} must be an array of ${hint}`)
     }
     boundaries[key] = value[key].map((item) => {
       if (typeof item !== 'string' || !item.trim()) {

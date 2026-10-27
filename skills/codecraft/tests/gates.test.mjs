@@ -20,13 +20,13 @@ void test('loadConfig: missing file returns empty config', () => {
   try {
     const loaded = loadConfig(root)
     assert.equal(loaded.file, null)
-    assert.deepEqual(loaded.config, { ignore: [] })
+    assert.deepEqual(loaded.config, { ignore: [], exclude: [] })
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
 })
 
-void test('loadConfig: reads pack, gates and ignore', () => {
+void test('loadConfig: reads pack, gates, ignore and exclude', () => {
   const root = tempRoot()
   try {
     write(
@@ -36,6 +36,7 @@ void test('loadConfig: reads pack, gates and ignore', () => {
         pack: 'library',
         gates: [{ name: 'ok', run: 'node -e "process.exit(0)"' }],
         ignore: [{ rule: 'A17', file: 'src/pages/**', reason: 'legacy', expires: '2026-12-31' }],
+        exclude: ['server/.env.local'],
       }),
     )
 
@@ -46,6 +47,7 @@ void test('loadConfig: reads pack, gates and ignore', () => {
     assert.deepEqual(loaded.config.ignore, [
       { rule: 'A17', file: 'src/pages/**', reason: 'legacy', expires: '2026-12-31' },
     ])
+    assert.deepEqual(loaded.config.exclude, ['server/.env.local'])
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
@@ -70,6 +72,18 @@ void test('loadConfig: rejects invalid JSON and invalid gates', () => {
     assert.throws(() => loadConfig(root), /boundaries/)
 
     write(root, 'codecraft.config.json', JSON.stringify({ boundaries: { external: [1] } }))
+    assert.throws(() => loadConfig(root), /non-empty/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ boundaries: { allowedImporters: 'src/**' } }))
+    assert.throws(() => loadConfig(root), /allowedImporters/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ boundaries: { generatedDirs: [1] } }))
+    assert.throws(() => loadConfig(root), /non-empty/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ exclude: 'dist' }))
+    assert.throws(() => loadConfig(root), /exclude.*array/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ exclude: [1] }))
     assert.throws(() => loadConfig(root), /non-empty/)
   } finally {
     fs.rmSync(root, { recursive: true, force: true })

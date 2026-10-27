@@ -1,7 +1,7 @@
 # Codecraft
 
 > 面向 JS/TS 的代码规范与代码架构设计（不含业务架构），作为可安装的 skill 包。
-> 默认 Web 前端；示例原生优先（TS / 原生 Web API），框架只给 Vue 3 / React；Node 后端只复用结构规则；其它语言不在范围。
+> 前端与 JS/TS 后端分轨：共享 A1–A21、门禁与输出契约，族卡与架构按端读取；其它语言不在范围。
 
 - 版本：见 [VERSION](./VERSION)
 - npm：[@ultime/codecraft](https://www.npmjs.com/package/@ultime/codecraft)
@@ -13,7 +13,7 @@
 
 | 是 | 不是 |
 |---|---|
-| 一套可执行的代码宪法（A1–A21）与代码族卡 | 业务组件库 |
+| 一套可执行的代码宪法（A1–A21）与前端 / 后端两套代码族卡 | 业务组件库 |
 | 面向 AI 的固定入口与输出格式 | 某个框架的编码风格指南 |
 | 通用规则的静态检查 + 项目门禁编排 | 替代 typecheck / 单测 / e2e |
 | 代码架构分析与报告 | 业务架构 / 角色 / 流程 / 领域建模 |
@@ -31,7 +31,7 @@
 | 新建 | 架构设计 | 定档位、边界、依赖规则 | 目标架构 / ADR（架构决策记录） | Plan（计划） |
 | 新建 | 脚手架 | app / library 骨架 | 目录、配置、门禁 | Apply（执行） |
 | 接手 | 代码架构报告 | 把现有结构讲清楚 | 架构分析文档 | Audit（审计） |
-| 接手 | 老项目审计 | A1–A21 体检 | 报告、差距、升级计划 | Audit |
+| 接手 | 前端老项目审计 | A1–A21 体检 | 报告、差距、升级计划 | Audit |
 | 接手 | 重构 / 迁移评审 | 现状 → 目标、回退点 | 迁移计划 | Plan |
 | 演进 | 包 / monorepo（单仓多包）边界 | 拆包、依赖方向修正 | 边界计划 | Plan |
 | 演进 | 生成物 / 契约链 | 单一生成链、diff 门禁 | 治理方案 | Plan |
@@ -39,29 +39,34 @@
 | 日常 | PR / 增量审计 | 只看变更范围 | findings | Audit |
 | 日常 | 规范落地 | 宪法 → 项目 `rules/` + 门禁 | 规则与门禁映射 | Apply |
 | 日常 | Design System（设计系统） / 组件库 | 包边界、公共 API、文档自包含 | 审计报告 | Audit |
+| 日常 | 后端服务审计 | 入口、用例、数据访问、迁移、权限 | 报告、差距、升级计划 | Audit |
+| 日常 | 后端 PR / 增量审计 | 入口 / 用例 / 事务 / 迁移的变更 | findings | Audit |
+| 新建 / 演进 | 后端架构设计 | 模块边界、事务与幂等、数据演进 | 目标架构 / ADR | Plan |
 | 日常 | 只出报告 | 只读汇报 | 报告 | Audit |
 
-不适用：业务能力地图、角色与业务流程、领域建模、UI / 交互设计、运行时性能、渗透测试、数据库调优。
+不适用：业务能力地图、角色与业务流程、领域建模、UI / 交互设计、运行时性能、渗透测试、容量规划。
 
 ## 范围与分层
 
 | 项 | 内容 |
 |---|---|
-| 覆盖 | JS/TS 项目；Web 前端为默认场景（示例原生优先，框架仅 Vue 3 / React） |
+| 覆盖 | JS/TS 前端与 JS/TS 后端；前端示例原生优先（框架仅 Vue 3 / React），后端不绑定运行时、框架 / ORM |
 | 代码架构 | 系统 / 容器 / 模块 / 组件边界、依赖方向、关键链路、生成物、演进 |
-| 可复用 | Node 后端：模块边界、依赖方向、内外分离、生成物、门禁与文档规则 |
-| 不适用 | 业务架构、角色 / 流程 / 领域建模；Page / Component 等前端族；数据库、缓存、并发、事务等后端专项 |
-| 不在范围 | Java / Go / Python 等其它语言；后端专项另立体系 |
+| 共享 | A1–A21、门禁契约、模式选型、审计口径、术语 |
+| 分端 | 前端：Page / Component / Behavior / State / Transport / Wrapper（内外转换）/ Type …；后端：Route / Controller / Validation / Service / Repository / DB / Job / Cache / Auth … |
+| 不适用 | 业务架构、角色 / 流程 / 领域建模；前端族不套后端，后端族不套前端 |
+| 不在范围 | Java / Go / Python 等其它语言；云资源、部署拓扑与容量规划 |
 
-内容分三层，按需取用：
+内容按「共享 + 两端」分层，按需取用：
 
 | 层 | 回答什么 | 位置 |
 |---|---|---|
-| **规则** | 什么不能变 | [`docs/rules/00-constitution.md`](./docs/rules/00-constitution.md) |
-| **形状** | 边界与结构长什么样 | [`docs/guides/06-architecture.md`](./docs/guides/06-architecture.md)、[`docs/rules/01-family-cards.md`](./docs/rules/01-family-cards.md) |
-| **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/guides/05-patterns.md`](./docs/guides/05-patterns.md) |
+| **共享规则** | 什么不能变 | [`docs/shared/00-constitution.md`](./docs/shared/00-constitution.md) |
+| **前端形状** | 页面 / 组件 / 行为 / 状态怎么落 | [`docs/frontend/06-architecture.md`](./docs/frontend/06-architecture.md)、[`docs/frontend/01-family-cards.md`](./docs/frontend/01-family-cards.md) |
+| **后端形状** | 入口 / 用例 / 数据 / 迁移怎么落 | [`docs/backend/11-architecture.md`](./docs/backend/11-architecture.md)、[`docs/backend/10-family-cards.md`](./docs/backend/10-family-cards.md) |
+| **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/shared/05-patterns.md`](./docs/shared/05-patterns.md) |
 
-> 族卡的形状默认原生（HTML + TS）；框架示例只给 Vue 3 / React，其它框架在族卡 §12 登记，不预建。
+> 前端族卡的形状默认原生（HTML + TS）；框架示例只给 Vue 3 / React，其它框架在族卡 §12 登记，不预建。
 
 
 ## 安装
@@ -98,8 +103,18 @@ npx skills-npm setup
 
 ## 第一次使用
 
+前端：
+
 ```text
-用 Codecraft 审计本项目，只读，不改文件。
+用 Codecraft 审计 client/，Audit 模式，只读，不改文件。
+按 docs/frontend/09-audit.md 出报告，A1–A21 逐条给证据。
+```
+
+后端：
+
+```text
+用 Codecraft 审计 server/，Audit 模式，只读，不改文件。
+按 scenarios/backend-audit.md 出报告；事务、幂等、迁移、权限各给证据。
 ```
 
 需要一份能读的代码架构文档：
@@ -111,18 +126,41 @@ npx skills-npm setup
 
 只启用 skill、不说 Codecraft 时，agent 可能按普通项目分析处理，不保证走 Audit 模式。带上名字最稳。
 
-更多场景（代码架构报告、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/guides/07-ai-prompts.md](./docs/guides/07-ai-prompts.md)。
+更多场景（代码架构报告、后端服务审计、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/shared/07-ai-prompts.md](./docs/shared/07-ai-prompts.md)。
 
 ## 常用场景怎么说
 
 说清三件事：模式、范围、产出。下面可以直接复制。
 
-**老项目审计**
+**前端审计**
 
 ```text
 用 Codecraft 审计本项目，只读，不改文件。
 范围：client/ 和 admin/；重点看边界、错误模型、生成物。
-产出：按 prompts/output.md 出报告，A1–A21 逐条给证据。
+产出：按 docs/frontend/09-audit.md 出报告，A1–A21 逐条给证据。
+```
+
+**后端服务审计**
+
+```text
+用 Codecraft 审计 server/，Audit 模式，只读。
+按 scenarios/backend-audit.md 和 docs/backend/13-audit.md 逐条判定；
+重点：入口职责、事务边界、幂等、迁移兼容、权限与配置。
+```
+
+**后端架构设计**
+
+```text
+用 Codecraft 为 server/ 设计架构，Plan 模式，只读。
+按 docs/backend/11-architecture.md 先定模块边界、事务与幂等策略、迁移与回滚；
+输出目录树、角色清单、分阶段计划，不直接写代码。
+```
+
+**后端 PR 评审**
+
+```text
+用 Codecraft 评审 server/ 的 <diff / 模块>，Review 模式，只读。
+重点：Controller 是否写业务、事务是否在 Service、迁移是否兼容、权限判断是否单点。
 ```
 
 **代码架构分析报告**
@@ -245,9 +283,11 @@ codecraft init --root . --name demo --apply      # 写盘
 
 | Pack | 内置规则 | 检查范围 |
 |---|---|---|
-| `app` | A6 / A17 / A21 | 空 catch；`pages / components / behavior` 不 import `external/` / `generated/`（含生成文件头与 `boundaries` 配置）；密钥扫描 |
+| `app` | A6 / A17 / A21 | 空 catch；`pages / components / behavior` 不 import `external/` / `generated/`（Wrapper / API / adapters 允许；含生成文件头与 `boundaries` 配置）；密钥扫描 |
 | `library` | A2 / A6 / A11 / A21 | 包不 import app、相对路径不逃逸、workspace 依赖必须声明；空 catch；生成物必须有“勿手改 / 派生”标记；密钥扫描 |
 | `design-system` | A2 / A6 / A11 / A21 | library 规则 + 包内公开文档不得引用内部 `docs/` |
+
+> CLI 的结构规则以前端为主；后端审计按 [`docs/backend/13-audit.md`](./docs/backend/13-audit.md)，只把 A21 / A2 / A6 / A11 当抽样，不把 `0 findings` 当成通过。
 
 `--pack auto` 的判定顺序（基于 JS/TS 生态的目录与 `package.json`）：
 
@@ -268,6 +308,7 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 ```json
 {
   "pack": "auto",
+  "exclude": ["dist/**", "coverage/**"],
   "gates": [
     { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
     { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
@@ -282,29 +323,31 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
   ],
   "boundaries": {
     "external": ["@/types/external"],
-    "generated": ["@/types/project"]
+    "generated": ["@/types/project"],
+    "allowedImporters": ["src/types/internal/*/wrapper.ts"],
+    "generatedDirs": ["src/types/external"]
   }
 }
 ```
 
 - `pack`：`app` / `library` / `design-system` / `auto`。
+- `exclude`：扫描级排除（路径或 glob），与 `--exclude` 合并；用于 fixture、构建产物、本地密钥文件。要登记规则例外用 `ignore`，两者不要混用。
 - `gates`：数组；每项必须有一个非空的 `run` 字符串，可选 `name`、`timeoutMs`（默认 `120000`）。
 - `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
-- `boundaries`：A17 的补充路径。生成类型优先按文件头自动识别；`external` / `generated` 填 import 前缀或 glob，用于头部没有标记、或路径不在约定内的项目。
+- `boundaries`：A17 的补充声明。`external` / `generated` 填 import 前缀或 glob；`allowedImporters` 填允许 import 外部类型的文件（路径或 glob，相对 `--root`）；`generatedDirs` 填生成物根目录（相对 `--root`），目录内文件即使没有生成头也按生成物处理。
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
 - gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
-- 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/guides/04-gates.md`](./docs/guides/04-gates.md)。
+- 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/shared/04-gates.md`](./docs/shared/04-gates.md)。
 
 ## 目录
 
 ```text
 SKILL.md      标准 agent skill 入口（skills add / skills-npm 使用）
-docs/rules/          宪法、族卡、风格总图
-docs/contracts/      AI 契约、审计契约
-docs/guides/         门禁、模式、架构、AI 提示词
-docs/glossary.md     术语表
-scenarios/    新项目 / 旧项目审计 / 代码架构报告 / 只出报告 / 重构评审
+docs/shared/          宪法、AI 契约、审计契约、门禁、模式、提示词、术语表
+docs/frontend/        前端族卡、风格总图、架构、审计判定
+docs/backend/         后端族卡、风格总图、架构、审计判定
+scenarios/    前端 / 后端审计、新项目、代码架构报告、只出报告、重构评审
 adapters/     generic 手动指针（其它 agent 统一指向 SKILL.md）
 prompts/      输出格式
 src/ + bin/   CLI（check / audit / plan / init）
@@ -332,6 +375,8 @@ evals/        CLI eval fixtures + golden tasks（人工回归）
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
 - **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app / Vue CLI 标记、单页 Web 入口或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
+- **支持后端吗？** 支持，读 `docs/backend/` 一轨；后端轨不绑定运行时与框架，CLI 本身仍需 Node.js >= 20。后端审计按 `docs/backend/13-audit.md` 人工补齐，不把 CLI 的 `0 findings` 当通过。
+- **同一个仓库前后端都有，怎么审计？** 分两次跑：先说明端与目录（`client/` / `server/`），每次只读该端族卡与审计文件；不要在一次报告里混用两端判定。
 - **支持哪些文件？** A2 / A6 / A11 / A17 扫描 JS/TS 相关扩展名与 `package.json`；A21 额外扫描配置与后端源码（`.yml` / `.yaml` / `.env` / `.properties` / `.xml` / `.java` / `.kt` 等）里的明文密钥。其它语言仍不在检查范围。
 
 ## 边界

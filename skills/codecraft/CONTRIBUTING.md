@@ -2,7 +2,7 @@
 
 > 定位：给贡献者与 AI 的最短协作规则；规范正文在 `docs/`。
 > 状态：现行（2026-10）。
-> 关系：行为约束见 `docs/contracts/02-ai-contract.md`；门禁口径见 `docs/guides/04-gates.md`。
+> 关系：行为约束见 `docs/shared/02-ai-contract.md`；门禁口径见 `docs/shared/04-gates.md`。
 
 ## 工作流
 

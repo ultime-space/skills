@@ -1,39 +1,42 @@
-# 代码族卡 v1（11 个环节 · JS/TS）
+# 前端代码族卡 v1（11 个环节）
 
 > 2026-10-27 · v1 稳定版。
-> 用途：把《代码宪法 v1》落到每个代码族（环节）；不同族可以不同形状，族内必须同形。
+> 用途：把《代码宪法 v1》落到前端代码族（环节）；不同族可以不同形状，族内必须同形。
 > 形状与示例原生优先：TS + 原生 Web API（DOM / fetch / CustomEvent）为默认；框架示例只给 Vue 3 / React。
 > 其它框架不预建，先在 §12 扩展位登记。
-> 前端专用族：Page / Component；Node 后端只复用结构与边界类族。
+> 后端族卡见 `docs/backend/10-family-cards.md`，不要混用。
 > 术语：English（中文）。
 
 ## 0. 卡模板
 
 每个代码族写清：**职责 / 形状 / 命名 / 契约 / 状态与错误 / 测试 / 正例 / 反例 / 验收**。
 
-> 族是「环节」，不是必须模块；项目没有这个职责时，这一族可以不存在。
+> 族是「角色 / 环节」，不是目录；项目没有这个职责时，这一族可以不存在。
+> 同族可以落在不同目录：目录名只是默认示例，不是契约。
 
 ## 0.1 适用范围
 
-| 族 | 前端 | Node 后端 | 备注 |
-|---|---|---|---|
-| Page | ✅ | ❌ | 后端无对应物，不要硬造 |
-| Component | ✅ | ❌ | 同上 |
-| Behavior | ✅ | ⚠️ | 对应 domain service；core 不依赖框架仍成立 |
-| Transport | ✅ | ✅ | 后端是 client / adapter |
-| Wrapper | ✅ | ✅ | 防腐层，规则一致 |
-| Type | ✅ | ✅ | 联合类型等验收项按语言替换 |
-| Package | ✅ | ✅ | 包边界、版本、public API 规则通用 |
-| State | ✅ | ⚠️ | 状态机 / 领域状态可用；computed 换成同义派生 |
-| Util | ✅ | ✅ | 纯函数，规则一致 |
-| Script | ✅ | ✅ | 脚本通用 |
-| Test | ✅ | ✅ | 分层测试策略通用 |
+| 族 | 前端 | 备注 |
+|---|---|---|
+| Page | ✅ | 后端无对应物，不要硬造 |
+| Component | ✅ | 同上 |
+| Behavior | ✅ | 后端对应用例服务（Service），见 `docs/backend/10-family-cards.md` |
+| Transport | ✅ | 后端是 client / adapter |
+| Wrapper | ✅ | 防腐层，规则一致 |
+| Type | ✅ | 联合类型等验收项按语言替换 |
+| Package | ✅ | 包边界、版本、public API 规则通用 |
+| State | ✅ | 状态机 / 领域状态可用；computed 换成同义派生 |
+| Util | ✅ | 纯函数，规则一致 |
+| Script | ✅ | 脚本通用 |
+| Test | ✅ | 分层测试策略通用 |
 
 > ✅ 直接用；⚠️ 思路可用、形状要按项目重写；❌ 不适用。
+> 本表只描述前端族；后端族以后端族卡为准，不按本表套用。
+> 路由 / 入口组织不单列族：文件路由（Nuxt / Next）、显式路由表（Vue Router / React Router）或单页都行；只要求入口做参数解析、守卫与编排，不承载业务规则。
 
 ## 1. Page（页面）· 前端专用
 
-- **职责**：组合根；路由入口；只做编排、布局、状态展示；不承载业务规则。
+- **职责**：组合根；路由入口（组织方式由项目决定：文件路由 / 显式路由表 / 单页）；只做编排、布局、状态展示；不承载业务规则。
 - **形状**：`pages/<domain>/index.html` + `index.ts`（原生）；`index.vue`（Vue）；`index.tsx`（React）。页面级类 `page-*`；页面骨架固定为顶栏 / 内容 / 底栏 / 弹层四插槽（组件名按项目命名）。
 - **命名**：目录 kebab-case；页面级类 `page-*`（标作用域，不做装饰）；组件名原生用 kebab-case 自定义元素，Vue / React 用 PascalCase。
 - **契约**：接收路由参数；调用 Behavior Layer（行为层）；渲染 loading / empty / error / success；不直接 import api。
@@ -71,17 +74,17 @@
 
 ## 4. Wrapper
 
-- **职责**：外部契约适配；把后端 / 第三方的类型、字段、code 转成内部类型 / 错误；不放业务规则、不放 UI。
-- **形状**：`adapters/<source>/` 或 `api/<domain>/<source>.ts`；一个外部来源一个适配器。
-- **命名**：`fromXxx` / `toXxx` / `parseXxx`；外部类型只在包装层内命名（如 `BackendUser` / `ThirdPartyArticle`）。
-- **契约**：输入外部 raw / 外部类型；输出内部 `Xxx` / `Result`；外部字段不泄漏。
+- **职责**：外部契约到内部形状的唯一转换收口；做机械转换，不做业务判断、不放 UI。
+- **形状**：载体自由——`wrapper.ts`（如 `types/internal/<域>/wrapper.ts`）、`adapters/<source>/`、`api/<domain>/<source>.ts`、Transport 内 adapter、生成客户端 + mapper，或 BFF；不要求单独目录。
+- **命名**：`fromXxx` / `toXxx` / `parseXxx`；外部类型只在 Wrapper 角色内命名（如 `BackendUser` / `ThirdPartyArticle`）。
+- **契约**：输入外部 raw / 外部类型；输出内部 `Xxx` / `Result`；转换覆盖类型 / 字段 / 枚举、单位 / 精度、协议 / 信封 / 分页、外部 code → 内部错误、调用聚合；外部字段不泄漏。
 - **状态与错误**：把外部 code / 错误映射成内部错误分类；不弹 toast、不做 UI。
-- **测试**：fixture / 契约测试；第三方响应快照。
-- **正例**：gen-api 类型 → 内部 `User`；资讯平台 → `Article`；支付渠道 → `PaymentResult`。
-- **反例**：页面直接 import `UserDto`；内部类型叫 `UserVo`；第三方字段名出现在 UI。
-- **验收**：lint「内部代码不 import `external/` 或生成类型」；Wrapper 单测；换源不改内部。
+- **测试**：fixture / 契约测试；第三方响应快照；mapper 纯函数单测。
+- **正例**：gen-api 类型 → 内部 `User`；资讯平台 → `Article`；支付渠道 → `PaymentResult`；分页信封 → `PageInfo<T>`；金额分 → 元。
+- **反例**：页面直接 import `UserDto`；内部类型叫 `UserVo`；第三方字段名出现在 UI；在 Wrapper 里算折扣 / 判权限。
+- **验收**：lint「内部代码不 import `external/` 或生成类型」；Wrapper 单测；换源不改内部；不靠目录名证明 Wrapper 存在。
 - **转换示例**：一个后端接口返回三个系统的数据 → Wrapper 拆成 `FinanceSummary / OperationsSummary / SupportSummary` 三个内部模型；三个页面各取所需，不共享一个「大而全」的后端类型。
-- **导入规则**：只有 Wrapper / API 层可以 import `external/`；页面 / 组件 / 行为层不得 import。
+- **导入规则**：只有 Wrapper 角色（及 Transport adapter / `boundaries.allowedImporters` 声明的文件）可以 import `external/`；页面 / 组件 / 行为层不得 import。
 
 ## 5. Type（类型）
 
@@ -95,7 +98,7 @@
 - **特殊**：`shared/types/` 不能变成杂物间；跨应用业务类型用 `packages/domain-<x>`。
 - **命名**：按《代码宪法 v1》§3.1（外部保持原名；通用中性；业务后缀角色；不用 `I` / `model_xxx`）；本卡不重复全表。
 - **依赖**：General ← Business；Business 不 import External；UI 只消费 Business / General。
-- **契约**：外部类型只被 Wrapper import；页面 / 组件 / 行为层只用内部类型。
+- **契约**：外部类型只被 Wrapper 角色内的代码 import；页面 / 组件 / 行为层只用内部类型。
 - **状态与错误**：类型里不允许不可能组合；互斥状态用联合类型。
 - **测试**：类型测试（tsd / expect-type）可选；Wrapper 契约测试。
 - **正例**：`BackendUser` → `toUser()` → `User` → `UserView`。

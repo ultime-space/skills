@@ -1,10 +1,10 @@
 # 代码架构设计方法（可选）
 
-> 用途：系统级 / 模块级 / 演进级的代码架构决策方法；代码级模式见 `docs/guides/05-patterns.md`。
+> 用途：系统级 / 模块级 / 演进级的代码架构决策方法；代码级模式见 `docs/shared/05-patterns.md`。
 > 边界：只讨论代码架构；业务能力、角色、业务流程、领域规则不在本 skill 范围。
 > 产出：只出文档时用 `scenarios/architecture-report.md` + `templates/architecture-report.md`。
 > 原则：**方法先于模式；约束先于图；边界先于抽象。**
-> 范围：方法本身与语言无关，可用于 JS/TS 前端与 Node 后端；文中目录与框架取舍以 JS/TS 为准。
+> 范围：方法本身与语言无关，可用于 JS/TS 前端与 JS/TS 后端；文中目录与框架取舍以 JS/TS 为准。
 > 术语：English（中文）。
 
 ## 0. 先分开六个词
@@ -13,7 +13,7 @@
 |---|---|---|
 | **Architecture（架构）** | 系统的结构 + 约束 + 决策理由 | 模块、依赖方向、public API、ADR、验证规则 |
 | **Architecture Style（架构风格）** | 可复用的结构方案 | 分层、模块化单体、六边形、事件驱动… |
-| **Design Pattern（设计模式）** | 代码级解法 | Strategy、Adapter、State…（见 `docs/guides/05-patterns.md`） |
+| **Design Pattern（设计模式）** | 代码级解法 | Strategy、Adapter、State…（见 `docs/shared/05-patterns.md`） |
 | **Method（方法）** | 产出架构的过程 | 目标 → 质量场景 → 边界 → 规则 → 验证 |
 | **View（视图）** | 面向某类关注点的投影 | Context / Container / Runtime / Deployment |
 | **Tactic（战术）** | 为某个质量属性做的局部决策 | 缓存、限流、重试、冗余 |
@@ -108,6 +108,7 @@ src/
 
 - 依赖只能向下；同层不互相 import；跨模块只走 public API。
 - 结构默认与框架无关：原生能表达的先写原生，Vue / React 只作页面与组件的落点。
+- 路由 / 入口组织属于实现自由：文件路由（Nuxt / Next）、显式路由表（Vue Router / React Router）或单页都可以；入口只做参数解析、守卫与编排，不承载业务规则，也不单列代码族。
 - `shared/api` + adapter + interceptors 是承重墙，不塞进 feature。
 - server state 与 client state 分开：server state 用 query 层；client state 用 store / 状态机。
 - 测试分层：纯 core 单测 → feature 行为测试 → 页面 smoke → API 契约测试。

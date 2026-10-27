@@ -38,6 +38,67 @@ void test('A17: pages / components / behavior cannot import external or generate
   }
 })
 
+void test('A17: wrapper may import external and generated types', () => {
+  const root = tempRoot()
+  try {
+    write(root, 'src/wrapper/user.ts', "import type { UserVO } from '@/external/user'\n")
+    write(root, 'src/api/user.ts', "import type { Row } from '@/generated/types'\n")
+    write(root, 'src/pages/home.ts', "import type { UserVO } from '@/external/user'\n")
+
+    const result = check(root)
+    const findings = result.findings.filter((finding) => finding.rule === 'A17')
+
+    assert.equal(findings.length, 1)
+    assert.equal(findings[0].file, 'src/pages/home.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('A17: allowedImporters config permits a custom wrapper path', () => {
+  const root = tempRoot()
+  try {
+    write(root, 'src/types/external/user.ts', 'export type UserVO = { id: string }\n')
+    write(root, 'src/types/internal/user/wrapper.ts', "import type { UserVO } from '@/types/external/user'\n")
+    write(root, 'src/pages/home.ts', "import type { UserVO } from '@/types/external/user'\n")
+
+    const withoutConfig = check(root).findings.filter((finding) => finding.rule === 'A17')
+    assert.deepEqual(
+      withoutConfig.map((finding) => finding.file).sort(),
+      ['src/pages/home.ts', 'src/types/internal/user/wrapper.ts'],
+    )
+
+    const configured = check(root, {
+      boundaries: { allowedImporters: ['src/types/internal/*/wrapper.ts'] },
+    }).findings.filter((finding) => finding.rule === 'A17')
+
+    assert.equal(configured.length, 1)
+    assert.equal(configured[0].file, 'src/pages/home.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('A17: generatedDirs marks generated types without a header', () => {
+  const root = tempRoot()
+  try {
+    write(root, 'src/types/contract/user.ts', 'export type UserVO = { id: string }\n')
+    write(root, 'src/pages/home.ts', "import type { UserVO } from '@/types/contract/user'\n")
+
+    const plain = check(root).findings.filter((finding) => finding.rule === 'A17')
+    assert.equal(plain.length, 0)
+
+    const configured = check(root, {
+      boundaries: { generatedDirs: ['src/types/contract'] },
+    }).findings.filter((finding) => finding.rule === 'A17')
+
+    assert.equal(configured.length, 1)
+    assert.equal(configured[0].file, 'src/pages/home.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('A17: boundaries config catches custom generated paths', () => {
   const root = tempRoot()
   try {

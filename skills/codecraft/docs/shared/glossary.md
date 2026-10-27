@@ -9,7 +9,7 @@
 | Audit | 审计 |
 | Plan | 计划 |
 | Apply | 执行 |
-| Wrapper | 包装层 |
+| Wrapper | 内外转换 |
 | Gate | 门禁 |
 | Gates | 门禁 |
 | Drift | 漂移 |

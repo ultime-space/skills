@@ -1,7 +1,7 @@
 # 代码宪法 v1（JS/TS）
 
 > 2026-10-27 · v1 稳定版。
-> 用途：给人和 AI 的共同约束；适用于 JS/TS 项目，默认前端场景。
+> 用途：给人和 AI 的共同约束；适用于 JS/TS 项目，前端与 JS/TS 后端分轨。
 > 读者：团队 / AI（Design Specification）。
 > 术语：English（中文）。
 
@@ -9,13 +9,13 @@
 
 | 项 | 内容 |
 |---|---|
-| 覆盖 | JS/TS；Web 前端为默认场景 |
-| 可复用 | Node 后端：M1–M5 与 A1–A21 中的结构、边界与安全规则 |
+| 覆盖 | JS/TS 前端与 JS/TS 后端；A1–A21 跨端，族卡与架构分端 |
+| 分端 | 前端读 `docs/frontend/`；后端读 `docs/backend/`；不要混用两端族卡 |
 | 部分适用 | A5 / A6 / A8 的验收列是 TS / 前端写法（`assertNever` / `satisfies` / `computed`）；其它实现只要证明同一不变量即可 |
-| 示例顺序 | 原生（TS / Web API）→ Vue 3 / React → 其它框架（不预建，族卡 §12 登记） |
-| 不在范围 | Page / Component 等前端族；数据库、缓存、并发、事务；其它语言 |
+| 示例顺序 | 前端：原生（TS / Web API）→ Vue 3 / React → 其它框架（不预建，族卡 §12 登记）；后端：不绑定框架 / ORM |
+| 不在范围 | 业务架构、角色 / 流程 / 领域建模；其它语言；云资源、部署拓扑与容量规划 |
 
-> 读法：§1 元判据 → §2 不变量 → 按主题查 §3 → 族形查《代码族卡 v1》。
+> 读法：§1 元判据 → §2 不变量 → 按主题查 §3 → 族形查对应端《代码族卡》。
 
 ## 0.1 第一性
 
@@ -57,7 +57,7 @@
 | A14 | 按需求付工程费（Pay for Engineering by Need） | 过度设计也是债 | L0→L1→L2，有触发条件 |
 | A15 | AI 输出契约（AI Output Contract） | 多模型 / 多 agent 会漂移 | 说明改了什么 / 为什么 / 怎么验 / 风险 |
 | A16 | 命名即导航（Naming as Navigation） | 前缀 / 后缀标层、防重名、可搜索；组合时读出骨架 | 同族一种前缀；搜索可见 |
-| A17 | 内外分离（Inside/Outside Separation） | 前端规范只管内部；外部契约在包装层转换 | 内部不 import 外部类型 |
+| A17 | 内外分离（Inside/Outside Separation） | 前端规范只管内部；外部契约只经 Wrapper 转换 | 内部不 import 外部类型 |
 | A18 | 预案完整，默认最小（Full Plan, Minimal Default） | 规范覆盖大项目能力，默认只启用小项目所需 | 有档位；默认 L0；按触发升级 |
 | A19 | 实现自由，边界固定（Implementation Free, Boundary Fixed） | 模块内部形式自由；public contract 固定；可替换 | 入参/出参/错误/副作用边界一致；有契约测试 |
 | A20 | 记录环节，不记录实现（Record the Stage, Not the Implementation） | 只记录需要什么功能 / 环节、职责与契约；实现可自研 / 第三方 / 暂时没有 | 环节可消失；不把库当架构层 |
@@ -96,7 +96,7 @@
 | 内部查询 | `UserQuery` | `UserSearchModel` |
 | 内部输入 | `UserInput` | `UserSetModel` |
 | 内部视图模型 | `UserView` | 无 |
-| 外部类型（后端 / 第三方） | 只存在于 `external/` 或 Wrapper；不参与内部命名 | 生成物原名 |
+| 外部类型（后端 / 第三方） | 只存在于 `external/` 或 Wrapper 角色内；不参与内部命名 | 生成物原名 |
 | UI 原语 | `app-` | 同左 |
 | 页面类 | `page-*` | 同左 |
 | 表 | `statusMap` / `apiMap` | 同左 |
@@ -145,7 +145,7 @@
 
 - **通用层**放 `types/common/`（单应用）；**`shared/types/` 只是项目决策**：当单仓多包且前后端同为 TS 时，可作为前后端单一类型源；只放类型 / 契约，不放业务 / UI；跨应用业务类型建领域包。
 - **业务层**放 `types/<domain>/`；可以 import 通用层，不能 import 外部类型。
-- 依赖方向：External → Wrapper → Business → UI；General 被所有层引用，自己不引用业务。
+- 依赖方向：External → Wrapper → Business → UI（角色链，不对应固定目录）；General 被所有层引用，自己不引用业务。
 - 外部类型保持原名，由 Wrapper 函数（`toXxx` / `parseXxx`）负责映射；不需要 `BackendXxx` 这类改名。
 - 不用 `I` 前缀（`IUser`）；不用 `model_xxx` 小写下划线作类型名。
 - 一个实体一个基名；同概念多体系时用限定词（`LoginUser` / `MemberUser`），不用 `User1 / User2`。
@@ -160,12 +160,13 @@
 ### 3.2 内外边界（Inside/Outside Boundary）
 
 - 前端规范只管**内部代码**；后端 API、第三方 API 的契约风格不在规范内。
-- 外部内容只在 **Wrapper** 出现；Wrapper 负责把外部类型 / 字段 / code 转成内部类型 / 错误。
-- 内部代码不 import 外部类型；Wrapper 是唯一入口。
-- Wrapper 可自由适配，但必须：类型安全、错误归一、不泄漏外部字段、可插拔。
+- **Wrapper 是角色，不是层或目录**：外部契约到内部形状的转换只有一个收口；载体可以是一个文件（如 `types/internal/<域>/wrapper.ts`）、Transport 内的 adapter、独立 mapper、生成客户端 + 适配，或 BFF。
+- Wrapper 负责机械转换：类型 / 字段 / 枚举、单位 / 精度、协议 / 信封 / 分页、外部 code → 内部错误、调用聚合；不做业务判断（折扣 / 权限规则 / 流程），不放 UI。
+- 内部代码不 import 外部类型；外部形状不越过 Wrapper。
+- Wrapper 可自由适配，但必须：类型安全、错误归一、不泄漏外部字段、可插拔、可测。
 - 换后端 / 第三方 = 换 Wrapper，不改内部。
 - 类型分三层：**External（外部形状）/ Domain（内部领域）/ View（页面视图）**。
-- External 只被 Wrapper import；Domain 供行为层 / 页面；View 由页面 / 行为层派生。
+- External 只被 Wrapper 角色内的代码 import；Domain 供行为层 / 页面；View 由页面 / 行为层派生。
 - 页面 / 组件不得用后端类型定义交互状态；UI 状态用内部联合类型 / 视图模型。
 
 ### 3.3 规模档位（Scale Tiers）
@@ -248,7 +249,7 @@ repo/
 | 环节 | 职责 | 是否必需 | 可选实现 |
 |---|---|---|---|
 | **Transport（传输）** | 网络 / HTTP / 取消 | 有远程调用时 | 自研 / 第三方 |
-| **Wrapper（包装）** | 外部 → 内部转换 | 有外部契约时 | 自研 / 生成 |
+| **Wrapper** | 外部 → 内部转换 | 有外部契约时 | 文件 / adapter / mapper / 生成客户端 + 适配 / BFF |
 | **Behavior（行为）** | 页面无关行为 | 有复用 / 复杂逻辑时 | 纯函数 / 状态机；需要时再加 composable / hook / service |
 | **State（状态）** | 状态建模与转移 | 有异步 / 多态时 | 联合类型 / 状态机 |
 | **Concurrency（并发控制）** | 去重 / 共享 in-flight / 取消 | 有并发请求时 | 自研 / 第三方 / 不做 |
@@ -319,4 +320,4 @@ repo/
 ## 7. 待定
 
 - 每条规则的 owner 和到期日。
-- 后端（Node）专项是否独立成体系；当前只复用本宪法的结构与安全规则。
+- 后端深化（分布式事务 / 消息中间件 / 多租户）是否升级为独立规则；当前用族卡与后端解释矩阵覆盖。

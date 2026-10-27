@@ -2,7 +2,7 @@
 
 > 定位：把代码架构讲清楚，形成一份人能读、能评审、能执行的 Markdown 文档。
 > 范围：只做代码架构；业务能力、角色、业务流程、领域规则不在本 skill 范围。
-> 关系：方法见 `docs/guides/06-architecture.md`；证据门槛见 `docs/contracts/08-audit-contract.md`；模板见 `templates/architecture-report.md`。
+> 关系：方法见 `docs/frontend/06-architecture.md` 或 `docs/backend/11-architecture.md`；证据门槛见 `docs/shared/08-audit-contract.md`；模板见 `templates/architecture-report.md`。
 
 ## 何时用
 
@@ -24,10 +24,10 @@
 ## 先读
 
 1. 项目 `AGENTS.md` / `rules/`
-2. `docs/rules/00-constitution.md`
-3. `docs/guides/06-architecture.md`
-4. 只读相关族卡：`docs/rules/01-family-cards.md`
-5. 审计模式：`docs/contracts/08-audit-contract.md`
+2. `docs/shared/00-constitution.md`
+3. 判定端，读对应架构方法：`docs/frontend/06-architecture.md` 或 `docs/backend/11-architecture.md`
+4. 只读该端族卡：`docs/frontend/01-family-cards.md` 或 `docs/backend/10-family-cards.md`
+5. 审计模式：`docs/shared/08-audit-contract.md` + `docs/frontend/09-audit.md` / `docs/backend/13-audit.md`
 6. 输出：`prompts/output.md` + `templates/architecture-report.md`
 
 ## 步骤
@@ -39,8 +39,8 @@
    - 容器 / 模块：职责、边界、依赖方向。
    - 公共 API：哪些是契约，哪些是内部实现。
 4. **关键链路**：请求链、状态链、错误模型、数据流、生成链；每段给 `file:line`。
-5. **跑静态检查**：`codecraft check / audit`，记录 `files / findings / 覆盖范围`；写明 A17 / A21 盲区。
-6. **逐条判定**：A1–A21，标 `pass` / `pass（静态）` / `warn` / `fail` / `na`，每条带证据与局限。
+5. **跑静态检查**：`codecraft check / audit`，记录 `files / findings / 覆盖范围`；前端写明 A17 / A21 盲区，后端写明事务 / 幂等 / 迁移未由 CLI 覆盖。
+6. **逐条判定**：按该端判定矩阵（前端 `09` / 后端 `13`）标 `pass` / `pass（静态）` / `warn` / `fail` / `na`，每条带证据与局限。
 7. **风险与技术债**：按 P0–P3 排；区分「已发生」与「可能发生」。
 8. **演进计划**：
    - 老项目：现状 → 目标 → 分阶段迁移，每阶段可回滚、有验收命令。
@@ -71,7 +71,7 @@
 ## 验收
 
 - 报告结构与模板一致，结论 / 证据 / 风险 / 计划 / 未知项齐全。
-- A1–A21 全覆盖或写 `na`；每条有证据。
+- 该端规则全覆盖或写 `na`；每条有证据。
 - 明确写了「只做代码架构，不含业务架构」。
 - Audit / Plan 模式未改任何文件。
 - 计数与命令可复现。
@@ -80,7 +80,8 @@
 
 | 场景 | 侧重 | 产出 |
 |---|---|---|
-| `audit-existing.md` | A1–A21 体检 | findings、差距、升级计划 |
+| `audit-existing.md` | 前端 A1–A21 体检 | findings、差距、升级计划 |
+| `backend-audit.md` | 后端 A1–A21 解释 + 专项检查 | findings、差距、升级计划 |
 | `new-project.md` | 新项目设计 | 目标架构、骨架、阶段计划 |
 | `report-only.md` | 只要 findings | 只读问题清单 |
 | 本场景 | 结构叙事 + 演进 | 一份完整代码架构分析报告 |

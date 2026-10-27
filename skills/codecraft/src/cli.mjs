@@ -110,10 +110,11 @@ export function main(argv) {
     return 0
   }
 
+  const exclude = [...new Set([...(config.config.exclude ?? []), ...args.exclude])]
   const result = check(root, {
     pack,
     boundaries: config.config.boundaries,
-    exclude: args.exclude,
+    exclude,
   })
   let changed = null
   let scoped = result.findings
@@ -154,7 +155,7 @@ export function main(argv) {
     files: result.files,
     scope: args.changed || args.since ? 'changed' : 'full',
     changed: changed?.length ?? null,
-    exclude: args.exclude,
+    exclude,
     findings: activeFindings.length,
     ignored: filtered.ignored.length,
     expired: filtered.expired.length,

@@ -1,5 +1,6 @@
 {
   "pack": "auto",
+  "exclude": ["dist/**", "coverage/**"],
   "gates": [
     {
       "name": "typecheck",
@@ -22,6 +23,8 @@
   ],
   "boundaries": {
     "external": ["@/types/external"],
-    "generated": ["@/types/project"]
+    "generated": ["@/types/project"],
+    "allowedImporters": ["src/types/internal/*/wrapper.ts"],
+    "generatedDirs": ["src/types/external"]
   }
 }

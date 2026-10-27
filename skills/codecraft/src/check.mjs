@@ -26,7 +26,7 @@ const SKIP_DIRS = new Set([
 const GENERATED_SKIP_DIRS = new Set(['node_modules', '.git', 'coverage', '.turbo', '.cache'])
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.svelte'])
 const GENERATED_EXTENSIONS = new Set(['.ts', '.js', '.css', '.json', '.md'])
-const ALLOWED_SEGMENTS = new Set(['external', 'generated', 'api', 'adapters'])
+const ALLOWED_SEGMENTS = new Set(['external', 'generated', 'api', 'adapters', 'wrapper'])
 const GENERATED_MARKER = /生成物|generated|do not edit|勿手改|auto-generated|派生/i
 /** 只认文件头里的只读声明，避免把正文里的「派生」当成生成物。 */
 const GENERATED_HEADER =
@@ -106,7 +106,7 @@ export function check(root, options = {}) {
 function checkApp(root, options = {}) {
   const isExcluded = createExcluder(root, options.exclude)
   const files = collectAppFiles(root).filter((file) => !isExcluded(file) && !isMinified(file))
-  const generated = collectGeneratedFiles(files)
+  const generated = collectGeneratedFiles(files, root, options.boundaries)
   const findings = []
   for (const file of files) findings.push(...scanAppFile(file, root, options.boundaries, generated))
   findings.push(...scanSecrets(root, isExcluded))
@@ -255,11 +255,13 @@ function collectAppFiles(root) {
   return files
 }
 
-function collectGeneratedFiles(files) {
+function collectGeneratedFiles(files, root, boundaries) {
   const generated = new Map()
+  const dirs = boundaries?.generatedDirs ?? []
   for (const file of files) {
     const text = read(file)
-    if (text == null || !hasGeneratedHeader(text)) continue
+    if (text == null) continue
+    if (!hasGeneratedHeader(text) && !matchesDeclaredPath(dirs, relativePath(root, file))) continue
     generated.set(path.resolve(file), { types: exportsTypes(text) })
   }
   return generated
@@ -360,7 +362,7 @@ function scanAppFile(file, root, boundaries, generated) {
   if (generated?.has(path.resolve(file))) return []
 
   const findings = []
-  if (!isAllowedImporter(file, root)) {
+  if (!isAllowedImporter(file, root, boundaries)) {
     for (const { spec, line } of collectImports(stripComments(text))) {
       const generatedImport = generated?.size ? resolveGeneratedImport(spec, file, root, generated) : false
       if (!generatedImport && !isExternalSpec(spec, boundaries)) continue
@@ -476,9 +478,24 @@ function isFile(target) {
   }
 }
 
-function isAllowedImporter(file, root) {
-  const segments = path.relative(root, file).split(path.sep)
-  return segments.some((segment) => ALLOWED_SEGMENTS.has(segment))
+function isAllowedImporter(file, root, boundaries) {
+  const rel = relativePath(root, file)
+  const declared = boundaries?.allowedImporters ?? []
+  if (declared.some((pattern) => matchesDeclaredPath([pattern], rel))) return true
+  return rel.split('/').some((segment) => ALLOWED_SEGMENTS.has(segment))
+}
+
+/** 声明路径相对 root；无通配符时按目录前缀匹配，有通配符时按 glob 匹配。 */
+function matchesDeclaredPath(patterns, rel) {
+  return patterns.some((pattern) => {
+    const clean = String(pattern).replace(/\/+$/, '')
+    if (!/[*?]/.test(clean)) return rel === clean || rel.startsWith(`${clean}/`)
+    return matchPath(clean, rel)
+  })
+}
+
+function relativePath(root, file) {
+  return path.relative(root, file).split(path.sep).join('/')
 }
 
 function isExternalSpec(spec, boundaries) {

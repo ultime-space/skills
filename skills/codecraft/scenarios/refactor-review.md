@@ -11,7 +11,7 @@ Apply 或 Review（只评审）。
 ## 步骤
 
 1. 读 diff / 目标文件。
-2. 对照相关族卡与 A1–A21。
+2. 对照该端族卡与规则：前端 `docs/frontend/01-family-cards.md` + `09-audit.md`；后端 `docs/backend/10-family-cards.md` + `13-audit.md`。
 3. 列问题：边界、状态、错误、命名、注释、生成物。
 4. 出最小改动计划；能不改就不改。
 5. Apply：执行 + 跑门禁；Review：只出意见。

@@ -2,7 +2,7 @@
 
 > 定位：漏洞与凭据泄露的报告方式；不在这里披露细节。
 > 状态：现行（2026-10）。
-> 关系：文档安全边界见 `docs/rules/00-constitution.md` §3.6；AI 约束见 `docs/contracts/02-ai-contract.md`。
+> 关系：文档安全边界见 `docs/shared/00-constitution.md` §3.6；AI 约束见 `docs/shared/02-ai-contract.md`。
 
 ## 报告
 
