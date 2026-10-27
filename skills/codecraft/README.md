@@ -334,7 +334,7 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 - `exclude`：扫描级排除（路径或 glob），与 `--exclude` 合并；用于 fixture、构建产物、本地密钥文件。要登记规则例外用 `ignore`，两者不要混用。
 - `gates`：数组；每项必须有一个非空的 `run` 字符串，可选 `name`、`timeoutMs`（默认 `120000`）。
 - `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
-- `boundaries`：A17 的补充声明。`external` / `generated` 填 import 前缀或 glob；`allowedImporters` 填允许 import 外部类型的文件（路径或 glob，相对 `--root`）；`generatedDirs` 填生成物根目录（相对 `--root`），目录内文件即使没有生成头也按生成物处理。
+- `boundaries`：A17 的补充声明。`external` / `generated` 填 import 前缀或 glob；`allowedImporters` 填允许 import 外部类型的文件（路径或 glob，相对 `--root`；默认只按目录段放行 `wrapper/`，文件级 `wrapper.ts` 需在此登记）；`generatedDirs` 填生成物根目录（相对 `--root`），目录内文件即使没有生成头也按生成物处理。
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
 - gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。

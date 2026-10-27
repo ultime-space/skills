@@ -113,7 +113,8 @@ docscraft/
 ## 验证
 
 ```bash
-npm test              # 结构、版本对齐、相对链接、SKILL 路由路径、清单覆盖
+npm test              # 结构、版本对齐、相对链接、SKILL 路由路径、路由覆盖、清单覆盖
+npm run release-check # 版本 / CHANGELOG / 打包文件
 npm pack --dry-run    # 检查发布内容
 ```
 

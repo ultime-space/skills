@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.1 - 2026-10-28
+
+- `docs/shared/04-gates.md` 的配置改为链接 `codecraft.config.example.json` + README 字段说明，删除重复 JSON，避免字段漂移。
+- A17 文档明确：默认只按目录段放行；`types/internal/<域>/wrapper.ts` 这类文件级载体需 `boundaries.allowedImporters`。
+- CLI help 的 pack 列表补 A6，与 README / gates 对齐。
+- 新增结构测试：frontmatter、版本一致、相对链接、SKILL 路由、config 示例字段、docs 路由覆盖；CLI help 的 pack 规则与 README 比对。
+- 新增 `release-check` 脚本（版本 / CHANGELOG / 打包文件），并接入 `prepublishOnly`。
+- SKILL 路由补风格总图入口。
+
 ## 1.8.0 - 2026-10-28
 
 - docs 重组为 `shared/`（宪法、AI 契约、审计契约、门禁、模式、提示词、术语）、`frontend/`（前端族卡、风格、架构、审计）、`backend/`（后端族卡、风格、架构、审计）；SKILL 按端路由，AI 只读相关端。
@@ -20,6 +29,8 @@
 - 新增 `scenarios/backend-audit.md`；README 补后端审计 / 架构 / PR 评审示例、前后端分开审计的 FAQ。
 - 新增测试：Wrapper 放行、文件级 allowedImporters、generatedDirs、config exclude 合并与校验；术语测试递归扫描 docs 子目录。
 - CLI 结构规则仍以前端为主；后端只把 A21 / A2 / A6 / A11 当抽样，不把 `0 findings` 当成通过。
+
+> 1.7.0 未发布；其变更已并入 1.8.0。
 
 ## 1.6.1 - 2026-10-27
 

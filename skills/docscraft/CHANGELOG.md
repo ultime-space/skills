@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 - 2026-10-28
+
+- `SKILL.md` 路由补 `docs/rules/02-doc-types.md`（文档类型速查）。
+- 新增 docs 路由覆盖测试与 `release-check` 脚本（接入 `prepublishOnly`）。
+
 ## 0.2.0 - 2026-10-27
 
 - 新增 `docs/contracts/08-checklist.md`：D1–D12 判定矩阵、判定口径、一致性检查、机检映射、交付前自检与计划表。

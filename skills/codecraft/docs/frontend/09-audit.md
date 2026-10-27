@@ -11,7 +11,7 @@
 
 - **A17**：按三条线索识别生成类型：路径含 `external/` / `generated/`、文件头有只读声明（`本文件由…生成` / `勿手改` / `@generated`）、`boundaries.external` / `boundaries.generated` 配置。只解析相对路径与 `@/` `~/` `#/` 别名；解析不到或头部无标记时仍是盲区，必须人工检查。
   - `boundaries.external` / `boundaries.generated` 填的是 import 前缀或 glob（如 `@/types/external`），不是目录路径；`boundaries.allowedImporters` 与 `boundaries.generatedDirs` 填的是相对 `--root` 的路径或 glob。
-  - 允许 import 外部 / 生成类型的目录：默认 `wrapper` / `api` / `adapters` / `external` / `generated`；可用 `boundaries.allowedImporters` 追加（如 `client/src/types/internal/*/wrapper.ts`）。Wrapper 是角色，目录只是默认线索；报告必须写明本次放行清单，否则 0 findings 不可复现。
+  - 允许 import 外部 / 生成类型的默认目录：`wrapper/` / `api/` / `adapters/` / `external/` / `generated/`；按**目录段**匹配，`types/internal/<域>/wrapper.ts` 这类文件级载体不命中 `wrapper`，须写入 `boundaries.allowedImporters`。Wrapper 是角色，目录只是默认线索；报告必须写明本次放行清单，否则 0 findings 不可复现。
   - `boundaries.generatedDirs` 内的文件按生成物处理，不依赖文件头或目录名；仍只把导出类型 / 枚举 / 接口的模块算作契约，数据 / 资源模块不触发 A17。
   - 生成的数据 / 资源模块（如图标表）不算类型契约，不触发 A17。
   - 约定：生成 / 外部类型放在 `external/` 或 `generated/` 下；迁移前按人工检查，不能因 0 findings 判 `pass`。

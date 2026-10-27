@@ -25,27 +25,13 @@
 
 ## 3. 配置
 
-```json
-{
-  "pack": "auto",
-  "gates": [
-    { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
-    { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
-  ],
-  "ignore": [
-    { "rule": "A17", "file": "src/pages/legacy/**", "reason": "legacy page", "expires": "2026-12-31" }
-  ],
-  "boundaries": {
-    "external": ["@/types/external"],
-    "generated": ["@/types/project"]
-  }
-}
-```
+配置示例以 [`codecraft.config.example.json`](../../codecraft.config.example.json) 为唯一可执行真源；字段说明见 [`README.md`](../../README.md) 的「配置」。本文只保留门禁契约，不再复制 JSON。
 
 - `pack`：`app` / `library` / `design-system` / `auto`；CLI `--pack` 优先。
 - `gates`：数组；每项必须有 `run`，可选 `name` / `timeoutMs`。
 - `ignore`：例外登记（A12）；`rule` / `file` / `reason` 必填，`expires` 可选。过期条目不生效，报告中单列；安全规则 `A21` 不可豁免。
-- `boundaries`：A17 的补充路径；生成类型优先按文件头识别，`external` / `generated` 填 import 前缀或 glob，覆盖头部无标记或路径不在约定内的项目。
+- `exclude`：扫描级排除，与 `--exclude` 合并。
+- `boundaries`：A17 的补充声明；`external` / `generated` 填 import 前缀，`allowedImporters` / `generatedDirs` 填相对 `--root` 的路径或 glob。
 - 配置文件默认 `codecraft.config.json`；可用 `--config` 指定。
 
 ## 4. 按项目类型选门禁

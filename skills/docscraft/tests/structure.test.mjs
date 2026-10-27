@@ -98,6 +98,15 @@ void test('SKILL.md routing paths exist', () => {
   }
 })
 
+void test('every docs file is reachable from SKILL.md', () => {
+  const skill = read('SKILL.md')
+  const missing = markdownFiles(path.join(ROOT, 'docs'))
+    .map((file) => path.relative(ROOT, file).split(path.sep).join('/'))
+    .filter((rel) => !skill.includes(rel))
+
+  assert.deepEqual(missing, [], `SKILL.md routing misses: ${missing.join(', ')}`)
+})
+
 void test('checklist covers every drift type', () => {
   const drift = read('docs/guides/04-drift-guards.md')
   const section = drift.split('## 漂移类型')[1]?.split('\n## ')[0] ?? ''

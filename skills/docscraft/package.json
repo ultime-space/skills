@@ -1,6 +1,6 @@
 {
   "name": "@ultime/docscraft",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraft），作为可安装的 skill 包。",
   "keywords": [
     "ai",
@@ -39,7 +39,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "prepublishOnly": "npm test"
+    "release-check": "node scripts/release-check.mjs",
+    "prepublishOnly": "npm test && npm run release-check"
   },
   "engines": {
     "node": ">=20"

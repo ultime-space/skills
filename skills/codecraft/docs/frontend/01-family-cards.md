@@ -84,7 +84,7 @@
 - **反例**：页面直接 import `UserDto`；内部类型叫 `UserVo`；第三方字段名出现在 UI；在 Wrapper 里算折扣 / 判权限。
 - **验收**：lint「内部代码不 import `external/` 或生成类型」；Wrapper 单测；换源不改内部；不靠目录名证明 Wrapper 存在。
 - **转换示例**：一个后端接口返回三个系统的数据 → Wrapper 拆成 `FinanceSummary / OperationsSummary / SupportSummary` 三个内部模型；三个页面各取所需，不共享一个「大而全」的后端类型。
-- **导入规则**：只有 Wrapper 角色（及 Transport adapter / `boundaries.allowedImporters` 声明的文件）可以 import `external/`；页面 / 组件 / 行为层不得 import。
+- **导入规则**：只有 Wrapper 角色（及 Transport adapter / `boundaries.allowedImporters` 声明的文件）可以 import `external/`；页面 / 组件 / 行为层不得 import。静态检查默认按目录段放行 `wrapper/`、`api/`；`types/internal/<域>/wrapper.ts` 这类文件级载体要在 `allowedImporters` 登记。
 
 ## 5. Type（类型）
 

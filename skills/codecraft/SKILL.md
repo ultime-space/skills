@@ -40,6 +40,8 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 | 后端架构分析 / 设计 | `docs/backend/11-architecture.md` + 宪法 | 报告 / 计划（只读） |
 | 新项目 / 脚手架 | 对应端架构 + `scenarios/new-project.md` | 骨架计划；必要时 `init` |
 | 选型（模式 / 库） | `docs/shared/05-patterns.md` | 选型与代价 |
+| 门禁配置 / 契约 | `docs/shared/04-gates.md` | 两层门禁与 Gate Contract |
+| 风格 / 模式速查 | `docs/frontend/03-style-map.md` / `docs/backend/12-style-map.md` | 速查表 |
 | 改代码 | 宪法 + 对应端族卡 + 项目门禁 | 变更 + 验证 |
 
 ## 先读

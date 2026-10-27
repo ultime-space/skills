@@ -10,7 +10,7 @@ import { applyIgnores } from './ignore.mjs'
 const PACKAGE = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const VERSION = PACKAGE.version
 
-const HELP = `codecraft <command> [options]
+export const HELP = `codecraft <command> [options]
 
 Commands:
   check       Scan for boundary violations (default)
@@ -38,10 +38,10 @@ Options:
   --version, -v
 
 Packs:
-  app            A17 / A21 — pages / components / behavior must not import external or generated;
-                 high-confidence secrets are always scanned
-  library        A2 / A11 / A21 — package boundaries, generated-file markers, secret scan
-  design-system  A2 / A11 / A21 — library rules + public docs must not reference internal docs
+  app            A6 / A17 / A21 — empty catch; pages / components / behavior must not import
+                 external or generated; high-confidence secrets are always scanned
+  library        A2 / A6 / A11 / A21 — package boundaries, empty catch, generated-file markers, secret scan
+  design-system  A2 / A6 / A11 / A21 — library rules + public docs must not reference internal docs
 `
 
 export function main(argv) {

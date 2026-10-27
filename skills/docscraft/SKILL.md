@@ -34,6 +34,7 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 | 重整文档结构 | `docs/rules/01-layers.md` + `scenarios/reorganize-docs.md` | 迁移计划；确认后执行 |
 | 写 ADR / 决策记录 | `docs/guides/06-adr.md` + `scenarios/write-adr.md` | ADR |
 | 治理规则 / 红线 | `docs/rules/05-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
+| 文档类型速查 | `docs/rules/02-doc-types.md` | 类型映射 |
 | 检查 AI 入口 | `docs/contracts/03-ai-context.md` | 入口修订建议 |
 | 防漂移 | `docs/guides/04-drift-guards.md` | 检查清单 / CI 建议 |
 | 交付前自检 | `docs/contracts/08-checklist.md` | 逐条判定 + 自检结果 |

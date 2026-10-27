@@ -22,6 +22,7 @@
 npm test
 npm run eval
 npm run self-check
+npm run release-check
 npm pack --dry-run
 node bin/codecraft.mjs check --root <项目>
 ```
@@ -37,5 +38,6 @@ node bin/codecraft.mjs check --root <项目>
 - **minor**：新能力——CLI 选项、检查规则、适配器、模板、向后兼容的配置字段。
 - **patch**：修复、文档、提示词、测试、CI，或无行为变化的内部调整。
 - `2.0` 不设时间表；没有破坏性变更就不进 major。
-- v1 内容收口未完成前不发版；内容变更先累积在 `CHANGELOG.md` 的 Unreleased。
-- 发布前同时改 `VERSION`、`package.json`、`CHANGELOG.md`，并跑 `npm test` 与 `npm pack --dry-run`。
+- v1 内容收口未完成前不发版；内容变更先累积在 `CHANGELOG.md` 的当前版本，发布前统一结账。
+- 发布前同时改 `VERSION`、`package.json`、`CHANGELOG.md`，并跑 `npm run release-check`、`npm test` 与 `npm pack --dry-run`。
+- 跳过的版本号要在 CHANGELOG 里注明「未发布，变更已并入 X.Y.Z」，不留空号。
