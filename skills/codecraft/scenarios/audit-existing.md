@@ -27,7 +27,7 @@
 
 ## 输出
 
-- 体检报告（按 `docs/08-audit-contract.md`）
+- 体检报告（按 `docs/contracts/08-audit-contract.md`）
 - 逐条判定表（A1–A21，含证据与局限）
 - 差距清单（P0–P3）
 - 升级计划

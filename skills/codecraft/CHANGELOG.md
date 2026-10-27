@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1 - 2026-10-27
+
+- `docs/` 拆分为 `rules/`（宪法、族卡、风格总图）、`contracts/`（AI 契约、审计契约）、`guides/`（门禁、模式、架构、AI 提示词）；术语表移到 `docs/glossary.md`。
+- `SKILL.md` 路由、README、adapters、scenarios、prompts 与跨文档引用同步到新路径；条目编号不变。
+- 术语测试改为递归扫描 `docs/` 子目录，新增文件不会被漏检。
+
 ## 1.6.0 - 2026-10-27
 
 - 新增代码架构分析报告场景与模板：`scenarios/architecture-report.md`、`templates/architecture-report.md`。

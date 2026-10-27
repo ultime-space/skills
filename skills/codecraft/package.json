@@ -1,6 +1,6 @@
 {
   "name": "@ultime/codecraft",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "面向 JS/TS 的代码规范与架构设计（前端默认，Node 后端可复用结构规则），作为可安装的 skill 包。",
   "keywords": [
     "ai",

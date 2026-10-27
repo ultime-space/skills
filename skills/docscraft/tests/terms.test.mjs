@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const GLOSSARY = path.join(ROOT, 'docs', '07-glossary.md')
+const GLOSSARY = path.join(ROOT, 'docs', 'glossary.md')
 
 function parseGlossary() {
   const terms = []
@@ -35,15 +35,24 @@ function bodyLines(file) {
   return body
 }
 
+function markdownFiles(dir) {
+  const files = []
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) files.push(...markdownFiles(full))
+    else if (entry.name.endsWith('.md')) files.push(full)
+  }
+  return files
+}
+
 function aiFiles() {
   const files = [path.join(ROOT, 'SKILL.md')]
   for (const dir of ['docs', 'scenarios', 'prompts', 'templates']) {
     const full = path.join(ROOT, dir)
     if (!fs.existsSync(full)) continue
-    for (const name of fs.readdirSync(full)) {
-      if (!name.endsWith('.md')) continue
-      if (name === '07-glossary.md') continue
-      files.push(path.join(full, name))
+    for (const file of markdownFiles(full)) {
+      if (file === GLOSSARY) continue
+      files.push(file)
     }
   }
   const golden = path.join(ROOT, 'evals', 'golden-tasks.md')

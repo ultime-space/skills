@@ -1,6 +1,6 @@
 # Output Format（输出格式）
 
-默认 Markdown；JSON 仅用于 CLI / CI。Audit 还必须满足 `docs/08-audit-contract.md`。
+默认 Markdown；JSON 仅用于 CLI / CI。Audit 还必须满足 `docs/contracts/08-audit-contract.md`。
 
 ## Markdown
 

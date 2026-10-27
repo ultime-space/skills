@@ -62,7 +62,7 @@ repo/
 - `types.md`：类型来源、命名、生成
 - `styles.md`：token、布局、响应式
 
-每条规则必须能归入事实 / 约束 / 判断（见 `05-rule-types.md`）。
+每条规则必须能归入事实 / 约束 / 判断（见 `docs/rules/05-rule-types.md`）。
 
 ### docs
 

@@ -3,7 +3,7 @@
 > 2026-10-27 · v1
 > 用途：约束 Audit 模式的判定、证据、局限与一致性，防止把“静态检查 0 findings”写成“全部通过”。
 > 范围：JS/TS 项目，默认前端；Node 后端只复用结构与安全类判定。
-> 关系：流程见 `docs/02-ai-contract.md`；格式见 `prompts/output.md`；规则正文见 `docs/00-constitution.md` 与 `docs/01-family-cards.md`。
+> 关系：流程见 `docs/contracts/02-ai-contract.md`；格式见 `prompts/output.md`；规则正文见 `docs/rules/00-constitution.md` 与 `docs/rules/01-family-cards.md`。
 
 ## 1. 必填结构
 

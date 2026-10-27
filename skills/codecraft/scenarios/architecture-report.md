@@ -2,7 +2,7 @@
 
 > 定位：把代码架构讲清楚，形成一份人能读、能评审、能执行的 Markdown 文档。
 > 范围：只做代码架构；业务能力、角色、业务流程、领域规则不在本 skill 范围。
-> 关系：方法见 `docs/06-architecture.md`；证据门槛见 `docs/08-audit-contract.md`；模板见 `templates/architecture-report.md`。
+> 关系：方法见 `docs/guides/06-architecture.md`；证据门槛见 `docs/contracts/08-audit-contract.md`；模板见 `templates/architecture-report.md`。
 
 ## 何时用
 
@@ -24,10 +24,10 @@
 ## 先读
 
 1. 项目 `AGENTS.md` / `rules/`
-2. `docs/00-constitution.md`
-3. `docs/06-architecture.md`
-4. 只读相关族卡：`docs/01-family-cards.md`
-5. 审计模式：`docs/08-audit-contract.md`
+2. `docs/rules/00-constitution.md`
+3. `docs/guides/06-architecture.md`
+4. 只读相关族卡：`docs/rules/01-family-cards.md`
+5. 审计模式：`docs/contracts/08-audit-contract.md`
 6. 输出：`prompts/output.md` + `templates/architecture-report.md`
 
 ## 步骤

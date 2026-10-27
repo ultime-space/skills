@@ -50,6 +50,13 @@ npx skills add ultime-space/skills --skill docscraft
 重点：事实 / 约束 / 判断分类、owner 与复核日期、入口是否只做索引。
 ```
 
+**交付前自检**
+
+```text
+用 Docscraft 按 docs/contracts/08-checklist.md 对这份审计报告做交付前自检，只读。
+逐条给判定与证据；没有证据的项标 warn。
+```
+
 更多场景见 [`scenarios/`](./scenarios/) 与 [`prompts/output.md`](./prompts/output.md)。
 
 ## 适用
@@ -74,14 +81,18 @@ npx skills add ultime-space/skills --skill docscraft
 docscraft/
 ├── SKILL.md
 ├── docs/
-│   ├── 00-principles.md
-│   ├── 01-layers.md
-│   ├── 02-doc-types.md
-│   ├── 03-ai-context.md
-│   ├── 04-drift-guards.md
-│   ├── 05-rule-types.md
-│   ├── 06-adr.md
-│   └── 07-glossary.md
+│   ├── rules/
+│   │   ├── 00-principles.md
+│   │   ├── 01-layers.md
+│   │   ├── 02-doc-types.md
+│   │   └── 05-rule-types.md
+│   ├── contracts/
+│   │   ├── 03-ai-context.md
+│   │   └── 08-checklist.md
+│   ├── guides/
+│   │   ├── 04-drift-guards.md
+│   │   └── 06-adr.md
+│   └── glossary.md
 ├── scenarios/
 │   ├── audit-docs.md
 │   ├── reorganize-docs.md
@@ -93,7 +104,7 @@ docscraft/
 │   ├── rules.md
 │   └── adr.md
 ├── evals/golden-tasks.md
-├── tests/                 结构与术语测试
+├── tests/                 结构、术语与清单覆盖测试
 ├── package.json
 ├── VERSION
 └── CHANGELOG.md
@@ -102,11 +113,11 @@ docscraft/
 ## 验证
 
 ```bash
-npm test              # 结构、版本对齐、相对链接、SKILL 路由路径
+npm test              # 结构、版本对齐、相对链接、SKILL 路由路径、清单覆盖
 npm pack --dry-run    # 检查发布内容
 ```
 
-改动文档结构或新增场景时，同步更新 `SKILL.md` 路由表；测试会检查被引用的路径是否存在。
+改动文档结构或新增场景时，同步更新 `SKILL.md` 路由表；测试会检查被引用的路径是否存在，以及 `docs/contracts/08-checklist.md` 是否覆盖 `docs/guides/04-drift-guards.md` 的全部漂移类型。
 
 ## 三条底线
 

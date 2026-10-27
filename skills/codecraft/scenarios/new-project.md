@@ -14,11 +14,11 @@
 ## 先读
 
 1. 项目 `AGENTS.md` / `rules/`
-2. `../docs/00-constitution.md`
-3. `../docs/01-family-cards.md`（只读相关族）
-4. `../docs/03-style-map.md`
-5. `../docs/06-architecture.md`（档位 / 七步法 / 边界）；决策用 ADR
-6. 需要选型时：`../docs/05-patterns.md`
+2. `../docs/rules/00-constitution.md`
+3. `../docs/rules/01-family-cards.md`（只读相关族）
+4. `../docs/rules/03-style-map.md`
+5. `../docs/guides/06-architecture.md`（档位 / 七步法 / 边界）；决策用 ADR
+6. 需要选型时：`../docs/guides/05-patterns.md`
 
 ## 步骤
 

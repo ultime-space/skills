@@ -17,25 +17,35 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 | 不适用 | 代码架构规范（用 Codecraft）；业务组件 / API 设计；纯写作润色 |
 | 不在范围 | 客户名、本机路径、个人协作偏好；这些留在本地记忆或项目私有文档 |
 
+## 目录
+
+| 目录 | 放什么 |
+|---|---|
+| `docs/rules/` | 原则、分层、文档类型、规则类型 |
+| `docs/contracts/` | AI 入口契约、交付前清单 |
+| `docs/guides/` | 防漂移、ADR |
+| `docs/glossary.md` | 术语表 |
+
 ## 读法（按任务路由）
 
 | 任务 | 先读 | 产出 |
 |---|---|---|
-| 审计现有文档 | `docs/00-principles.md` + `docs/01-layers.md` + `scenarios/audit-docs.md` | 只读报告 |
-| 重整文档结构 | `docs/01-layers.md` + `scenarios/reorganize-docs.md` | 迁移计划；确认后执行 |
-| 写 ADR / 决策记录 | `docs/06-adr.md` + `scenarios/write-adr.md` | ADR |
-| 治理规则 / 红线 | `docs/05-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
-| 检查 AI 入口 | `docs/03-ai-context.md` | 入口修订建议 |
-| 防漂移 | `docs/04-drift-guards.md` | 检查清单 / CI 建议 |
+| 审计现有文档 | `docs/rules/00-principles.md` + `docs/rules/01-layers.md` + `scenarios/audit-docs.md` | 只读报告 |
+| 重整文档结构 | `docs/rules/01-layers.md` + `scenarios/reorganize-docs.md` | 迁移计划；确认后执行 |
+| 写 ADR / 决策记录 | `docs/guides/06-adr.md` + `scenarios/write-adr.md` | ADR |
+| 治理规则 / 红线 | `docs/rules/05-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
+| 检查 AI 入口 | `docs/contracts/03-ai-context.md` | 入口修订建议 |
+| 防漂移 | `docs/guides/04-drift-guards.md` | 检查清单 / CI 建议 |
+| 交付前自检 | `docs/contracts/08-checklist.md` | 逐条判定 + 自检结果 |
 
 ## 先读
 
 1. 项目 `README.md`、`AGENTS.md`、各端 `rules/`
-2. `docs/00-principles.md`
-3. 按任务读 `docs/01`–`07`；术语写法见 `docs/07-glossary.md`（AI 文档英文裸写；`README` / 对外报告首次出现标注中文）
+2. `docs/rules/00-principles.md`
+3. 按任务读 `docs/rules/`、`docs/contracts/`、`docs/guides/`；术语写法见 `docs/glossary.md`（AI 文档英文裸写；`README` / 对外报告首次出现标注中文）
 4. 相关 `scenarios/`
 5. 项目现有 `docs/` 与 ADR
-6. 输出按 `prompts/output.md`
+6. 输出按 `prompts/output.md`；审计结论按 `docs/contracts/08-checklist.md` 自检
 
 ## 模式
 

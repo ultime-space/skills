@@ -57,9 +57,9 @@
 
 | 层 | 回答什么 | 位置 |
 |---|---|---|
-| **规则** | 什么不能变 | [`docs/00-constitution.md`](./docs/00-constitution.md) |
-| **形状** | 边界与结构长什么样 | [`docs/06-architecture.md`](./docs/06-architecture.md)、[`docs/01-family-cards.md`](./docs/01-family-cards.md) |
-| **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/05-patterns.md`](./docs/05-patterns.md) |
+| **规则** | 什么不能变 | [`docs/rules/00-constitution.md`](./docs/rules/00-constitution.md) |
+| **形状** | 边界与结构长什么样 | [`docs/guides/06-architecture.md`](./docs/guides/06-architecture.md)、[`docs/rules/01-family-cards.md`](./docs/rules/01-family-cards.md) |
+| **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/guides/05-patterns.md`](./docs/guides/05-patterns.md) |
 
 > 族卡的形状默认原生（HTML + TS）；框架示例只给 Vue 3 / React，其它框架在族卡 §12 登记，不预建。
 
@@ -111,7 +111,7 @@ npx skills-npm setup
 
 只启用 skill、不说 Codecraft 时，agent 可能按普通项目分析处理，不保证走 Audit 模式。带上名字最稳。
 
-更多场景（代码架构报告、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/07-ai-prompts.md](./docs/07-ai-prompts.md)。
+更多场景（代码架构报告、只出报告、新项目、重构评审、架构设计、模式选型、脚手架、Design System）见 [docs/guides/07-ai-prompts.md](./docs/guides/07-ai-prompts.md)。
 
 ## 常用场景怎么说
 
@@ -294,13 +294,16 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
 - gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
-- 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/04-gates.md`](./docs/04-gates.md)。
+- 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/guides/04-gates.md`](./docs/guides/04-gates.md)。
 
 ## 目录
 
 ```text
 SKILL.md      标准 agent skill 入口（skills add / skills-npm 使用）
-docs/         宪法、族卡、AI 契约、审计契约、风格总图、模式、架构、AI 提示词、门禁、术语表
+docs/rules/          宪法、族卡、风格总图
+docs/contracts/      AI 契约、审计契约
+docs/guides/         门禁、模式、架构、AI 提示词
+docs/glossary.md     术语表
 scenarios/    新项目 / 旧项目审计 / 代码架构报告 / 只出报告 / 重构评审
 adapters/     generic 手动指针（其它 agent 统一指向 SKILL.md）
 prompts/      输出格式

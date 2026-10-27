@@ -12,13 +12,15 @@ const REQUIRED = [
   'VERSION',
   'CHANGELOG.md',
   'LICENSE',
-  'docs/00-principles.md',
-  'docs/01-layers.md',
-  'docs/02-doc-types.md',
-  'docs/03-ai-context.md',
-  'docs/04-drift-guards.md',
-  'docs/05-rule-types.md',
-  'docs/06-adr.md',
+  'docs/rules/00-principles.md',
+  'docs/rules/01-layers.md',
+  'docs/rules/02-doc-types.md',
+  'docs/rules/05-rule-types.md',
+  'docs/contracts/03-ai-context.md',
+  'docs/contracts/08-checklist.md',
+  'docs/guides/04-drift-guards.md',
+  'docs/guides/06-adr.md',
+  'docs/glossary.md',
   'scenarios/audit-docs.md',
   'scenarios/reorganize-docs.md',
   'scenarios/write-adr.md',
@@ -94,4 +96,28 @@ void test('SKILL.md routing paths exist', () => {
   for (const ref of refs) {
     assert.ok(fs.existsSync(path.join(ROOT, ref)), `SKILL.md references missing ${ref}`)
   }
+})
+
+void test('checklist covers every drift type', () => {
+  const drift = read('docs/guides/04-drift-guards.md')
+  const section = drift.split('## 漂移类型')[1]?.split('\n## ')[0] ?? ''
+  const types = []
+  for (const line of section.split('\n')) {
+    const match = /^\|\s*([^|]+?)\s*\|/.exec(line)
+    if (!match) continue
+    const type = match[1].trim()
+    if (!type || /^-+$/.test(type) || type === '类型') continue
+    types.push(type)
+  }
+
+  assert.ok(types.length >= 8, `expected 8 drift types, got ${types.length}`)
+
+  const checklist = read('docs/contracts/08-checklist.md')
+  const missing = types.filter((type) => !checklist.includes(type))
+  assert.deepEqual(missing, [], `checklist missing: ${missing.join(', ')}`)
+
+  const matrix = checklist.split('## 3. 判定矩阵')[1]?.split('\n## ')[0] ?? ''
+  const ids = [...matrix.matchAll(/^\|\s*(D\d+)\s*\|/gm)].map((match) => match[1])
+  assert.equal(ids.length, 12, `expected D1–D12, got ${ids.length}`)
+  assert.equal(new Set(ids).size, ids.length, 'checklist IDs must be unique')
 })

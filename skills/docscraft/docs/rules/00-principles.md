@@ -112,7 +112,7 @@ rg -n "pattern" src
 
 - AI 面向文档（`docs/` / `scenarios/` / `prompts/` / `templates/`）英文裸写；`README`、对外报告首次出现用 `English（中文）`。
 - 名字类不附中文：产品 / 文件 / 命令 / 语言 / 框架 / 标准名 / 代码标识（如 Docscraft、README.md、npm、JS/TS、JSON）。
-- 术语表见 `07-glossary.md`；`tests/terms.test.mjs` 检查术语表与 README 首次出现，漏加即失败。
+- 术语表见 `docs/glossary.md`；`tests/terms.test.mjs` 检查术语表与 README 首次出现，漏加即失败。
 
 ## 每个文档先回答三问
 

@@ -1,6 +1,6 @@
 # 代码架构设计方法（可选）
 
-> 用途：系统级 / 模块级 / 演进级的代码架构决策方法；代码级模式见 `05-patterns.md`。
+> 用途：系统级 / 模块级 / 演进级的代码架构决策方法；代码级模式见 `docs/guides/05-patterns.md`。
 > 边界：只讨论代码架构；业务能力、角色、业务流程、领域规则不在本 skill 范围。
 > 产出：只出文档时用 `scenarios/architecture-report.md` + `templates/architecture-report.md`。
 > 原则：**方法先于模式；约束先于图；边界先于抽象。**
@@ -13,7 +13,7 @@
 |---|---|---|
 | **Architecture（架构）** | 系统的结构 + 约束 + 决策理由 | 模块、依赖方向、public API、ADR、验证规则 |
 | **Architecture Style（架构风格）** | 可复用的结构方案 | 分层、模块化单体、六边形、事件驱动… |
-| **Design Pattern（设计模式）** | 代码级解法 | Strategy、Adapter、State…（见 `05-patterns.md`） |
+| **Design Pattern（设计模式）** | 代码级解法 | Strategy、Adapter、State…（见 `docs/guides/05-patterns.md`） |
 | **Method（方法）** | 产出架构的过程 | 目标 → 质量场景 → 边界 → 规则 → 验证 |
 | **View（视图）** | 面向某类关注点的投影 | Context / Container / Runtime / Deployment |
 | **Tactic（战术）** | 为某个质量属性做的局部决策 | 缓存、限流、重试、冗余 |

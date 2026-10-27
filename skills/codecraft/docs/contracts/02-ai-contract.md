@@ -9,9 +9,9 @@
 
 1. 项目覆盖：`AGENTS.md` / `rules/` / `README`
 2. 《代码宪法 v1》
-3. 设计或评审架构：`06-architecture.md`（档位 / 七步法 / 边界）；决策用 ADR
+3. 设计或评审架构：`docs/guides/06-architecture.md`（档位 / 七步法 / 边界）；决策用 ADR
 4. 只读相关《代码族卡 v1》（前端项目才读 Page / Component）
-5. 需要选型时：`05-patterns.md`（按力选，不按名字选）
+5. 需要选型时：`docs/guides/05-patterns.md`（按力选，不按名字选）
 6. 相关契约 / 类型 / 测试 / 示例
 
 ## 2. 禁止
@@ -37,7 +37,7 @@
 - 内部文档标 `Internal`；不进入交付目录。
 - 生成示例值用占位符（`<TOKEN>` / `<PASSWORD>`），不得复制真实配置。
 - 发现疑似密钥 / 隐私，停止生成、脱敏、提示轮换。
-- 术语写法：AI 面向文档（`docs/` / `scenarios/` / `prompts/` / `templates/`）英文裸写；`README`、对外报告首次出现用 `English（中文）`；名字类（产品 / 文件 / 命令 / 语言 / 框架 / 标准名 / 代码标识）不附中文。术语表见 `09-glossary.md`，`tests/docs.test.mjs` 检查术语表与 README 首次出现。
+- 术语写法：AI 面向文档（`docs/` / `scenarios/` / `prompts/` / `templates/`）英文裸写；`README`、对外报告首次出现用 `English（中文）`；名字类（产品 / 文件 / 命令 / 语言 / 框架 / 标准名 / 代码标识）不附中文。术语表见 `docs/glossary.md`，`tests/docs.test.mjs` 检查术语表与 README 首次出现。
 
 ## 4. 必须
 
@@ -56,7 +56,7 @@
 4. **风险 / 不确定**
 5. **后续**：owner + 到期
 
-Audit 报告还必须满足 `docs/08-audit-contract.md`。
+Audit 报告还必须满足 `docs/contracts/08-audit-contract.md`。
 
 ## 6. 审计证据门槛
 
