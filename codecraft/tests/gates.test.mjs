@@ -20,25 +20,32 @@ void test('loadConfig: missing file returns empty config', () => {
   try {
     const loaded = loadConfig(root)
     assert.equal(loaded.file, null)
-    assert.deepEqual(loaded.config, {})
+    assert.deepEqual(loaded.config, { ignore: [] })
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
 })
 
-void test('loadConfig: reads pack and gates', () => {
+void test('loadConfig: reads pack, gates and ignore', () => {
   const root = tempRoot()
   try {
     write(
       root,
       'codecraft.config.json',
-      JSON.stringify({ pack: 'library', gates: [{ name: 'ok', run: 'node -e "process.exit(0)"' }] }),
+      JSON.stringify({
+        pack: 'library',
+        gates: [{ name: 'ok', run: 'node -e "process.exit(0)"' }],
+        ignore: [{ rule: 'A17', file: 'src/pages/**', reason: 'legacy', expires: '2026-12-31' }],
+      }),
     )
 
     const loaded = loadConfig(root)
 
     assert.equal(loaded.config.pack, 'library')
     assert.equal(loaded.config.gates.length, 1)
+    assert.deepEqual(loaded.config.ignore, [
+      { rule: 'A17', file: 'src/pages/**', reason: 'legacy', expires: '2026-12-31' },
+    ])
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
@@ -55,6 +62,9 @@ void test('loadConfig: rejects invalid JSON and invalid gates', () => {
 
     write(root, 'codecraft.config.json', JSON.stringify({ gates: [{ name: 'x' }] }))
     assert.throws(() => loadConfig(root), /run.*string/)
+
+    write(root, 'codecraft.config.json', JSON.stringify({ ignore: [{ rule: 'A17', file: 'src/**' }] }))
+    assert.throws(() => loadConfig(root), /reason/)
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }

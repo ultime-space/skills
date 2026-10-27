@@ -55,6 +55,92 @@ void test('cli: --ci turns findings into a failing exit', () => {
   }
 })
 
+void test('cli: ignore suppresses findings and keeps them in the report', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages', 'legacy'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'legacy', 'home.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(
+      path.join(root, 'codecraft.config.json'),
+      JSON.stringify({
+        ignore: [{ rule: 'A17', file: 'src/pages/legacy/**', reason: 'legacy page; migrate in 2026-Q4' }],
+      }),
+    )
+
+    const result = run(['check', '--root', root, '--ci', '--format', 'json'])
+
+    assert.equal(result.status, 0)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.findings.length, 0)
+    assert.equal(report.ignored.length, 1)
+    assert.equal(report.summary.ignored, 1)
+    assert.match(report.ignored[0].reason, /legacy page/)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: expired ignore entries do not suppress findings', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'home.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(
+      path.join(root, 'codecraft.config.json'),
+      JSON.stringify({
+        ignore: [{ rule: 'A17', file: 'src/pages/**', reason: 'expired', expires: '2000-01-01' }],
+      }),
+    )
+
+    const result = run(['check', '--root', root, '--ci', '--format', 'json'])
+
+    assert.equal(result.status, 1)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.findings.length, 1)
+    assert.equal(report.expired, 1)
+    assert.equal(report.exceptions[0].status, 'expired')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: invalid ignore config exits 2 with a reason hint', () => {
+  const root = tempRoot()
+  try {
+    fs.writeFileSync(
+      path.join(root, 'codecraft.config.json'),
+      JSON.stringify({ ignore: [{ rule: 'A17', file: 'src/**' }] }),
+    )
+
+    const result = run(['check', '--root', root])
+
+    assert.equal(result.status, 2)
+    assert.match(result.stderr, /reason/)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: markdown output lists ignored findings', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'home.ts'), "import { User } from '@/external/user'\n")
+    fs.writeFileSync(
+      path.join(root, 'codecraft.config.json'),
+      JSON.stringify({ ignore: [{ rule: 'A17', file: 'src/pages/**', reason: 'legacy' }] }),
+    )
+
+    const result = run(['check', '--root', root])
+
+    assert.equal(result.status, 0)
+    assert.match(result.stdout, /## Ignored/)
+    assert.match(result.stdout, /legacy/)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('cli: init --apply requires --name', () => {
   const root = tempRoot()
   try {

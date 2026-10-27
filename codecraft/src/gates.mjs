@@ -1,30 +1,33 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { validateIgnore } from './ignore.mjs'
 
 export function loadConfig(root, configPath) {
   const file = configPath ? path.resolve(root, configPath) : path.join(root, 'codecraft.config.json')
 
-  if (!fs.existsSync(file)) return { file: null, config: {} }
+  if (!fs.existsSync(file)) return { file: null, config: { ignore: [] } }
 
   let config
   try {
     config = JSON.parse(fs.readFileSync(file, 'utf8'))
   } catch (error) {
-    throw new Error(`invalid config ${file}: ${error.message}`)
+    throw new Error(
+      `invalid config ${file}: ${error.message} (fix the JSON syntax, or remove the file to use defaults)`,
+    )
   }
 
   if (config.gates != null && !Array.isArray(config.gates)) {
-    throw new Error(`invalid config ${file}: "gates" must be an array`)
+    throw new Error(`invalid config ${file}: "gates" must be an array (each item: { name?, run, timeoutMs? })`)
   }
 
   for (const gate of config.gates ?? []) {
     if (!gate || typeof gate.run !== 'string' || !gate.run.trim()) {
-      throw new Error(`invalid config ${file}: each gate needs a "run" string`)
+      throw new Error(`invalid config ${file}: each gate needs a "run" string (e.g. "pnpm test")`)
     }
   }
 
-  return { file, config }
+  return { file, config: { ...config, ignore: validateIgnore(config.ignore, file) } }
 }
 
 export function runGates(root, gates, options = {}) {

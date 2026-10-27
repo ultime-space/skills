@@ -4,6 +4,7 @@ import { check } from './check.mjs'
 import { loadConfig, runGates } from './gates.mjs'
 import { buildPlan, summarizePlan } from './plan.mjs'
 import { applyInitPlan, buildInitPlan } from './init.mjs'
+import { applyIgnores } from './ignore.mjs'
 import { applyInstallPlan, buildInstallPlan, parseAgents } from './install.mjs'
 
 const PACKAGE = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
@@ -59,13 +60,13 @@ export function main(argv) {
 
   const command = args.command || 'check'
   if (!['check', 'audit', 'plan', 'init', 'install'].includes(command)) {
-    console.error(`codecraft: unknown command "${command}"`)
+    console.error(`codecraft: unknown command "${command}"\n  next: run codecraft --help`)
     return 2
   }
 
   const root = path.resolve(process.cwd(), args.root)
   if (!fs.existsSync(root)) {
-    console.error(`codecraft: root not found: ${root}`)
+    console.error(`codecraft: root not found: ${root}\n  next: pass --root <project> or run from the project directory`)
     return 2
   }
 
@@ -115,13 +116,15 @@ export function main(argv) {
 
   const pack = resolvePack(args.pack, config.config.pack, root)
   if (!pack) {
-    console.error('codecraft: invalid config pack; expected app, library or auto')
+    console.error(
+      `codecraft: invalid config pack "${config.config.pack}"\n  next: use app, library, design-system or auto`,
+    )
     return 2
   }
 
   if (command === 'init') {
     if (args.apply && !args.name) {
-      console.error('codecraft: init --apply requires --name <name>')
+      console.error('codecraft: init --apply requires --name <name>\n  next: add --name <demo>')
       return 2
     }
     const plan = buildInitPlan(root, pack === 'design-system' ? 'library' : pack, args.name)
@@ -149,10 +152,12 @@ export function main(argv) {
   const result = check(root, { pack })
   const severity = args.ci ? 'error' : args.severity
   const findings = result.findings.map((finding) => ({ ...finding, severity }))
+  const filtered = applyIgnores(findings, config.config.ignore ?? [])
+  const activeFindings = filtered.findings
   const gates = shouldRunGates(command, args)
     ? runGates(root, config.config.gates ?? [], { failFast: args.failFast })
     : []
-  const plan = command === 'plan' ? buildPlan(findings) : []
+  const plan = command === 'plan' ? buildPlan(activeFindings) : []
   const meta = {
     version: VERSION,
     mode: command,
@@ -162,7 +167,9 @@ export function main(argv) {
     severity,
     rules: pack === 'app' ? ['A17', 'A21'] : ['A2', 'A11', 'A21'],
     files: result.files,
-    findings: findings.length,
+    findings: activeFindings.length,
+    ignored: filtered.ignored.length,
+    expired: filtered.expired.length,
     plan: plan.length,
     gates: gates.length,
   }
@@ -172,12 +179,16 @@ export function main(argv) {
       JSON.stringify(
         {
           ...meta,
-          findings,
+          findings: activeFindings,
+          ignored: filtered.ignored,
+          exceptions: filtered.exceptions,
           plan,
           gates,
           summary: {
             files: result.files,
-            findings: findings.length,
+            findings: activeFindings.length,
+            ignored: filtered.ignored.length,
+            expired: filtered.expired.length,
             plan: plan.length,
             gates: gates.length,
             gateFailures: gates.filter((gate) => gate.exitCode !== 0).length,
@@ -188,12 +199,14 @@ export function main(argv) {
       ),
     )
   } else if (command === 'plan') {
-    console.log(formatPlan(meta, findings, plan, gates))
+    console.log(formatPlan(meta, activeFindings, plan, gates))
   } else {
-    console.log(formatReport(meta, findings, gates))
+    console.log(formatReport(meta, activeFindings, filtered.ignored, filtered.expired, gates))
   }
 
-  const failed = findings.some((finding) => finding.severity === 'error') || gates.some((gate) => gate.exitCode !== 0)
+  const failed =
+    activeFindings.some((finding) => finding.severity === 'error') ||
+    gates.some((gate) => gate.exitCode !== 0)
   return failed ? 1 : 0
 }
 
@@ -280,7 +293,7 @@ function fail(message) {
   process.exit(2)
 }
 
-function formatReport(meta, findings, gates) {
+function formatReport(meta, findings, ignored, expired, gates) {
   const lines = header(meta)
 
   if (!findings.length) {
@@ -290,6 +303,35 @@ function formatReport(meta, findings, gates) {
     for (const finding of findings) {
       lines.push(row(finding))
     }
+  }
+
+  if (ignored.length) {
+    lines.push(
+      '',
+      '## Ignored',
+      '',
+      '| Rule | File | Line | Reason | Expires |',
+      '|---|---|---|---|---|',
+    )
+    for (const finding of ignored) {
+      lines.push(
+        `| ${finding.rule} | ${finding.file} | ${finding.line} | ${escapeCell(finding.reason)} | ${finding.expires ?? '—'} |`,
+      )
+    }
+  }
+
+  if (expired.length) {
+    lines.push(
+      '',
+      '## Expired Exceptions',
+      '',
+      '| Rule | File | Expires | Reason |',
+      '|---|---|---|---|',
+    )
+    for (const exception of expired) {
+      lines.push(`| ${exception.rule} | ${exception.file} | ${exception.expires} | ${escapeCell(exception.reason)} |`)
+    }
+    lines.push('', '- Expired exceptions no longer suppress findings; renew the date or remove the entry.')
   }
 
   lines.push(...gateLines(gates))
@@ -438,6 +480,8 @@ function header(meta) {
     `- Severity: ${meta.severity}`,
     `- Files: ${meta.files}`,
     `- Findings: ${meta.findings}`,
+    `- Ignored: ${meta.ignored ?? 0}`,
+    `- Expired exceptions: ${meta.expired ?? 0}`,
     `- Gates: ${meta.gates}`,
     '',
   ]

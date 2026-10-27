@@ -19,9 +19,20 @@
 ## 验证
 
 ```bash
-node --test tests/*.test.mjs
+npm test
+npm pack --dry-run
 node bin/codecraft.mjs check --root <项目>
 ```
 
 - 新增 / 修改规则必须补测试；没有反例的规则降级为「参考」。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
+
+## 版本号
+
+只按 semver，不按「感觉重要」升 major：
+
+- **major**：破坏性变更——规则 ID 语义变更、配置格式不兼容、JSON 输出结构变化。
+- **minor**：新能力——CLI 选项、检查规则、适配器、模板、向后兼容的配置字段。
+- **patch**：修复、文档、提示词、测试、CI，或无行为变化的内部调整。
+- `2.0` 不设时间表；没有破坏性变更就不进 major。
+- 发布前同时改 `VERSION`、`package.json`、`CHANGELOG.md`，并跑 `npm test` 与 `npm pack --dry-run`。

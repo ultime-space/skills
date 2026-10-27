@@ -11,5 +11,13 @@
       "run": "pnpm test",
       "timeoutMs": 120000
     }
+  ],
+  "ignore": [
+    {
+      "rule": "A17",
+      "file": "src/pages/legacy/**",
+      "reason": "legacy page; migrate in 2026-Q4",
+      "expires": "2026-12-31"
+    }
   ]
 }

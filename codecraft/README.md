@@ -1,7 +1,7 @@
 # Codecraft（代码手艺）
 
-> 语言无关的代码规范，作为可安装的 skill 包。
-> 让 AI 和人在新项目、旧项目、评审中按同一套约束工作，并能按版本引入。
+> 面向 JS/TS 的代码规范与架构设计，作为可安装的 skill 包。
+> 默认 Web 前端；示例原生优先（TS / 原生 Web API），框架只给 Vue 3 / React；Node 后端只复用结构规则；其它语言不在范围。
 
 - 版本：见 [VERSION](./VERSION)
 - npm：[@ultime/codecraft](https://www.npmjs.com/package/@ultime/codecraft)
@@ -20,6 +20,26 @@
 规则正文只在 [`docs/`](./docs/)；其它位置只放入口与指针，避免第二份真源。
 
 > 第一次用：直接看 [安装](#安装) 和 [第一次使用](#第一次使用)。
+
+## 范围与分层
+
+| 项 | 内容 |
+|---|---|
+| 覆盖 | JS/TS 项目；Web 前端为默认场景（示例原生优先，框架仅 Vue 3 / React） |
+| 可复用 | Node 后端：模块边界、依赖方向、内外分离、生成物、门禁与文档规则 |
+| 不适用 | Page / Component 等前端族；数据库、缓存、并发、事务等后端专项 |
+| 不在范围 | Java / Go / Python 等其它语言；后端专项另立体系 |
+
+内容分三层，按需取用：
+
+| 层 | 回答什么 | 位置 |
+|---|---|---|
+| **规则** | 什么不能变 | [`docs/00-constitution.md`](./docs/00-constitution.md) |
+| **形状** | 边界与结构长什么样 | [`docs/06-architecture.md`](./docs/06-architecture.md)、[`docs/01-family-cards.md`](./docs/01-family-cards.md) |
+| **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/05-patterns.md`](./docs/05-patterns.md) |
+
+> 族卡的形状默认原生（HTML + TS）；框架示例只给 Vue 3 / React，其它框架在族卡 §12 登记，不预建。
+
 
 ## 安装
 
@@ -175,7 +195,7 @@ codecraft install --dry-run
 | `library` | A2 / A11 / A21 | 包不 import app、相对路径不逃逸、workspace 依赖必须声明；生成物必须有“勿手改 / 派生”标记；密钥扫描 |
 | `design-system` | A2 / A11 / A21 | library 规则 + 包内公开文档不得引用内部 `docs/` |
 
-`--pack auto` 的判定顺序：
+`--pack auto` 的判定顺序（基于 JS/TS 生态的目录与 `package.json`）：
 
 1. 有 `apps/` 或 `src/pages` → `app`
 2. 有 `packages/` 或根 `package.json` → `library`
@@ -195,12 +215,22 @@ A4（单一收口）属于结构判断，由 review 与项目门禁负责，不�
   "gates": [
     { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
     { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
+  ],
+  "ignore": [
+    {
+      "rule": "A17",
+      "file": "src/pages/legacy/**",
+      "reason": "legacy page; migrate in 2026-Q4",
+      "expires": "2026-12-31"
+    }
   ]
 }
 ```
 
 - `pack`：`app` / `library` / `design-system` / `auto`。
 - `gates`：数组；每项必须有一个非空的 `run` 字符串，可选 `name`、`timeoutMs`（默认 `120000`）。
+- `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
+- 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
 - gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
 - 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/04-gates.md`](./docs/04-gates.md)。
@@ -223,13 +253,26 @@ ROADMAP.md    后续版本计划与交接说明
 ## 版本与稳定承诺
 
 - semver；当前版本见 [VERSION](./VERSION)。
+- **major**：只用于破坏性变更——规则 ID 语义变更、配置格式不兼容、JSON 输出结构变化。
+- **minor**：新能力——CLI 选项、检查规则、适配器、模板、向后兼容的配置字段。
+- **patch**：修复、文档、提示词、测试、CI，或无行为变化的内部调整。
+- 不按「感觉重要」升 major；`2.0` 不设时间表。
 - 规则 ID `A1–A21` 稳定；增删规则属于 minor 以上的变更。
 - 报告始终携带版本号；跨版本对比以 JSON 为准。
 - 后续计划：[ROADMAP.md](https://github.com/ultime-space/skills/blob/main/codecraft/ROADMAP.md)。
 
+## FAQ
+
+- **静态检查误报怎么办？** 在 `codecraft.config.json` 的 `ignore` 里登记 `rule` + `file` + `reason`，必要时加 `expires`；不要直接删规则。
+- **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
+- **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
+- **monorepo 为什么被判成 library？** 有 `packages/` 或根 `package.json` 即按 library；可用 `--pack` 显式覆盖。
+- **支持哪些文件？** 只扫 JS/TS 相关扩展名与 `package.json`；其它语言不覆盖。
+
 ## 边界
 
 - 静态检查是文本级：能覆盖高置信模式，可能漏报或误报；最终以项目门禁与 review 为准。
+- 机检只扫描 JS/TS 相关文件（`.ts` / `.tsx` / `.js` / `.jsx` / `.mjs` / `.cjs` / `.vue` / `.svelte`）与 `package.json`，其它语言不覆盖。
 - 不内置任何业务规则、框架约定或公司内部门禁。
 - 不读取、不上传代码；所有检查在本地完成。
 
