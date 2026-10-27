@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1 - 2026-10-27
+
+- 修复 pack 自动判定：识别 Nuxt 2 的 `pages/`、Nuxt 3 的 `app/`、uni-app 的 `manifest.json + pages.json`、Taro / uni-app 依赖，以及 workspace 内的嵌套应用。
+- 新增 `trae-cn` 安装目标（`~/.trae-cn/skills`）；`--agent` 顺序改为 generic / claude / cursor / trae / trae-cn，不再默认优先 Trae。
+- 扫描 0 个源文件时输出警告并以 2 退出，避免把空扫描当成通过。
+- README 补充 agent 列表、`--dest`、`Files: 0` 与 Trae CN 的说明。
+
 ## 1.2.0 - 2026-10-27
 
 - 新增 `ignore` 例外配置（A12）：`rule` / `file` / `reason` 必填，`expires` 可选；支持 `*` / `**` / `?` 路径匹配；安全规则 `A21` 不可豁免。
