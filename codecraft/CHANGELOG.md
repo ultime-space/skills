@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 - 2026-10-27
+
+- 新增 `ignore` 例外配置（A12）：`rule` / `file` / `reason` 必填，`expires` 可选；支持 `*` / `**` / `?` 路径匹配；安全规则 `A21` 不可豁免。
+- 命中例外的 findings 不再影响退出码，但仍在报告的 `Ignored` 表和 JSON 的 `ignored` / `exceptions` 中可见；过期例外汇总到 `Expired Exceptions`。
+- 错误信息补充下一步：root 不存在、config 非法、pack 不匹配、未知命令。
+- README 增加 FAQ 与版本口径；`docs/04` 与配置示例补充 `ignore`。
+- 文档明确范围：JS/TS、默认前端、示例原生优先、Node 后端只复用结构规则；框架示例只保留 Vue 3 / React，其它框架留扩展位。
+
 ## 1.1.0 - 2026-10-27
 
 - 新增根 `SKILL.md`，兼容 Agent Skills / `skills-npm`；安装 `@ultime/codecraft` 后可被自动发现。
