@@ -50,6 +50,7 @@
 ## 输出
 
 - 一份 Markdown 报告，按 `templates/architecture-report.md`。
+- 只做安全 / 身份 / 存储中的单一域时，另出 `templates/specialist-report.md`；架构报告只保留 3.4–3.6 摘要。
 - 默认不画图；用表格、列表、缩进表达结构。
 - 如果后续需要图，图只作为视图，源仍写在 Markdown 里，不把图片当唯一真源。
 - 报告落在项目 `docs/` 下；文件名建议 `<主题>-代码架构分析报告.md`，并纳入项目文档索引。
@@ -84,6 +85,7 @@
 | `backend-audit.md` | 后端 A1–A21 解释 + 专项检查 | findings、差距、升级计划 |
 | `new-project.md` | 新项目设计 | 目标架构、骨架、阶段计划 |
 | `report-only.md` | 只要 findings | 只读问题清单 |
+| `templates/specialist-report.md` | 单域深挖（安全 / 身份 / 存储） | 专项报告 |
 | 本场景 | 结构叙事 + 演进 | 一份完整代码架构分析报告 |
 
 本场景可以复用 `audit-existing` 的 findings，但不重复做业务架构。

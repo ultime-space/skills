@@ -34,6 +34,10 @@
 - 每条结论引用 A-ID，并给文件行号或可复现命令；计数必须带检索式。
 - `pass` 必须有证据；只有静态检查通过时写 `pass（静态）`，不能替代人工抽样。
 - `codecraft check` 的 0 findings 只能写「静态检查未命中」；同时写明 A17 / A21 的覆盖盲区。
+- 涉及密码、传输、密钥、令牌时先读 `docs/shared/09-security.md`；命中禁止项写入「差距 / 风险」并标 P0，给替代方案与验证命令。
+- 涉及登录、会话、权限时先读 `docs/shared/10-auth.md`；前端守卫与隐藏按钮不能作为授权证据，命中 P0 写入「差距 / 风险」。
+- 涉及文件存储、上传时先读 `docs/shared/11-storage.md`；密钥进前端、前端拼 key、永久 URL 入库按 P0 / P1 写入「差距 / 风险」。
+- 报告按用途选模板：全面分析用 `templates/architecture-report.md`；A1–A21 体检用 `templates/audit-report.md`；新项目设计用 `templates/architecture-design.md`；单域深挖用 `templates/specialist-report.md`。
 - 出结论前做一致性检查：A4 / A8 / A11 / A17 / A21 与证据矛盾时必须降级。
 - 不写敏感信息；示例用占位符。
 - 英文术语首次出现用 `English（中文）`。

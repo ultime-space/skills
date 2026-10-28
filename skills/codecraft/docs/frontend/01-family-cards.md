@@ -66,11 +66,12 @@
 - **契约**：返回 raw response 或传输层结果；不产出域类型；错误只做传输层归一。
 - **状态与错误**：无 UI 状态；401 单一收口；超时 / 取消 / 网络错误；不弹业务 toast。
 - **并发与去重**：可选环节；查询默认共享 in-flight（同一 key 返回同一 Promise），变更默认按 key 去重；可按 route / page / instance 隔离 scope；可用第三方库或不实现。
-- **日志**：可选环节；dev-only 结构化日志（request id / method / url / timing / status）；prod 静默；可用第三方 APM 或不实现。
+- **日志**：可选环节；dev-only 结构化日志（request id / method / url / timing / status）；prod 静默；加密开启时打解密后的域数据，不打印密钥与密文原文；可用第三方 APM 或不实现。
+- **加密**：可选环节；只做 body 的编解码（URL / query / header 仍明文；OSS 直传、大文件不加密），业务层 / Wrapper / 页面只见明文；默认关闭，启用判据见宪法 §3「应用层加密」；解密失败单独分类，不混成业务 code、不当网络错误重试。算法、IV、信封、密钥来源与重放防护见 `docs/shared/09-security.md` §3。
 - **测试**：契约测试 / mock server；边界 schema 校验在域解析器。
 - **正例**：`adapter + interceptors` 组合；`createApi` 工厂统一注入 baseURL / 超时 / 错误归一。
-- **反例**：传输层把业务 code 解析成域变体；transport import store / UI；全局单例藏副作用。
-- **验收**：lint「transport 不 import UI / store」；401 / pending 测试；契约测试。
+- **反例**：传输层把业务 code 解析成域变体；transport import store / UI；全局单例藏副作用；业务层或每个 api 文件手写 AES；把加密当安全边界；解密失败当成网络错误重试。
+- **验收**：lint「transport 不 import UI / store」；401 / pending 测试；契约测试；lint「crypto 只在 Transport 导入」；加解密往返契约测试（同一 fixture 加密再解密，旧 key 版本仍可解）。
 
 ## 4. Wrapper
 

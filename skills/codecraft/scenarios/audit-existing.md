@@ -29,11 +29,13 @@
 
 ## 输出
 
+- 按 `templates/audit-report.md` 出报告。
 - 体检报告（按 `docs/shared/08-audit-contract.md` + 对应端审计文件）
 - 逐条判定表（A1–A21，含证据与局限）
 - 差距清单（P0–P3）
 - 升级计划
 - 回滚方案
+- 需要单域深挖（安全 / 身份 / 存储）时，另出 `templates/specialist-report.md`，本报告只留摘要。
 
 ## 停止条件
 

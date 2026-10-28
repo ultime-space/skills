@@ -31,6 +31,7 @@
 
 ## 输出
 
+- 按 `templates/architecture-design.md` 出设计报告。
 - 架构图（文字）
 - 目录树
 - 环节清单

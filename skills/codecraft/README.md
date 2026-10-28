@@ -64,6 +64,11 @@
 | **共享规则** | 什么不能变 | [`docs/shared/00-constitution.md`](./docs/shared/00-constitution.md) |
 | **前端形状** | 页面 / 组件 / 行为 / 状态怎么落 | [`docs/frontend/06-architecture.md`](./docs/frontend/06-architecture.md)、[`docs/frontend/01-family-cards.md`](./docs/frontend/01-family-cards.md) |
 | **后端形状** | 入口 / 用例 / 数据 / 迁移怎么落 | [`docs/backend/11-architecture.md`](./docs/backend/11-architecture.md)、[`docs/backend/10-family-cards.md`](./docs/backend/10-family-cards.md) |
+| **安全 / 密码** | 密码怎么存、传输怎么配、密钥归谁 | [`docs/shared/09-security.md`](./docs/shared/09-security.md) |
+| **身份与授权** | 登录 / 会话 / 权限怎么选 | [`docs/shared/10-auth.md`](./docs/shared/10-auth.md) |
+| **文件存储** | 文件放哪、怎么传、怎么取 | [`docs/shared/11-storage.md`](./docs/shared/11-storage.md) |
+| **专项评估** | 安全 / 身份 / 存储的单域深挖报告 | [`templates/specialist-report.md`](./templates/specialist-report.md) |
+| **体检与设计** | A1–A21 体检、新项目设计 | [`templates/audit-report.md`](./templates/audit-report.md)、[`templates/architecture-design.md`](./templates/architecture-design.md) |
 | **示例** | 原生怎么落，框架怎么对应 | 族卡的形状、[`templates/`](./templates/)、[`docs/shared/05-patterns.md`](./docs/shared/05-patterns.md) |
 
 > 前端族卡的形状默认原生（HTML + TS）；框架示例只给 Vue 3 / React，其它框架在族卡 §12 登记，不预建。
@@ -344,7 +349,7 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 
 ```text
 SKILL.md      标准 agent skill 入口（skills add / skills-npm 使用）
-docs/shared/          宪法、AI 契约、审计契约、门禁、模式、提示词、术语表
+docs/shared/          宪法、AI 契约、审计契约、门禁、模式、提示词、术语表、安全基线、身份与授权、文件存储
 docs/frontend/        前端族卡、风格总图、架构、审计判定
 docs/backend/         后端族卡、风格总图、架构、审计判定
 scenarios/    前端 / 后端审计、新项目、代码架构报告、只出报告、重构评审
@@ -352,7 +357,7 @@ adapters/     generic 手动指针（其它 agent 统一指向 SKILL.md）
 prompts/      输出格式
 src/ + bin/   CLI（check / audit / plan / init）
 tests/        node:test 用例
-templates/    init --apply 的 app / library 骨架 + 架构报告模板
+templates/    init --apply 骨架 + 架构报告 / 体检报告 / 架构设计 / 专项评估模板
 evals/        CLI eval fixtures + golden tasks（人工回归）
 ```
 
