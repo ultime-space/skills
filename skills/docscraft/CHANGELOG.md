@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 - 2026-10-28
+
+- 新增 `docs/rules/06-doc-safety.md`：文档分级、隐私与个人信息、凭据与内部信息、第三方引用、版权与许可、发现后的处置、检查方式与反模式。
+- `docs/contracts/08-checklist.md` 新增 D13「安全与引用」，判定范围改为 D1–D13，补一致性检查、机检映射与自检项；结构测试数量同步。
+- `SKILL.md` 路由、覆盖与禁止项接入；`prompts/output.md` 补引用格式与隐私规则；`00-principles.md` §9 增加指针；README 同步。
+
 ## 0.2.1 - 2026-10-28
 
 - `SKILL.md` 路由补 `docs/rules/02-doc-types.md`（文档类型速查）。

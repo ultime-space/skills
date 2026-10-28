@@ -16,6 +16,7 @@ const REQUIRED = [
   'docs/rules/01-layers.md',
   'docs/rules/02-doc-types.md',
   'docs/rules/05-rule-types.md',
+  'docs/rules/06-doc-safety.md',
   'docs/contracts/03-ai-context.md',
   'docs/contracts/08-checklist.md',
   'docs/guides/04-drift-guards.md',
@@ -127,6 +128,6 @@ void test('checklist covers every drift type', () => {
 
   const matrix = checklist.split('## 3. 判定矩阵')[1]?.split('\n## ')[0] ?? ''
   const ids = [...matrix.matchAll(/^\|\s*(D\d+)\s*\|/gm)].map((match) => match[1])
-  assert.equal(ids.length, 12, `expected D1–D12, got ${ids.length}`)
+  assert.equal(ids.length, 13, `expected D1–D13, got ${ids.length}`)
   assert.equal(new Set(ids).size, ids.length, 'checklist IDs must be unique')
 })

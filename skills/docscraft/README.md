@@ -8,6 +8,7 @@
 - 人、agent、维护者是否各有清晰入口
 - 规则是否分为事实 / 约束 / 判断，并有 owner 与到期
 - 文档是否与代码、生成物、链接、示例一起漂移
+- 隐私、凭据、第三方引用与版权是否守住边界
 - AI 是否能在正确的上下文里工作，而不是靠猜
 
 ## 安装
@@ -85,7 +86,8 @@ docscraft/
 │   │   ├── 00-principles.md
 │   │   ├── 01-layers.md
 │   │   ├── 02-doc-types.md
-│   │   └── 05-rule-types.md
+│   │   ├── 05-rule-types.md
+│   │   └── 06-doc-safety.md
 │   ├── contracts/
 │   │   ├── 03-ai-context.md
 │   │   └── 08-checklist.md

@@ -12,7 +12,7 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 
 | 项 | 内容 |
 |---|---|
-| 覆盖 | README、AGENTS、rules、docs、ADR、CHANGELOG、索引与链接、规则治理、AI 上下文入口 |
+| 覆盖 | README、AGENTS、rules、docs、ADR、CHANGELOG、索引与链接、规则治理、AI 上下文入口、文档安全、第三方引用与版权 |
 | 可复用 | 任意仓库的文档分层、单一真源、事实 / 约束 / 判断分类、文档漂移检查 |
 | 不适用 | 代码架构规范（用 Codecraft）；业务组件 / API 设计；纯写作润色 |
 | 不在范围 | 客户名、本机路径、个人协作偏好；这些留在本地记忆或项目私有文档 |
@@ -35,6 +35,7 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 | 写 ADR / 决策记录 | `docs/guides/06-adr.md` + `scenarios/write-adr.md` | ADR |
 | 治理规则 / 红线 | `docs/rules/05-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
 | 文档类型速查 | `docs/rules/02-doc-types.md` | 类型映射 |
+| 文档安全 / 引用与版权 | `docs/rules/06-doc-safety.md` + `docs/contracts/08-checklist.md` | 检查清单 / 处置建议 |
 | 检查 AI 入口 | `docs/contracts/03-ai-context.md` | 入口修订建议 |
 | 防漂移 | `docs/guides/04-drift-guards.md` | 检查清单 / CI 建议 |
 | 交付前自检 | `docs/contracts/08-checklist.md` | 逐条判定 + 自检结果 |
@@ -72,6 +73,7 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 - 不把判断型规则写成硬门禁；没有 owner 与复核日期就不算稳定规则。
 - 不写度量快照；写查询命令。
 - 不把客户名、本机路径、内部工具路径写进公开文档。
+- 把隐私、凭据或客户数据写进文档；引用第三方不标来源或超范围复制。
 - 不让 AI 单独定稿判断型规则；只给选项与代价。
 - 不在 Audit / Plan 模式改文件。
 
