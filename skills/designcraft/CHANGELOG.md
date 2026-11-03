@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- 首次通过 GitHub Actions + Trusted Publishing 发布，验证 CI 发版链路；无功能变更。
+
 ## 0.2.0
 
 - `docs/color.md`：按新颜色模型重写——对比度目标（7.2 / 6 / 5 / 2.0）、alpha 反解、`on` 独立配对维度、三条文字线、审计分级与 core 边界、品牌色可达性。
