@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 - 2026-11-04
+
+- `docs/contracts/00-ai-context.md`：补 Agent Skills 标准与预算（frontmatter 必填 / 可选字段、目录约定、三级渐进披露、`skills-ref validate`）与「AGENTS.md vs SKILL.md」选择判据。
+- `docs/rules/01-layers.md`：新增「包级文档模型」——每包 README / DESIGN / AGENTS / rules / llms.txt / skills.md / agent.md 的职责、版本戳与指针规则；「新增端 / 包」步骤同步补 AI 三件套。
+
 ## 0.3.1 - 2026-11-03
 
 - 文档编号修复：`docs/` 拆子目录时沿用的平铺时代全局序号改为**目录内连续编号**——rules 00–04（05-rule-types→03、06-doc-safety→04）、contracts 00–01（03-ai-context→00、08-checklist→01）、guides 00–01（04-drift-guards→00、06-adr→01）；SKILL / README / prompts / 正文互链与结构测试同步更新。历史 CHANGELOG 条目保留旧路径不改写。

@@ -105,13 +105,48 @@ agent 入口（如 `.agents/rules/`、`AGENTS.md`）只做索引：
 └─ 调研 / 草稿 → .local/notes/（不进 git）
 ```
 
+## 包级文档模型
+
+多包仓库里，每个包是独立真源；根仓只做索引与跨包规范。
+
+```text
+packages/<pkg>/
+├── README.md      # 怎么用：安装、快速开始、API / 命令、边界
+├── DESIGN.md      # 可选：为什么这样设计（架构决策，不写规范条文）
+├── AGENTS.md      # 入口：先读什么、红线、验证
+├── rules/         # 本包开发规范：架构 / 领域对象 / 测试 / 发布
+├── llms.txt       # AI 索引：能力、入口、命令、链接
+├── skills.md      # 可调用能力：API / CLI / 字段 / 错误
+├── agent.md       # 操作约束：可写路径、禁止项、验证
+└── CHANGELOG.md   # 版本记录
+```
+
+| 文件 | 回答 | 不写 |
+|---|---|---|
+| README | 怎么用 | 设计理由、内部状态、规范条文 |
+| DESIGN | 为什么 | 用法步骤、规范全文 |
+| AGENTS | 开工前必须知道什么 | 领域细则、完整 API |
+| rules/ | 本包怎么改、怎么验 | 跨包机制、历史 |
+| llms.txt | 去哪找 | 正文 |
+| skills.md | 有哪些可调用能力 | 判断型规则 |
+| agent.md | 能改什么、不能改什么 | 与 AGENTS 重复的红线 |
+
+**版本同步**：`rules/` / `llms.txt` / `skills.md` / `agent.md` 与 `package.json` 同批更新；每份文件头写 `适用版本：X.Y.x`，发版前机检版本戳。
+
+**指针规则**：
+
+- 根仓只留索引与跨包规范；包内细则不上升到根仓。
+- 包 README 不链接内部文档站或路线图；对外指向已发布的 skill 或包内文件。
+- 同一事实只留一处：取值、字段、命令进源码 / schema，文档写查询方式。
+
 ## 新增一个端 / 包时
 
 1. 建 `<area>/AGENTS.md`，只写入口、红线、验证。
 2. 建 `<area>/rules/`，按领域拆正文。
-3. 在根 `AGENTS.md` 加一行指针，不复制端级内容。
-4. 在根 `README.md` 的目录表加一行。
-5. 检查是否有旧 `.agents/rules/` 正文需要迁移。
+3. 建 `llms.txt` / `skills.md` / `agent.md`，写 `适用版本：X.Y.x`，与 `package.json` 同批更新。
+4. 在根 `AGENTS.md` 加一行指针，不复制端级内容。
+5. 在根 `README.md` 的目录表加一行。
+6. 检查是否有旧 `.agents/rules/` 正文需要迁移。
 
 ## 迁移旧项目
 

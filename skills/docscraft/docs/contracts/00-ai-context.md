@@ -65,6 +65,29 @@ Skill 与文档都应该按需加载：
 
 判断方法：如果入口超过一屏，读者还没有开始任务，就已经迷路了。
 
+## SKILL.md 标准与预算
+
+`SKILL.md` 是 Agent Skills 开放标准的入口文件（Anthropic 2025-12 发布，2026-10 捐给 Linux 基金会 AAIF）。
+
+- **必填 frontmatter**：`name`（≤64 字符、小写连字符、与目录名一致）、`description`（≤1024 字符，写清「什么时候用」）。
+- **可选字段**：`license` / `compatibility` / `metadata` / `allowed-tools`。
+- **目录约定**：`scripts/` 放可执行脚本，`references/` 放按需文档，`assets/` 放资源。
+- **渐进披露三级**：元数据 ~100 tokens → 正文建议 <5000 tokens / 500 行 → 资源按需加载。
+- **校验**：官方 `skills-ref validate`；本地再加结构测试（frontmatter、路由可达、相对链接）。
+
+`SKILL.md` 超预算时，先拆 `docs/` 与 `references/`，不要压缩到读者无法判断。
+
+## AGENTS.md 与 SKILL.md 怎么选
+
+| 维度 | `AGENTS.md` | `SKILL.md` |
+|---|---|---|
+| 性质 | 静态上下文：本仓怎么协作、先读什么 | 按需能力：一类任务怎么做 |
+| 加载 | 任务开始时常驻 | 命中描述时才激活 |
+| 内容 | 入口、红线、验证命令 | 路由、适用条件、禁止、输出格式 |
+| 边界 | 不写领域细则 | 不写本仓协作约定 |
+
+判断：**只对「在本仓工作」成立 → AGENTS.md；跨项目、可安装、按任务触发 → SKILL.md**。两者都只做路由，正文放 `rules/` / `docs/`。
+
 ## 激活与假阴性
 
 Skill 不是“装上就自动生效”：
