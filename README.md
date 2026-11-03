@@ -44,6 +44,7 @@ npx skills add ultime-space/skills --skill='*' -g
 |---|---|---|
 | **Codecraft** | 面向 JS/TS 的代码规范与代码架构设计（不含业务架构）：审计、架构报告、代码架构设计、脚手架与门禁编排 | [README](./skills/codecraft/README.md) · [SKILL.md](./skills/codecraft/SKILL.md) · [VERSION](./skills/codecraft/VERSION) |
 | **Docscraft** | 文档组织与 AI 上下文治理：分层、单一真源、规则治理、ADR、文档漂移检查 | [README](./skills/docscraft/README.md) · [SKILL.md](./skills/docscraft/SKILL.md) · [VERSION](./skills/docscraft/VERSION) |
+| **Designcraft** | 设计系统视觉规范：排版与颜色、场景取档、对比与深浅配对评审 | [README](./skills/designcraft/README.md) · [SKILL.md](./skills/designcraft/SKILL.md) · [VERSION](./skills/designcraft/VERSION) |
 
 ---
 

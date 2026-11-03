@@ -37,3 +37,19 @@ jobs:
 
       - run: npm test
       - run: npm pack --dry-run
+
+  designcraft:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skills/designcraft
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm test
+      - run: npm run release-check
+      - run: npm pack --dry-run

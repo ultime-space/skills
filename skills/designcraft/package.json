@@ -1,0 +1,51 @@
+{
+  "name": "@ultime/designcraft",
+  "version": "0.2.0",
+  "description": "面向设计系统的视觉规范（Designcraft），作为可安装的 skill 包：排版、颜色与取档建议。",
+  "keywords": [
+    "ai",
+    "skill",
+    "design-system",
+    "design-tokens",
+    "typography",
+    "color",
+    "agent-skills"
+  ],
+  "author": "Ultime contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ultime-space/skills.git",
+    "directory": "skills/designcraft"
+  },
+  "homepage": "https://github.com/ultime-space/skills/tree/main/skills/designcraft",
+  "bugs": {
+    "url": "https://github.com/ultime-space/skills/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "docs",
+    "scenarios",
+    "prompts",
+    "templates",
+    "evals",
+    "VERSION",
+    "CHANGELOG.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "release-check": "node scripts/release-check.mjs",
+    "prepublishOnly": "npm test && npm run release-check"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
