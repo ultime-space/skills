@@ -46,6 +46,7 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 | 专项评估报告（安全 / 身份 / 存储） | `templates/specialist-report.md` + 对应 `docs/shared/09-security.md` / `docs/shared/10-auth.md` / `docs/shared/11-storage.md` | 报告（只读） |
 | 门禁配置 / 契约 | `docs/shared/04-gates.md` | 两层门禁与 Gate Contract |
 | 规范落地（宪法 → 项目 rules） | `scenarios/adopt-standards.md` + 宪法 | 规则与门禁映射、config、接入建议 |
+| 改代码后的自检循环 | `scenarios/agent-loop.md` + 宪法 | 改前 check → 改后 `--rules --ci` 点检 → 修完全量 |
 | 风格 / 模式速查 | `docs/frontend/03-style-map.md` / `docs/backend/12-style-map.md` | 速查表 |
 | 改代码 | 宪法 + 对应端族卡 + 项目门禁 | 变更 + 验证 |
 
@@ -67,7 +68,7 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 
 ## 模式
 
-- **Audit**：只读，出报告。
+- **Audit**：只读，出报告（CLI 的 `audit` 默认只跑静态规则，gates 需 `--run-gates`）。
 - **Plan**：只读，出架构 / 升级计划（CLI 的 `plan` 默认不执行项目命令，`--with-gates` 例外）。
 - **Apply**：改代码 + 跑门禁。
 

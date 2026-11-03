@@ -12,6 +12,7 @@
 | Wrapper | 内外转换 |
 | Gate | 门禁 |
 | Gates | 门禁 |
+| Baseline | 基线 |
 | Drift | 漂移 |
 | ADR | 架构决策记录 |
 | Canonical Link | 规范链接 |

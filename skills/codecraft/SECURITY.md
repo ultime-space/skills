@@ -23,7 +23,7 @@
 
 ## 威胁模型（2026-11-03）
 
-- **不可信仓库**：`check` 与默认参数的 `plan` 只读扫描、不执行项目命令；`audit` 在 1.x 默认执行 config gates——打开不可信仓库时不要跑 `audit`（或先加 `--no-gates`）。2.0 起 gates 需要显式 `--run-gates`。
+- **不可信仓库**：`check`、`audit` 与默认参数的 `plan` 只读扫描、不执行项目命令（2.0 起 `audit` 默认只跑静态规则）；gates 仅在显式 `--run-gates`（audit）/ `--with-gates`（plan）时执行。
 - **gate 是任意 shell**：`codecraft.config.json` 来自被审仓库，gates 等于仓库作者可执行的代码；只允许可信分支 / 受保护配置携带 gates。fork PR 不跑 `audit`。
 - **env 继承**：gate 继承完整 `process.env`，能读取 CI 中的全部环境变量与密钥。本工具不收紧 env（会打断依赖环境变量的真实 gate）；项目侧在 CI 中使用最小权限凭据。
 - **报告泄露**：gate 输出进入报告前做高置信文本级脱敏（`[REDACTED]`，命中数记入 `redacted`），但脱敏不是保证；CI 上传报告前可用 `--no-gate-output` 整体省略输出。

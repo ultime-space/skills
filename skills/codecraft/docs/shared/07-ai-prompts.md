@@ -178,6 +178,16 @@ npx @ultime/codecraft check --pack design-system --root .
 要求：不复制宪法正文；ignore 带 reason 与 expires；接入从 check（只报告）开始；不自动改 CI 配置 / hooks，阻断策略由人确认。
 ```
 
+### 3.11 Agent 自检循环
+
+```text
+使用 Codecraft（<路径>/codecraft）。
+模式：Apply（改代码 + CLI 自检）。
+范围：<文件 / 模块 / diff>。
+任务：改代码前先跑 codecraft check 记录 findings；改完按 scenarios/agent-loop.md 三步走——点检（check --rules <触碰规则> --ci）非 0 就修，修完跑全量 check。
+要求：不要为过检放宽规则或登记无理由的 ignore；有 Baseline 的项目全量加 --baseline；静态规则没覆盖的维度（结构 / 状态）明确说明靠什么验证。
+```
+
 ## 4. 说法上的要点
 
 - 先说模式，不要让 AI 猜。

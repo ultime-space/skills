@@ -647,7 +647,10 @@ function scanSecrets(root, isExcluded = () => false, coverage = createCoverage()
         if (SECRET_ALLOW.has(match[0])) continue
         pushSecret(findings, seen, {
           rule: 'A21',
+          // 密钥是红线，但不借 severity 表达：severity 只表示阻断力度（--ci 才升 error）。
+          // 用 critical 独立标记，报告置顶，不改变「error ⇒ exit 1」的既有语义。
           severity: 'warn',
+          critical: true,
           file: path.relative(root, file),
           line: lineAt(text, match.index ?? 0),
           message: `possible ${pattern.id}; remove it and rotate the credential (A21)`,
@@ -663,6 +666,7 @@ function scanSecrets(root, isExcluded = () => false, coverage = createCoverage()
       pushSecret(findings, seen, {
         rule: 'A21',
         severity: 'warn',
+        critical: true,
         file: path.relative(root, file),
         line: index + 1,
         message: `plaintext ${assignment.key}; move it to env / config center and rotate (A21)`,

@@ -1,15 +1,16 @@
 {
   "pack": "auto",
   "exclude": ["dist/**", "coverage/**"],
+  "baseline": "codecraft-baseline.json",
   "gates": [
     {
-      "name": "typecheck",
-      "run": "pnpm typecheck",
+      "id": "typecheck",
+      "entry": "pnpm typecheck",
       "timeoutMs": 120000
     },
     {
-      "name": "test",
-      "run": "pnpm test",
+      "id": "test",
+      "entry": "pnpm test",
       "timeoutMs": 120000
     }
   ],

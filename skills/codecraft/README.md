@@ -21,6 +21,7 @@
 规则正文只在 [`docs/`](./docs/)；其它位置只放入口与指针，避免第二份真源。
 
 > 第一次用：直接看 [安装](#安装) 和 [第一次使用](#第一次使用)。
+> **从 1.x 升级**：2.0 改了 gate 配置形状（`run` → `entry`、`name` → `id`），且 `audit` 不再默认跑 gates。按「升级到 2.0」一节逐条改，配置写错时 CLI 会直接给出改写示例。
 
 ## 适用场景
 
@@ -110,10 +111,10 @@ npx skills-npm setup
 
 ```bash
 npx @ultime/codecraft check --root <项目路径>   # L0：只出报告，不改文件、不阻断
-npx @ultime/codecraft audit --root <项目路径>   # 额外执行 config gates（1.x 默认；2.0 起需 --run-gates）
+npx @ultime/codecraft audit --root <项目路径>   # 静态规则 + 告警；gates 需显式 --run-gates
 ```
 
-看懂报告：`Rules` 是本次启用的内置规则；`Coverage` 是扫描覆盖（跳过与未支持项，避免把 0 findings 误读成全量通过）；`Findings` 带文件 / 行号 / 规则 ID；退出码 0 / 1 / 2 见「退出码」。
+看懂报告：`Rules` 是本次启用的内置规则；`Critical` 是密钥红线（优先处理、不可豁免）；`Coverage` 是扫描覆盖（跳过与未支持项，避免把 0 findings 误读成全量通过）；`Findings` 带文件 / 行号 / 规则 ID；退出码 0 / 1 / 2 见「退出码」。
 
 ## 接入档位（Adoption Profile）
 
@@ -248,8 +249,8 @@ codecraft <command> [options]
 | 命令 | 作用 |
 |---|---|
 | `check` | 只跑内置规则（默认命令） |
-| `audit` | 内置规则 + gates；1.x 默认执行 config gates（stderr 提示 2.0 需 `--run-gates`），报告只读 |
-| `plan` | 把 findings 转成只读升级计划；默认不跑 gates |
+| `audit` | 内置规则；gates 仅在显式 `--run-gates` 时执行（配置了 gates 未执行会在 stderr 告警），报告只读 |
+| `plan` | 把 findings 转成只读升级计划；每条带验证命令与宪法条款出处（`constitution`）；默认不跑 gates |
 | `init` | 生成 app / library 骨架；默认 dry-run |
 | `version` | 输出版本号 |
 
@@ -278,14 +279,19 @@ codecraft init --root . --name demo --apply      # 写盘
 | `--config <path>` | 文件 | `codecraft.config.json` | 相对 `--root` |
 | `--changed` | — | 关 | 只报告变更 / 未跟踪文件中的 findings |
 | `--since <ref>` | git ref | — | 只报告自该 ref 以来变动文件中的 findings |
+| `--rules <A6,A21>` | 规则 ID 列表 | — | 只报这些规则的 findings；语义是 **pack 的过滤器**（取交集），config 的 pack 仍是唯一真源；部分规则不在 pack 内会在 stderr 警告，**全部不在 pack 内则 exit 2**（否则会 0 findings 静默变绿）。适合 agent 自检循环只验证触碰到的规则 |
 | `--exclude <glob>` | 路径 / glob | — | 扫描时跳过；可重复。用于 fixture、第三方目录等不应参与检查的路径 |
+| `--baseline [path]` | 路径（可省略） | 关 | 抑制基线文件中已登记的 findings；省略路径时用 `codecraft-baseline.json`；config `"baseline"` 也可激活。见「Baseline（基线）」一节 |
+| `--update-baseline` | — | 关 | 把当前 findings 快照进基线文件（整包全量，与 `--changed` / `--since` / `--rules` 互斥）；会产生新增条目时拒绝（exit 2），`--force` 才重建 |
+| `--force` | — | 关 | 仅配合 `--update-baseline`：即使新增也重建基线 |
+| `--compare <report.json>` | 上次报告 | — | 与上次 `check --format json` 报告对比（路径相对 `--root`），输出新增 / 消失的 findings（指纹同基线，不含行号）；只影响报告内容，不改退出码。趋势出口，替代口头承诺 |
 | `--format <fmt>` | `md` / `json` / `sarif` | `md` | 输出格式 |
-| `--severity <level>` | `warn` / `error` | `warn` | findings 的严重级别 |
+| `--severity <level>` | `warn` / `error` | `warn` | `warn` 只报告；`error` 等价于 `--ci`（阻断）。`findings[].severity` 就是阻断力度；A21 密钥不靠 severity 表达，用 `critical: true` 标记并在报告顶部单列 |
 | `--ci` | — | 关 | 等价于 `--severity error` |
 | `--fail-fast` | — | 关 | gates 遇到第一个失败即停止 |
 | `--no-gates` | — | 关 | `audit` 跳过 gates |
 | `--with-gates` | — | 关 | `plan` 执行 gates |
-| `--run-gates` | — | 关 | 显式执行 gates；1.x 中对 `audit` 是幂等空操作，2.0 起成为 `audit` 执行 gates 的必要条件 |
+| `--run-gates` | — | 关 | 在 `audit` 中显式执行 gates；2.0 起 `audit` 默认不跑 gates，此 flag 是唯一执行入口 |
 | `--no-gate-output` | — | 关 | 报告中省略 gate 输出（脱敏仍在的替代选择是整段省略） |
 | `--name <name>` | 字符串 | — | `init` 的 app / package 名称；`--apply` 时必填。只接受 1–64 位字母 / 数字 / `.` / `-` / `_`，拒绝分隔符、前导点与绝对路径 |
 | `--apply` | — | 关 | `init` 写盘；已存在路径跳过，不覆盖 |
@@ -295,14 +301,14 @@ codecraft init --root . --name demo --apply      # 写盘
 | 码 | 含义 |
 |---|---|
 | `0` | 通过；warning 不阻断 |
-| `1` | 有 error findings，或有 gate 失败 |
+| `1` | `--ci` / `--severity error` 下有 findings，或有 gate 失败；不带阻断开关时报告模式恒 0 |
 | `2` | 用法错误、root 不存在、配置非法 |
 
 ### 输出
 
-- 默认 Markdown：头部元信息（含 Coverage 精简行）+ Findings 表 + Gates（门禁）表。
-- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `coverage`（scanned / skipped / unsupportedExtensions / 每规则 limitations）/ `exclude` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
-- `--format sarif`：SARIF 2.1.0，可直接上传 GitHub Code Scanning。
+- 默认 Markdown：头部元信息（含 Coverage 精简行）+ Critical 段（A21 密钥，置顶）+ Findings 表 + Gates（门禁）表。
+- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `coverage`（scanned / skipped / unsupportedExtensions / 每规则 limitations；契约自 2.0.0 起冻结为稳定契约，字段只增不改语义）/ `exclude` / `findings`（密钥项带 `critical: true`）/ `baseline`（激活时的抑制计数与文件路径）/ `compare`（`--compare` 时的 added / resolved 明细）/ `plan` / `gates` / `summary`（含 `critical` 计数），用于 CI、趋势和两次运行 diff。
+- `--format sarif`：SARIF 2.1.0，可直接上传 GitHub Code Scanning；`critical`（A21 密钥）以 `error` 级别上报，其余按 severity 映射。SARIF 的级别只影响 Code Scanning 的展示与它自己的门禁，不改变本工具的退出码。
 - `--changed` / `--since` 只过滤 findings，底层仍做全量扫描；JSON 的 `scope` 为 `changed`，`changed` 为变更文件数。
 - 报告始终带版本号与规则 ID；`plan` 明确声明「No files were changed by this command.」。
 
@@ -336,9 +342,10 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 {
   "pack": "auto",
   "exclude": ["dist/**", "coverage/**"],
+  "baseline": "codecraft-baseline.json",
   "gates": [
-    { "name": "typecheck", "run": "pnpm typecheck", "timeoutMs": 120000 },
-    { "name": "test", "run": "pnpm test", "timeoutMs": 120000 }
+    { "id": "typecheck", "entry": "pnpm typecheck", "timeoutMs": 120000 },
+    { "id": "test", "entry": "pnpm test", "timeoutMs": 120000 }
   ],
   "ignore": [
     {
@@ -359,13 +366,58 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 
 - `pack`：`app` / `library` / `design-system` / `auto`。
 - `exclude`：扫描级排除（路径或 glob），与 `--exclude` 合并；用于 fixture、构建产物、本地密钥文件。要登记规则例外用 `ignore`，两者不要混用。
-- `gates`：数组；每项必须有一个非空的 `run` 字符串，可选 `name`、`timeoutMs`（默认 `120000`）。
+- `baseline`：基线文件路径（`true` 用默认 `codecraft-baseline.json`）；配合 `--update-baseline` 生成，见「Baseline（基线）」一节。
+- `gates`：数组；2.0 契约为 pre-commit 形状，每项必须有 `id` 与 `entry`（非空字符串，`args` 数组会追加到 `entry` 后），可选 `files` / `exclude`（glob 作用域，`--changed` / `--since` 模式下变更文件不在作用域内的 gate 跳过）、`output`（`sarif` / `junit` / `gitlab`，声明后解析 issue 数）、`threshold`（`{ metric: "issues", operator: "<|<=|>|>=|==", value: N }`，条件以失败口吻陈述；必须先声明 `output`，否则配置期报错；issue 数解析不出时按失败处理）、`timeoutMs`（默认 `120000`）。1.x 的 `run` / `name` 字段已移除（迁移：`run` → `entry`，`name` → `id`）。
 - `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
 - `boundaries`：A17 的补充声明。`external` / `generated` 填 import 前缀或 glob；`allowedImporters` 填允许 import 外部类型的文件（路径或 glob，相对 `--root`；默认只按目录段放行 `wrapper/`，文件级 `wrapper.ts` 需在此登记）；`generatedDirs` 填生成物根目录（相对 `--root`），目录内文件即使没有生成头也按生成物处理。
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
-- gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符，输出先经高置信脱敏（私钥 / 令牌 / Authorization / 带凭据连接串 → `[REDACTED]`，命中数记入 `redacted`），`--no-gate-output` 可整体省略。
-- `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
+- gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；输出全文捕获（不再截断尾部），先经高置信脱敏（私钥 / 令牌 / Authorization / 带凭据连接串 → `[REDACTED]`，命中数记入 `redacted`），`--no-gate-output` 可整体省略。gate 失败 = 退出码非 0 或 `threshold` 条件为真；`files` 作用域跳过的不算失败。
+- `check` 不跑 gates；`audit` 仅在 `--run-gates` 时跑；`plan` 只在 `--with-gates` 时跑。
 - 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/shared/04-gates.md`](./docs/shared/04-gates.md)。
+
+## 升级到 2.0（从 1.x）
+
+2.0 是破坏性大版本：**gate 配置形状**与 **`audit` 默认行为**都变了。逐条对照下表，改完跑一次 `codecraft check` 确认。
+
+| 变更 | 1.x | 2.0 | 怎么改 |
+|---|---|---|---|
+| gate 字段 | `{ "name": "test", "run": "pnpm test" }` | `{ "id": "test", "entry": "pnpm test" }` | `name` → `id`，`run` → `entry`；`args` / `files` / `exclude` / `output` / `threshold` 是新增可选项 |
+| `audit` 是否跑 gates | 默认执行 | 默认不执行 | CI 里改成 `audit --run-gates`；漏了会在 stderr 告警。确实不想跑就显式 `--no-gates` |
+| findings 分级 | `severity` 同时承担阻断 | `severity` 只表示阻断力度；密钥用 `critical` 标记 | 若你按 `findings[].severity === "error"` 自建门禁，改用 `--ci` 的退出码或 `summary.critical` |
+| gate 输出 | 截断尾部 40 行 / 4000 字符 | 全文捕获 | 报告可能变大；需要瘦身用 `--no-gate-output` |
+
+升级检查清单：
+
+1. 跑 `codecraft check`：gate 配置写错会直接退出并打印改写示例，按提示改完再继续。
+2. 把所有 `audit` 调用改成 `audit --run-gates`（或 `--no-gates`）；2.0 不会替你静默跳过 — 会在 stderr 告警。
+3. 存量项目先 `check --update-baseline` 建基线（随仓库提交），再上 `check --baseline --ci`，避免一次性全红。
+4. 阻断只认 `--ci`（`--severity error` 等价）；默认 `check` / `audit` 是报告，退出码 0。
+
+配置写错时的提示长这样（直接照着改，不用查文档）：
+
+```text
+codecraft: invalid config codecraft.config.json: gate "test" still uses the removed 1.x "run" field
+— rewrite { "name": "test", "run": "pnpm test" } as { "id": "test", "entry": "pnpm test" }
+(2.0 gate contract; see README "Upgrade to 2.0")
+```
+
+完整变更条目见 [CHANGELOG](./CHANGELOG.md) 的 2.0.0「迁移（必读）」。
+
+## 基线（Baseline）
+
+存量项目直接上 `--ci` 会立刻全红；`ignore` 登记到死又等于永久豁免。基线解决的是中间态：**快照存量，只拦新增**。
+
+```bash
+codecraft check --update-baseline          # 生成 codecraft-baseline.json（随仓库提交）
+codecraft check --baseline --ci            # 存量静默，新增阻断
+```
+
+- 指纹 = 规则 + 文件 + 稳定消息，**不含行号**（编辑代码不会让基线失配；路径统一 `/`，Windows 与 POSIX 共用一份基线）。
+- 基线文件带格式版本与工具版本：格式不符直接报错退出（被动失效显式化）；工具版本漂移只在 stderr 提醒；**基线文件不存在时只告警、不做任何抑制**（不会静默变成「全绿」）。
+- **只减不增**：`--update-baseline` 在会产生新增条目时拒绝执行（exit 2），提示修复或登记 `ignore`；确要重建用 `--force`。基线的生命目标是消失——报告头部的 `Baseline: N suppressed / M known` 就是收缩进度。
+- 基线与 `ignore` 分工：`ignore` 是带理由的逐条豁免（安全规则 A21 不可豁免），基线是存量的整批快照；新问题永远不该进基线。
+- **密钥永不进基线**：`--update-baseline` 会排除 `critical` 的 A21 findings 并提示轮换，`--baseline` 也不会抑制它们——与 `ignore` 禁止豁免 A21 同口径，密钥只能移除并轮换。
+- `--update-baseline` 是整包全量快照，与 `--changed` / `--since` / `--rules` 互斥（收窄会让未纳入的规则在后续全部被误报为新增）。
 
 ## 目录
 

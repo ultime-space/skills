@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.0.0 - 2026-11-03
+
+定位切换：**报告优先 + 修复契约**。报告归报告（默认不阻断），阻断归 `--ci` / `--severity error`；agent 自检循环升为官方 scenario。
+
+### 迁移（必读）
+
+- **`audit` 默认不再执行 gates**：默认只跑静态规则；执行 gates 需显式 `--run-gates`（1.14 已预告）。配置了 gates 未执行时 stderr 告警（`--no-gates` 显式跳过则不告警）——存量 CI 若依赖 `audit` 跑 gates，请改为 `audit --run-gates`。
+- **gate 声明迁移到 2.0 契约（pre-commit 形状，破坏性）**：`run` 字段移除 → 改名 `entry`；`name` 移除 → 改名 `id`。新可选字段：`args` / `files` / `exclude` / `output` / `threshold`。1.x 形状的配置会在加载时报错并给出迁移提示。
+- **`--severity error` 现在等价于 `--ci`（阻断）**；`findings[].severity` 始终表示阻断力度（默认 `warn`）。**若你按 `findings[].severity === "error"` 自建门禁**，改用 `--ci` 的退出码或 `summary.critical`——2.0 不会再让某个规则单独带 `error` 级别。
+- **gate 输出不再截断尾部 40 行**，改为全文捕获（脱敏不变）；报告体积可能变大，可用 `--no-gate-output` 整体省略。
+
+### 新增
+
+- baseline（基线）：`check --update-baseline` 快照存量 findings 到 `codecraft-baseline.json`（仓库内提交）；`--baseline` / config `"baseline"` 激活后只报相对基线的新增 findings。指纹 = 规则 + 文件 + 稳定消息（不含行号，不含密钥值）；棘轮只减不增——会产生新增条目时 `--update-baseline` 拒绝执行（exit 2），`--force` 才重建。**密钥（A21 `critical`）永不进基线、也不会被基线抑制**（与 ignore 禁止豁免 A21 同口径）。
+- `--rules A6,A21`：规则级选择；语义为 pack 的过滤器（交集），config 的 pack 仍是唯一真源；不在 pack 内的规则 stderr 警告；`coverage.rules` 同步收窄。
+- `--compare <上次.json>`：与上次 `check --format json` 报告对比，输出新增 / 消失的 findings（指纹同基线）；只影响报告内容，不改退出码。
+- gate 契约标准化：`output` 声明 `sarif` / `junit` / `gitlab`（GitLab Code Quality）后解析 issue 数；`threshold` 用 `(metric, operator, value)` 三元组判定（metric 当前仅 `issues`）；`files` / `exclude` 作用域在 `--changed` / `--since` 模式下跳过不相关 gate。不引入 OPA / Rego。
+- `scenarios/agent-loop.md`：agent 自检循环三步（改前 check → 改后 `--rules --ci` 点检 → 修完全量）；SKILL 路由与 `07-ai-prompts.md` §3.11 同步接入。
+- `plan` 条目新增 `constitution` 字段：每条计划可反解到宪法条款（`docs/shared/00-constitution.md §2 Axx`）；Markdown 计划表同步加 Constitution 列。
+- A21 密钥 findings 带 `critical: true`（报告顶部单列 Critical 段，`summary.critical` 计数，SARIF 以 `error` 级别上报），但 severity 仍是 `warn`、本工具退出码不变；要阻断用 `--ci`。design-system 的文档路径检查（同编号 A21）不带 critical。
+
+### 变更
+
+- coverage 契约冻结为稳定契约（1.14 标 experimental）：字段只增不改语义。
+- gate 失败判定 = 退出码非 0 或 threshold 条件为真；`files` 作用域跳过不算失败；`--fail-fast` 同口径。
+
 ## 1.14.0 - 2026-11-03
 
 - 安全：`init --name` 只接受安全名称（1–64 位字母 / 数字 / `.` / `-` / `_`；拒绝分隔符 / 前导点 / 绝对路径），非法以 2 退出；写盘前对每个目标做 root 包含性校验（修复路径穿越）。
