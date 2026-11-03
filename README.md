@@ -5,6 +5,9 @@
 [![npm](https://img.shields.io/npm/v/@ultime/codecraft?label=%40ultime%2Fcodecraft&color=black)](https://www.npmjs.com/package/@ultime/codecraft)
 [![node](https://img.shields.io/node/v/@ultime/codecraft?label=node)](https://www.npmjs.com/package/@ultime/codecraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./skills/codecraft/LICENSE)
+[![npm](https://img.shields.io/npm/v/@ultime/docscraft?label=%40ultime%2Fdocscraft&color=black)](https://www.npmjs.com/package/@ultime/docscraft)
+[![node](https://img.shields.io/node/v/@ultime/docscraft?label=node)](https://www.npmjs.com/package/@ultime/docscraft)
+[![license](https://img.shields.io/badge/license-MIT-black)](./skills/docscraft/LICENSE)
 
 ---
 

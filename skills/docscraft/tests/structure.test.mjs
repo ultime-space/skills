@@ -15,12 +15,12 @@ const REQUIRED = [
   'docs/rules/00-principles.md',
   'docs/rules/01-layers.md',
   'docs/rules/02-doc-types.md',
-  'docs/rules/05-rule-types.md',
-  'docs/rules/06-doc-safety.md',
-  'docs/contracts/03-ai-context.md',
-  'docs/contracts/08-checklist.md',
-  'docs/guides/04-drift-guards.md',
-  'docs/guides/06-adr.md',
+  'docs/rules/03-rule-types.md',
+  'docs/rules/04-doc-safety.md',
+  'docs/contracts/00-ai-context.md',
+  'docs/contracts/01-checklist.md',
+  'docs/guides/00-drift-guards.md',
+  'docs/guides/01-adr.md',
   'docs/glossary.md',
   'scenarios/audit-docs.md',
   'scenarios/reorganize-docs.md',
@@ -109,7 +109,7 @@ void test('every docs file is reachable from SKILL.md', () => {
 })
 
 void test('checklist covers every drift type', () => {
-  const drift = read('docs/guides/04-drift-guards.md')
+  const drift = read('docs/guides/00-drift-guards.md')
   const section = drift.split('## 漂移类型')[1]?.split('\n## ')[0] ?? ''
   const types = []
   for (const line of section.split('\n')) {
@@ -122,7 +122,7 @@ void test('checklist covers every drift type', () => {
 
   assert.ok(types.length >= 8, `expected 8 drift types, got ${types.length}`)
 
-  const checklist = read('docs/contracts/08-checklist.md')
+  const checklist = read('docs/contracts/01-checklist.md')
   const missing = types.filter((type) => !checklist.includes(type))
   assert.deepEqual(missing, [], `checklist missing: ${missing.join(', ')}`)
 

@@ -32,13 +32,13 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 |---|---|---|
 | 审计现有文档 | `docs/rules/00-principles.md` + `docs/rules/01-layers.md` + `scenarios/audit-docs.md` | 只读报告 |
 | 重整文档结构 | `docs/rules/01-layers.md` + `scenarios/reorganize-docs.md` | 迁移计划；确认后执行 |
-| 写 ADR / 决策记录 | `docs/guides/06-adr.md` + `scenarios/write-adr.md` | ADR |
-| 治理规则 / 红线 | `docs/rules/05-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
+| 写 ADR / 决策记录 | `docs/guides/01-adr.md` + `scenarios/write-adr.md` | ADR |
+| 治理规则 / 红线 | `docs/rules/03-rule-types.md` + `scenarios/review-rules.md` | 规则清单 / 到期表 |
 | 文档类型速查 | `docs/rules/02-doc-types.md` | 类型映射 |
-| 文档安全 / 引用与版权 | `docs/rules/06-doc-safety.md` + `docs/contracts/08-checklist.md` | 检查清单 / 处置建议 |
-| 检查 AI 入口 | `docs/contracts/03-ai-context.md` | 入口修订建议 |
-| 防漂移 | `docs/guides/04-drift-guards.md` | 检查清单 / CI 建议 |
-| 交付前自检 | `docs/contracts/08-checklist.md` | 逐条判定 + 自检结果 |
+| 文档安全 / 引用与版权 | `docs/rules/04-doc-safety.md` + `docs/contracts/01-checklist.md` | 检查清单 / 处置建议 |
+| 检查 AI 入口 | `docs/contracts/00-ai-context.md` | 入口修订建议 |
+| 防漂移 | `docs/guides/00-drift-guards.md` | 检查清单 / CI 建议 |
+| 交付前自检 | `docs/contracts/01-checklist.md` | 逐条判定 + 自检结果 |
 
 ## 先读
 
@@ -47,7 +47,7 @@ description: 面向 JS/TS 仓库的文档组织与 AI 上下文治理（Docscraf
 3. 按任务读 `docs/rules/`、`docs/contracts/`、`docs/guides/`；术语写法见 `docs/glossary.md`（AI 文档英文裸写；`README` / 对外报告首次出现标注中文）
 4. 相关 `scenarios/`
 5. 项目现有 `docs/` 与 ADR
-6. 输出按 `prompts/output.md`；审计结论按 `docs/contracts/08-checklist.md` 自检
+6. 输出按 `prompts/output.md`；审计结论按 `docs/contracts/01-checklist.md` 自检
 
 ## 模式
 

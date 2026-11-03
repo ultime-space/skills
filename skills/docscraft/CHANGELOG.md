@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 - 2026-11-03
+
+- 文档编号修复：`docs/` 拆子目录时沿用的平铺时代全局序号改为**目录内连续编号**——rules 00–04（05-rule-types→03、06-doc-safety→04）、contracts 00–01（03-ai-context→00、08-checklist→01）、guides 00–01（04-drift-guards→00、06-adr→01）；SKILL / README / prompts / 正文互链与结构测试同步更新。历史 CHANGELOG 条目保留旧路径不改写。
+- 打包补齐：`files` 增 `CONTRIBUTING.md` / `SECURITY.md`；新增根级发布配套与两份包内文件（贡献流程 / 漏洞与密钥报告）。
+- `author` 统一为 `Ultime contributors`（与 LICENSE 版权行一致）。
+- README 结构树补 `scripts/`（release-check），结尾补「贡献与安全」节。
+
 ## 0.3.0 - 2026-10-28
 
 - 新增 `docs/rules/06-doc-safety.md`：文档分级、隐私与个人信息、凭据与内部信息、第三方引用、版权与许可、发现后的处置、检查方式与反模式。

@@ -71,7 +71,7 @@
 
 - 机检：secret scanning、内部路径 / 主机名模式、死链、附件元数据。
 - 人工：抽查示例、截图、第三方引用与许可声明。
-- 审计：对应 `docs/contracts/08-checklist.md` 的 D13；`0 findings` 只写「静态未命中」，不等于通过。
+- 审计：对应 `docs/contracts/01-checklist.md` 的 D13；`0 findings` 只写「静态未命中」，不等于通过。
 - 安全红线不可豁免；不能登记为例外。
 
 ## 反模式

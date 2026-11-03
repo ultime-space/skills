@@ -54,7 +54,7 @@ npx skills add ultime-space/skills --skill docscraft
 **交付前自检**
 
 ```text
-用 Docscraft 按 docs/contracts/08-checklist.md 对这份审计报告做交付前自检，只读。
+用 Docscraft 按 docs/contracts/01-checklist.md 对这份审计报告做交付前自检，只读。
 逐条给判定与证据；没有证据的项标 warn。
 ```
 
@@ -86,14 +86,14 @@ docscraft/
 │   │   ├── 00-principles.md
 │   │   ├── 01-layers.md
 │   │   ├── 02-doc-types.md
-│   │   ├── 05-rule-types.md
-│   │   └── 06-doc-safety.md
+│   │   ├── 03-rule-types.md
+│   │   └── 04-doc-safety.md
 │   ├── contracts/
-│   │   ├── 03-ai-context.md
-│   │   └── 08-checklist.md
+│   │   ├── 00-ai-context.md
+│   │   └── 01-checklist.md
 │   ├── guides/
-│   │   ├── 04-drift-guards.md
-│   │   └── 06-adr.md
+│   │   ├── 00-drift-guards.md
+│   │   └── 01-adr.md
 │   └── glossary.md
 ├── scenarios/
 │   ├── audit-docs.md
@@ -107,6 +107,7 @@ docscraft/
 │   └── adr.md
 ├── evals/golden-tasks.md
 ├── tests/                 结构、术语与清单覆盖测试
+├── scripts/               release-check（版本 / CHANGELOG / 打包文件）
 ├── package.json
 ├── VERSION
 └── CHANGELOG.md
@@ -120,7 +121,7 @@ npm run release-check # 版本 / CHANGELOG / 打包文件
 npm pack --dry-run    # 检查发布内容
 ```
 
-改动文档结构或新增场景时，同步更新 `SKILL.md` 路由表；测试会检查被引用的路径是否存在，以及 `docs/contracts/08-checklist.md` 是否覆盖 `docs/guides/04-drift-guards.md` 的全部漂移类型。
+改动文档结构或新增场景时，同步更新 `SKILL.md` 路由表；测试会检查被引用的路径是否存在，以及 `docs/contracts/01-checklist.md` 是否覆盖 `docs/guides/00-drift-guards.md` 的全部漂移类型。
 
 ## 三条底线
 
@@ -146,3 +147,9 @@ Docscraft 是内部方法整理，不复制外部正文。设计时对照过：
 ## 版本
 
 当前版本见 [VERSION](./VERSION)；变更见 [CHANGELOG.md](./CHANGELOG.md)。
+
+## 贡献与安全
+
+- 贡献流程：[CONTRIBUTING.md](./CONTRIBUTING.md)
+- 漏洞与密钥报告：[SECURITY.md](./SECURITY.md)
+- 许可：MIT（[LICENSE](./LICENSE)）

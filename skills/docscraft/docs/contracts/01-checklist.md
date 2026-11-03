@@ -3,7 +3,7 @@
 > 2026-10-27 · v1
 > 用途：约束 Audit 模式的判定与交付前自检，防止把「链接全绿 / 测试通过」写成「文档没问题」。
 > 范围：文档分层、真源、规则、决策、链接、生成物、示例与术语；代码架构判断用 Codecraft。
-> 关系：方法见 `docs/guides/04-drift-guards.md`；格式见 `prompts/output.md`；入口契约见 `docs/contracts/03-ai-context.md`。
+> 关系：方法见 `docs/guides/00-drift-guards.md`；格式见 `prompts/output.md`；入口契约见 `docs/contracts/00-ai-context.md`。
 
 ## 1. 必填结构
 
