@@ -1,4 +1,4 @@
-# Skills
+# @ultime/skills
 
 面向 AI 编程的 skill 集合。每个 skill 自包含：规则、适配器、版本都在各自目录内；安装交给 [`skills`](https://github.com/vercel-labs/skills) CLI，不在本仓维护 agent 列表。
 
