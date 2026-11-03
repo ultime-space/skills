@@ -59,6 +59,12 @@ void test('VERSION, package.json and CHANGELOG agree', () => {
   assert.match(read('CHANGELOG.md'), new RegExp(`^## ${version.replace(/\./g, '\\.')}\\b`, 'm'))
 })
 
+void test('README and docs index mention the current version family', () => {
+  const version = read('VERSION').trim()
+  assert.ok(read('README.md').includes(version), `README.md misses current version ${version}`)
+  assert.ok(read('docs/README.md').includes('0.2.x'), 'docs/README.md should use the 0.2.x family')
+})
+
 void test('required files exist', () => {
   for (const rel of REQUIRED) {
     assert.ok(fs.existsSync(path.join(ROOT, rel)), `missing ${rel}`)
