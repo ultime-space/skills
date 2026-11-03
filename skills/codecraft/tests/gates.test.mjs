@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
-import { loadConfig, runGates } from '../src/gates.mjs'
+import { loadConfig, redactSecrets, runGates } from '../src/gates.mjs'
 
 function write(root, rel, text) {
   const file = path.join(root, rel)
@@ -125,4 +125,46 @@ void test('runGates: failFast stops after the first failure', () => {
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }
+})
+
+void test('runGates: redacts secrets in gate output and reports the count', () => {
+  const root = tempRoot()
+  try {
+    const print = [
+      "const token = 'ghp_' + 'A'.repeat(30)",
+      "console.log('token=' + token)",
+      "console.log('Authorization: Bearer abc.def.ghi')",
+      "console.log('postgres://user:s3cret@db.internal:5432/app')",
+      "console.log('all done')",
+    ].join('; ')
+    const gates = runGates(root, [{ name: 'leak', run: `node -e "${print}"` }])
+
+    assert.equal(gates.length, 1)
+    assert.ok(!/ghp_|s3cret|abc\.def\.ghi/.test(gates[0].output), 'original secrets must not survive')
+    assert.match(gates[0].output, /\[REDACTED\]/)
+    assert.equal(gates[0].redacted, 3)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('runGates: clean output is untouched and has no redacted field', () => {
+  const root = tempRoot()
+  try {
+    const gates = runGates(root, [{ name: 'clean', run: 'node -e "console.log(\'tests 12 passed\')"' }])
+
+    assert.equal(gates[0].output, 'tests 12 passed')
+    assert.equal(gates[0].redacted, undefined)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('redactSecrets hides private keys end to end', () => {
+  const text = ['-----BEGIN RSA PRIVATE KEY-----', 'abcdef', '-----END RSA PRIVATE KEY-----'].join('\n')
+  const { text: out, count } = redactSecrets(text)
+
+  assert.equal(count, 1)
+  assert.ok(!out.includes('abcdef'))
+  assert.match(out, /\[REDACTED\]/)
 })

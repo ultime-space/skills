@@ -106,6 +106,26 @@ npx skills-npm setup
 
 入口示例：[`adapters/generic/AGENTS.md`](./adapters/generic/AGENTS.md)。其它 agent 不需要单独适配文件，统一指向 `SKILL.md`，避免维护多份正文。
 
+## 3 分钟最小试跑
+
+```bash
+npx @ultime/codecraft check --root <项目路径>   # L0：只出报告，不改文件、不阻断
+npx @ultime/codecraft audit --root <项目路径>   # 额外执行 config gates（1.x 默认；2.0 起需 --run-gates）
+```
+
+看懂报告：`Rules` 是本次启用的内置规则；`Coverage` 是扫描覆盖（跳过与未支持项，避免把 0 findings 误读成全量通过）；`Findings` 带文件 / 行号 / 规则 ID；退出码 0 / 1 / 2 见「退出码」。
+
+## 接入档位（Adoption Profile）
+
+| 档位 | 适合 | 命令 | 说明 |
+|---|---|---|---|
+| Local Advisory | 小项目、首次试用 | `check` | 只报告不阻断；盲区以 Coverage 与「边界」一节为准 |
+| Changed CI | 已进 Git、逐步治理 | `check --changed --ci`（CI 内配合 `--since <base>`） | 只拦变更文件 |
+| Architecture | 团队项目 / 公共库 | `check --ci`，必要时加 `audit --run-gates` | 全量阻断 + 业务门禁 |
+
+- **CLI enforces: A6 / A17 / A21**（library / design-system 另加 A2 / A11）。
+- **Human review: A1–A5 / A7–A16 / A18–A20**——这些是结构 / 状态判断，静态检查不覆盖，按族卡与审计判定人工评审。
+
 ## 第一次使用
 
 前端：
@@ -228,7 +248,7 @@ codecraft <command> [options]
 | 命令 | 作用 |
 |---|---|
 | `check` | 只跑内置规则（默认命令） |
-| `audit` | 内置规则 + `codecraft.config.json` 里的 gates，出只读报告 |
+| `audit` | 内置规则 + gates；1.x 默认执行 config gates（stderr 提示 2.0 需 `--run-gates`），报告只读 |
 | `plan` | 把 findings 转成只读升级计划；默认不跑 gates |
 | `init` | 生成 app / library 骨架；默认 dry-run |
 | `version` | 输出版本号 |
@@ -265,7 +285,9 @@ codecraft init --root . --name demo --apply      # 写盘
 | `--fail-fast` | — | 关 | gates 遇到第一个失败即停止 |
 | `--no-gates` | — | 关 | `audit` 跳过 gates |
 | `--with-gates` | — | 关 | `plan` 执行 gates |
-| `--name <name>` | 字符串 | — | `init` 的 app / package 名称；`--apply` 时必填 |
+| `--run-gates` | — | 关 | 显式执行 gates；1.x 中对 `audit` 是幂等空操作，2.0 起成为 `audit` 执行 gates 的必要条件 |
+| `--no-gate-output` | — | 关 | 报告中省略 gate 输出（脱敏仍在的替代选择是整段省略） |
+| `--name <name>` | 字符串 | — | `init` 的 app / package 名称；`--apply` 时必填。只接受 1–64 位字母 / 数字 / `.` / `-` / `_`，拒绝分隔符、前导点与绝对路径 |
 | `--apply` | — | 关 | `init` 写盘；已存在路径跳过，不覆盖 |
 
 ### 退出码
@@ -278,8 +300,8 @@ codecraft init --root . --name demo --apply      # 写盘
 
 ### 输出
 
-- 默认 Markdown：头部元信息 + Findings 表 + Gates（门禁）表。
-- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `exclude` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
+- 默认 Markdown：头部元信息（含 Coverage 精简行）+ Findings 表 + Gates（门禁）表。
+- `--format json`：包含 `version` / `mode` / `pack` / `rules` / `coverage`（scanned / skipped / unsupportedExtensions / 每规则 limitations）/ `exclude` / `findings` / `plan` / `gates` / `summary`，用于 CI、趋势和两次运行 diff。
 - `--format sarif`：SARIF 2.1.0，可直接上传 GitHub Code Scanning。
 - `--changed` / `--since` 只过滤 findings，底层仍做全量扫描；JSON 的 `scope` 为 `changed`，`changed` 为变更文件数。
 - 报告始终带版本号与规则 ID；`plan` 明确声明「No files were changed by this command.」。
@@ -288,7 +310,7 @@ codecraft init --root . --name demo --apply      # 写盘
 
 | Pack | 内置规则 | 检查范围 |
 |---|---|---|
-| `app` | A6 / A17 / A21 | 空 catch；`pages / components / behavior` 不 import `external/` / `generated/`（Wrapper / API / adapters 允许；含生成文件头与 `boundaries` 配置）；密钥扫描 |
+| `app` | A6 / A17 / A21 | 空 catch 与静默 Promise handler；所有内部文件不 import `external/` / `generated/`（Wrapper / API / adapters 允许；含生成文件头与 `boundaries` 配置）；密钥扫描 |
 | `library` | A2 / A6 / A11 / A21 | 包不 import app、相对路径不逃逸、workspace 依赖必须声明；空 catch；生成物必须有“勿手改 / 派生”标记；密钥扫描 |
 | `design-system` | A2 / A6 / A11 / A21 | library 规则 + 包内公开文档不得引用内部 `docs/` |
 
@@ -341,7 +363,7 @@ A4（单一收口）、A5（互斥布尔 / 非法状态）、A8（派生状态�
 - `ignore`：例外登记（A12）。每项必须有 `rule` / `file` / `reason`，`expires` 可选（`YYYY-MM-DD`）；`file` 支持 `*` / `**` / `?`。安全规则 `A21` 不可豁免。
 - `boundaries`：A17 的补充声明。`external` / `generated` 填 import 前缀或 glob；`allowedImporters` 填允许 import 外部类型的文件（路径或 glob，相对 `--root`；默认只按目录段放行 `wrapper/`，文件级 `wrapper.ts` 需在此登记）；`generatedDirs` 填生成物根目录（相对 `--root`），目录内文件即使没有生成头也按生成物处理。
 - 命中的 findings 不参与退出码，但仍出现在报告的 `Ignored` 表与 JSON 的 `ignored`；过期的条目不生效，列在 `Expired Exceptions`。
-- gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符。
+- gate 在 `--root` 下通过 shell 执行，注入 `CI=1`；失败时报告尾部 40 行 / 4000 字符，输出先经高置信脱敏（私钥 / 令牌 / Authorization / 带凭据连接串 → `[REDACTED]`，命中数记入 `redacted`），`--no-gate-output` 可整体省略。
 - `check` 不跑 gates；`audit` 默认跑；`plan` 只在 `--with-gates` 时跑。
 - 通用规则内置，业务门禁只编排、不复制。构建指引见 [`docs/shared/04-gates.md`](./docs/shared/04-gates.md)。
 
@@ -388,7 +410,8 @@ evals/        CLI eval fixtures + golden tasks（人工回归）
 
 - 静态检查是文本级：能覆盖高置信模式，可能漏报或误报；最终以项目门禁与 review 为准。
 - 结构规则（A2 / A6 / A11 / A17）只扫描 JS/TS 相关文件（`.ts` / `.tsx` / `.js` / `.jsx` / `.mjs` / `.cjs` / `.vue` / `.svelte`）与 `package.json`；A21 额外扫描配置与后端源码扩展名（见上），但只做密钥 / 内部路径模式匹配，不做语言级分析。
-- 压缩 / 构建产物（≤3 行且存在 >1000 字符的单行）不参与 A2 / A6 / A11 / A17，避免与源码重复报同一问题；A21 仍会扫描它们。
+- 压缩 / 构建产物（≤3 行且存在 >1000 字符的单行）不参与 A2 / A6 / A11 / A17，避免与源码重复报同一问题；`dist` / `build` 等构建目录整体不扫描，A21 同样跳过（仅 `src/` 内的压缩文件会被 A21 扫描）。
+- A6 是文本级检查（零依赖约束）：`.catch(() => {})` 等空 handler、只含注释、只返回 `null` / `undefined` / `{}` 的高置信形态会报告；带参数的 handler、外部函数引用、未经 `.catch` 的 rejection 属已知漏报。try-catch 的注释不构成豁免——注释剥离后仍按空处理。
 - `.agents` / `.trae` / `.claude` / `.cursor` 等 agent 安装目录不扫描，避免把已安装 skill 的 fixture 当项目代码。
 - `--exclude` 是扫描级排除，不产生 findings；它不能替代 `ignore`（后者用于登记已发现问题的例外，且 A21 不可豁免）。
 - 不内置任何业务规则、框架约定或公司内部门禁。

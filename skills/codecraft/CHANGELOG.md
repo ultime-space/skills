@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.14.0 - 2026-11-03
+
+- 安全：`init --name` 只接受安全名称（1–64 位字母 / 数字 / `.` / `-` / `_`；拒绝分隔符 / 前导点 / 绝对路径），非法以 2 退出；写盘前对每个目标做 root 包含性校验（修复路径穿越）。
+- 安全：gate 输出进入报告前做高置信脱敏（私钥 / 令牌 / Authorization / 带凭据连接串 → `[REDACTED]`，命中数记入 `redacted`）；新增 `--no-gate-output` 整体省略 gate 输出。
+- 迁移预告（2.0）：`audit` 在 1.x 仍默认执行 config gates，但会在 stderr 提示「2.0 将需要 `--run-gates`」；新增 `--run-gates`（对 1.x 的 `audit` 是幂等空操作），可提前适配。
+- A6 新增静默 Promise handler 检查：`.catch(() => {})`、handler 仅注释、仅返回 `null` / `undefined` / `{}` 会报告（默认 warn；文本级实现，漏报边界见 README「边界」）。`--ci` 下新增命中会变红，可用 `ignore`（reason + expires）登记。
+- A17 口径对齐：文档统一为「所有内部文件不 import external / generated（Wrapper / API / adapters 允许）」，实现不变。
+- JSON 报告新增 `coverage`（experimental，2.0 冻结）：scanned / skippedTests / skippedMinified / skippedByExclude / unsupportedExtensions / 每规则 limitations；Markdown 头部加 Coverage 精简行。
+- 修复：`--changed` 在 monorepo 下按包精确匹配，不再把其它包的同名相对路径误纳入变更范围。
+- 修复：CI 检出干净工作区时 `--changed` 无变更文件以 2 退出并提示改用 `--since <base>`（此前静默变绿）。
+- 修正文档失真：A21 不扫描 `dist` / `build`（与实现对齐）；`plan` 的只读限定为默认参数（`--with-gates` 会执行项目命令）。
+- 新增「3 分钟最小试跑」与三档接入档位（Local Advisory / Changed CI / Architecture）；明确 CLI enforces（A6 / A17 / A21，library 另加 A2 / A11）与 Human review 分层。
+- 新增 `scenarios/adopt-standards.md`（规范落地）：宪法 → 项目 rules / 门禁映射，含 AI 提示词与 SKILL 路由。
+- `SKILL.md` 禁止项新增：不自动修改 CI 配置 / hooks / `package.json` scripts，是否阻断由人确认。
+- `SECURITY.md` 增加威胁模型：不可信仓库、gate 执行边界、env 继承、报告泄露、init 写盘。
+
 ## 1.13.0 - 2026-10-28
 
 - 新增 `templates/audit-report.md`：A1–A21 体检报告，含计数、范围与盲区、逐条判定、差距、升级计划。

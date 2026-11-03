@@ -54,7 +54,8 @@ const SECRET_EXTENSIONS = new Set([
 const SECRET_SKIP_FILES = new Set(['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock'])
 /** 文档里公开的示例值，不当作真实凭据。 */
 const SECRET_ALLOW = new Set(['AKIAIOSFODNN7EXAMPLE'])
-const SECRET_PATTERNS = [
+/** 高置信密钥模式；A21 扫描与 gate 输出脱敏共用这一份真源。 */
+export const SECRET_PATTERNS = [
   { id: 'private key', re: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/ },
   { id: 'AWS access key', re: /\bAKIA[0-9A-Z]{16}\b/ },
   { id: 'Aliyun access key', re: /\bLTAI[0-9A-Za-z]{12,}\b/ },
@@ -93,43 +94,134 @@ const IMPORT_PATTERNS = [
   /^\s*import\s+['"]([^'"]+)['"]/gm,
 ]
 
-const EMPTY_CATCH = /\bcatch\s*(?:\([^)]*\))?\s*\{([\s\S]*?)\}/g
+/* 负向后行排除 .catch / x.catch 的属性访问，方法式 handler 由 EMPTY_PROMISE_CATCH 负责。 */
+const EMPTY_CATCH = /(?<![.\w$])catch\s*(?:\([^)]*\))?\s*\{([\s\S]*?)\}/g
+
+/** 高置信静默 Promise 失败：handler 为空体、只含注释、或只返回 null / undefined / {}。
+ *  文本级实现（零依赖约束），带参数的 handler 与外部函数引用不匹配、不报告；漏报边界写在 README。 */
+const ONLY_COMMENTS = String.raw`(?:\{\s*(?://[^\n]*|/\*[\s\S]*?\*/)*\s*\})`
+const EMPTY_PROMISE_CATCH = new RegExp(
+  String.raw`\.catch\s*\(\s*(?:async\s+)?(?:function\s*(?:\([^)]*\))?|\([^)]*\)|[A-Za-z_$][\w$]*)?\s*=>\s*(?:${ONLY_COMMENTS}|null|undefined|\(\s*\{\s*\}\s*\))\s*\)|` +
+    String.raw`\.catch\s*\(\s*(?:async\s+)?function\s*(?:\([^)]*\))?\s*${ONLY_COMMENTS}\s*\)`,
+  'g',
+)
+
+function scanSilentFailures(text, file, root) {
+  const findings = []
+  const source = stripComments(text)
+  for (const match of source.matchAll(EMPTY_CATCH)) {
+    if (match[1].trim()) continue
+    findings.push({
+      rule: 'A6',
+      severity: 'warn',
+      file: path.relative(root, file),
+      line: lineAt(source, match.index ?? 0),
+      message: 'empty catch swallows failures; return a Result or handle the error (A6)',
+    })
+  }
+  for (const match of source.matchAll(EMPTY_PROMISE_CATCH)) {
+    findings.push({
+      rule: 'A6',
+      severity: 'warn',
+      file: path.relative(root, file),
+      line: lineAt(source, match.index ?? 0),
+      message: 'promise catch handler silently discards the failure; return a Result or handle the error (A6)',
+    })
+  }
+  return findings
+}
 
 export function check(root, options = {}) {
   const absRoot = path.resolve(root)
   const pack = options.pack ?? 'app'
-  if (pack === 'library') return checkLibrary(absRoot, options)
-  if (pack === 'design-system') return checkDesignSystem(absRoot, options)
-  return checkApp(absRoot, options)
+  const coverage = createCoverage()
+  let result
+  if (pack === 'library') result = checkLibrary(absRoot, options, coverage)
+  else if (pack === 'design-system') result = checkDesignSystem(absRoot, options, coverage)
+  else result = checkApp(absRoot, options, coverage)
+  return { ...result, coverage: snapshotCoverage(coverage, result.files, pack) }
 }
 
-function checkApp(root, options = {}) {
+/** 扫描覆盖统计：让「0 findings」可解释——跳过了什么、没扫什么语言，一眼可查。 */
+function createCoverage() {
+  return {
+    skippedTests: 0,
+    skippedMinified: 0,
+    skippedByExclude: 0,
+    unsupported: new Set(),
+    secretFiles: 0,
+  }
+}
+
+const RULE_LIMITATIONS = {
+  A6: ['text-level; dynamic handlers and rejections without .catch are not detected'],
+  A17: ['text-level import matching; runtime resolution is approximated'],
+  A21: ['pattern-based; no language analysis'],
+  A2: ['package.json + import text matching'],
+  A11: ['filename/header heuristics'],
+}
+
+function snapshotCoverage(coverage, files, pack) {
+  const ruleIds = pack === 'app' ? ['A6', 'A17', 'A21'] : ['A2', 'A6', 'A11', 'A21']
+  const rules = {}
+  for (const id of ruleIds) {
+    rules[id] = {
+      scanned: id === 'A21' ? coverage.secretFiles : files,
+      limitations: RULE_LIMITATIONS[id] ?? [],
+    }
+  }
+  return {
+    scanned: files,
+    skippedTests: coverage.skippedTests,
+    skippedMinified: coverage.skippedMinified,
+    skippedByExclude: coverage.skippedByExclude,
+    unsupportedExtensions: [...coverage.unsupported].sort(),
+    rules,
+  }
+}
+
+function checkApp(root, options = {}, coverage = createCoverage()) {
   const isExcluded = createExcluder(root, options.exclude)
-  const files = collectAppFiles(root).filter((file) => !isExcluded(file) && !isMinified(file))
+  const walked = collectAppFiles(root, coverage)
+  const files = []
+  for (const file of walked) {
+    if (isExcluded(file)) {
+      coverage.skippedByExclude += 1
+      continue
+    }
+    if (isMinified(file)) {
+      coverage.skippedMinified += 1
+      continue
+    }
+    files.push(file)
+  }
   const generated = collectGeneratedFiles(files, root, options.boundaries)
   const findings = []
   for (const file of files) findings.push(...scanAppFile(file, root, options.boundaries, generated))
-  findings.push(...scanSecrets(root, isExcluded))
+  findings.push(...scanSecrets(root, isExcluded, coverage))
   return { root, files: files.length, findings }
 }
 
-function checkLibrary(root, options = {}) {
+function checkLibrary(root, options = {}, coverage = createCoverage()) {
   return checkPackages(root, {
     docPaths: false,
     boundaries: options.boundaries,
     exclude: options.exclude,
+    coverage,
   })
 }
 
-function checkDesignSystem(root, options = {}) {
+function checkDesignSystem(root, options = {}, coverage = createCoverage()) {
   return checkPackages(root, {
     docPaths: true,
     boundaries: options.boundaries,
     exclude: options.exclude,
+    coverage,
   })
 }
 
 function checkPackages(root, options) {
+  const coverage = options.coverage ?? createCoverage()
   const isExcluded = createExcluder(root, options.exclude)
   const packages = findPackages(root).filter((pkg) => !isExcluded(pkg))
   const manifests = packages.map((pkg) => readJson(path.join(pkg, 'package.json')))
@@ -138,13 +230,19 @@ function checkPackages(root, options) {
   let files = 0
 
   for (let i = 0; i < packages.length; i += 1) {
-    const result = checkPackage(packages[i], manifests[i], workspaceNames, isExcluded)
+    const pkg = packages[i]
+    const result = checkPackage(pkg, manifests[i], workspaceNames, isExcluded, coverage)
     files += result.files
     findings.push(...result.findings)
-    if (options.docPaths) findings.push(...scanPackageDocs(packages[i], isExcluded))
+    if (options.docPaths) {
+      findings.push(...scanPackageDocs(pkg, isExcluded).map((finding) => {
+        Object.defineProperty(finding, 'absBase', { value: pkg, enumerable: false })
+        return finding
+      }))
+    }
   }
 
-  findings.push(...scanSecrets(root, isExcluded))
+  findings.push(...scanSecrets(root, isExcluded, coverage))
   return { root, files, findings }
 }
 
@@ -184,7 +282,7 @@ function findPackages(root) {
   return []
 }
 
-function checkPackage(pkg, manifest, workspaceNames, isExcluded = () => false) {
+function checkPackage(pkg, manifest, workspaceNames, isExcluded = () => false, coverage = createCoverage()) {
   const name = manifest?.name ?? ''
   const deps = new Set([
     ...Object.keys(manifest?.dependencies ?? {}),
@@ -192,10 +290,25 @@ function checkPackage(pkg, manifest, workspaceNames, isExcluded = () => false) {
     ...Object.keys(manifest?.devDependencies ?? {}),
   ])
   const src = path.join(pkg, 'src')
-  const sourceFiles = (isDir(src) ? walkFiles(src) : []).filter(
-    (file) => !isExcluded(file) && !isMinified(file),
-  )
+  const walked = isDir(src) ? walkFiles(src, coverage) : []
+  const sourceFiles = []
+  for (const file of walked) {
+    if (isExcluded(file)) {
+      coverage.skippedByExclude += 1
+      continue
+    }
+    if (isMinified(file)) {
+      coverage.skippedMinified += 1
+      continue
+    }
+    sourceFiles.push(file)
+  }
   const findings = []
+  /** library findings 相对包目录；挂非枚举 absBase（pkg 为绝对路径）供 --changed 精确匹配，不进 JSON 输出。 */
+  const withBase = (finding) => {
+    Object.defineProperty(finding, 'absBase', { value: pkg, enumerable: false })
+    return finding
+  }
 
   for (const file of sourceFiles) {
     const text = read(file)
@@ -203,27 +316,31 @@ function checkPackage(pkg, manifest, workspaceNames, isExcluded = () => false) {
     for (const { spec, line } of collectImports(stripComments(text))) {
       const message = libraryImportIssue(spec, file, pkg, name, deps, workspaceNames)
       if (!message) continue
-      findings.push({
-        rule: 'A2',
-        severity: 'warn',
-        file: path.relative(pkg, file),
-        line,
-        message,
-      })
+      findings.push(
+        withBase({
+          rule: 'A2',
+          severity: 'warn',
+          file: path.relative(pkg, file),
+          line,
+          message,
+        }),
+      )
     }
-    findings.push(...scanEmptyCatch(text, file, pkg))
+    findings.push(...scanSilentFailures(text, file, pkg).map(withBase))
   }
 
   for (const file of collectGeneratedCandidates(pkg).filter((file) => !isExcluded(file))) {
     const text = read(file)
     if (text == null || hasGeneratedMarker(text)) continue
-    findings.push({
-      rule: 'A11',
-      severity: 'warn',
-      file: path.relative(pkg, file),
-      line: 1,
-      message: 'generated file lacks a "do not edit" marker; regenerate from source (A11)',
-    })
+    findings.push(
+      withBase({
+        rule: 'A11',
+        severity: 'warn',
+        file: path.relative(pkg, file),
+        line: 1,
+        message: 'generated file lacks a "do not edit" marker; regenerate from source (A11)',
+      }),
+    )
   }
 
   return { files: sourceFiles.length, findings }
@@ -248,10 +365,10 @@ function libraryImportIssue(spec, file, pkg, name, deps, workspaceNames) {
   return `imports workspace package "${dep}" without declaring it in package.json (A2)`
 }
 
-function collectAppFiles(root) {
+function collectAppFiles(root, coverage) {
   const files = []
   const seen = new Set()
-  for (const dir of collectAppRoots(root)) walk(dir, files, seen)
+  for (const dir of collectAppRoots(root)) walk(dir, files, seen, coverage)
   return files
 }
 
@@ -299,13 +416,13 @@ function collectAppRoots(root) {
   return roots
 }
 
-function walkFiles(dir) {
+function walkFiles(dir, coverage) {
   const files = []
-  walk(dir, files, new Set())
+  walk(dir, files, new Set(), coverage)
   return files
 }
 
-function walk(dir, files, seen) {
+function walk(dir, files, seen, coverage) {
   if (seen.has(dir)) return
   seen.add(dir)
 
@@ -319,12 +436,19 @@ function walk(dir, files, seen) {
   for (const entry of entries) {
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) walk(full, files, seen)
+      if (!SKIP_DIRS.has(entry.name)) walk(full, files, seen, coverage)
       continue
     }
     if (!entry.isFile()) continue
-    if (!EXTENSIONS.has(path.extname(entry.name))) continue
-    if (isTestFile(full)) continue
+    const extension = path.extname(entry.name)
+    if (!EXTENSIONS.has(extension)) {
+      coverage?.unsupported.add(extension || '(no extension)')
+      continue
+    }
+    if (isTestFile(full)) {
+      if (coverage) coverage.skippedTests += 1
+      continue
+    }
     files.push(full)
   }
 }
@@ -377,23 +501,7 @@ function scanAppFile(file, root, boundaries, generated) {
       })
     }
   }
-  findings.push(...scanEmptyCatch(text, file, root))
-  return findings
-}
-
-function scanEmptyCatch(text, file, root) {
-  const findings = []
-  const source = stripComments(text)
-  for (const match of source.matchAll(EMPTY_CATCH)) {
-    if (match[1].trim()) continue
-    findings.push({
-      rule: 'A6',
-      severity: 'warn',
-      file: path.relative(root, file),
-      line: lineAt(source, match.index ?? 0),
-      message: 'empty catch swallows failures; return a Result or handle the error (A6)',
-    })
-  }
+  findings.push(...scanSilentFailures(text, file, root))
   return findings
 }
 
@@ -523,13 +631,14 @@ function isMinified(file) {
   return lines.some((line) => line.length > 1000)
 }
 
-function scanSecrets(root, isExcluded = () => false) {
+function scanSecrets(root, isExcluded = () => false, coverage = createCoverage()) {
   const findings = []
   const seen = new Set()
   for (const file of collectScanFiles(root)) {
     if (isExcluded(file)) continue
     if (SECRET_SKIP_FILES.has(path.basename(file))) continue
     if (isTestFile(file)) continue
+    coverage.secretFiles += 1
     const text = read(file)
     if (text == null) continue
 

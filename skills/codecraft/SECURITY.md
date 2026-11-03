@@ -20,3 +20,11 @@
 
 - 本包是静态规则与 CLI，不执行网络请求；主要风险是密钥 / 隐私被写进规则、示例或报告。
 - 依赖漏洞按 `npm audit` / 依赖升级处理，不在规则层重复实现。
+
+## 威胁模型（2026-11-03）
+
+- **不可信仓库**：`check` 与默认参数的 `plan` 只读扫描、不执行项目命令；`audit` 在 1.x 默认执行 config gates——打开不可信仓库时不要跑 `audit`（或先加 `--no-gates`）。2.0 起 gates 需要显式 `--run-gates`。
+- **gate 是任意 shell**：`codecraft.config.json` 来自被审仓库，gates 等于仓库作者可执行的代码；只允许可信分支 / 受保护配置携带 gates。fork PR 不跑 `audit`。
+- **env 继承**：gate 继承完整 `process.env`，能读取 CI 中的全部环境变量与密钥。本工具不收紧 env（会打断依赖环境变量的真实 gate）；项目侧在 CI 中使用最小权限凭据。
+- **报告泄露**：gate 输出进入报告前做高置信文本级脱敏（`[REDACTED]`，命中数记入 `redacted`），但脱敏不是保证；CI 上传报告前可用 `--no-gate-output` 整体省略输出。
+- **init 写盘**：`--name` 只接受安全名称（无分隔符 / 前导点 / 绝对路径），写盘前对每个目标做 root 包含性校验；`init` 只在显式 `--apply` 时写盘。

@@ -115,6 +115,35 @@ void test('A17: boundaries config catches custom generated paths', () => {
   }
 })
 
+void test('A6: empty promise catch handlers are reported; handled ones are not', () => {
+  const root = tempRoot()
+  try {
+    const silent = [
+      '.catch(() => {})',
+      '.catch(() => null)',
+      '.catch(() => ({}))',
+      '.catch(() => undefined)',
+      '.catch(() => { /* ignore rotation errors */ })',
+      '.catch(function () {})',
+      '.catch(async () => {})',
+    ]
+    silent.forEach((expr, index) => {
+      write(root, `src/pages/silent${index}.ts`, `run().${expr}\n`)
+    })
+    write(root, 'src/pages/handled.ts', 'run().catch((error) => report(error))\n')
+    write(root, 'src/pages/named.ts', 'run().catch(handleError)\n')
+    write(root, 'src/pages/logged.ts', 'run().catch((error) => log(error))\n')
+
+    const result = check(root)
+    const findings = result.findings.filter((finding) => finding.rule === 'A6')
+
+    assert.equal(findings.length, silent.length)
+    assert.ok(findings.every((finding) => /promise catch/.test(finding.message)))
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('A6: empty catch is reported; handled catch is not', () => {
   const root = tempRoot()
   try {
@@ -250,6 +279,26 @@ void test('A21: flags high-confidence secrets', () => {
 
     assert.equal(findings.length, 1)
     assert.equal(findings[0].file, 'src/config.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('coverage explains skipped files and rule limitations', () => {
+  const root = tempRoot()
+  try {
+    write(root, 'src/pages/home.ts', "import { User } from '@/external/user'\n")
+    write(root, 'src/pages/home.test.ts', "import { User } from '@/external/user'\n")
+    write(root, 'src/pages/data.py', 'print("hi")\n')
+    write(root, 'server/.env', 'APP_SECRET=abcdef123456\n')
+
+    const result = check(root)
+
+    assert.equal(result.coverage.scanned, 1)
+    assert.equal(result.coverage.skippedTests, 1)
+    assert.ok(result.coverage.unsupportedExtensions.includes('.py'))
+    assert.ok(result.coverage.rules.A21.scanned >= 1)
+    assert.ok(result.coverage.rules.A6.limitations.length > 0)
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }

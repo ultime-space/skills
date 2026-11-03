@@ -3,7 +3,23 @@ import path from 'node:path'
 
 const TEMPLATES = new URL('../templates/', import.meta.url)
 
+/** 窄校验：拒绝空、`.` / `..`、分隔符、绝对路径与前导点；合法名称行为不变。 */
+const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/
+
+export function isValidName(name) {
+  return typeof name === 'string' && SAFE_NAME.test(name)
+}
+
+export function assertValidName(name) {
+  if (!isValidName(name)) {
+    throw new Error(
+      `invalid name "${name}": use 1-64 chars of letters, digits, dot, dash, underscore; no leading dot, slash or backslash`,
+    )
+  }
+}
+
 export function buildInitPlan(root, pack, name = '') {
+  if (name) assertValidName(name)
   const appName = name || '<app>'
   const packageName = name || '<package>'
   const id = toPackageId(name)
@@ -55,11 +71,16 @@ export function buildInitPlan(root, pack, name = '') {
 }
 
 export function applyInitPlan(root, plan) {
+  const rootAbs = path.resolve(root)
   const created = []
   const skipped = []
 
   for (const entry of plan.entries) {
-    const abs = path.join(root, entry.path)
+    const abs = path.resolve(rootAbs, entry.path)
+    const rel = path.relative(rootAbs, abs)
+    if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) {
+      throw new Error(`init plan entry escapes root: ${entry.path}`)
+    }
     if (entry.action === 'exists') {
       skipped.push(entry.path)
       continue

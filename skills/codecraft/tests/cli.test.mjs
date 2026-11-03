@@ -203,6 +203,69 @@ void test('cli: --changed only reports changed files', () => {
   }
 })
 
+void test('cli: --changed matches by package, not by relative suffix', () => {
+  const root = tempRoot()
+  try {
+    for (const pkg of ['a', 'b']) {
+      fs.mkdirSync(path.join(root, 'packages', pkg, 'src'), { recursive: true })
+      fs.writeFileSync(
+        path.join(root, 'packages', pkg, 'package.json'),
+        JSON.stringify({ name: `@x/${pkg}` }),
+      )
+      fs.writeFileSync(path.join(root, 'packages', pkg, 'src', 'x.ts'), 'try {\n  run()\n} catch {}\n')
+    }
+    const git = (args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' })
+    git(['init'])
+    git(['config', 'user.email', 'test@example.com'])
+    git(['config', 'user.name', 'test'])
+    git(['add', '.'])
+    git(['commit', '-m', 'init'])
+    fs.writeFileSync(path.join(root, 'packages', 'b', 'src', 'x.ts'), 'try {\n  run()\n} catch {} // changed\n')
+
+    const result = run(['check', '--root', root, '--changed', '--pack', 'library', '--format', 'json'])
+
+    assert.equal(result.status, 0)
+    const report = JSON.parse(result.stdout)
+    assert.equal(report.findings.length, 1, 'only packages/b/src/x.ts changed; package a must not be reported')
+    assert.equal(report.findings[0].file, 'src/x.ts')
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: --changed with no changes fails explicitly in CI, not locally', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src', 'pages'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'pages', 'a.ts'), "import { User } from '@/external/user'\n")
+    const git = (args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' })
+    git(['init'])
+    git(['config', 'user.email', 'test@example.com'])
+    git(['config', 'user.name', 'test'])
+    git(['add', '.'])
+    git(['commit', '-m', 'init'])
+
+    const env = (ci) => ({ ...process.env, CI: ci ? '1' : '' })
+    const inCi = spawnSync(process.execPath, [BIN, 'check', '--root', root, '--changed', '--format', 'json'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      env: env(true),
+    })
+    assert.equal(inCi.status, 2)
+    assert.match(inCi.stderr, /--since/)
+
+    const local = spawnSync(process.execPath, [BIN, 'check', '--root', root, '--changed', '--format', 'json'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      env: env(false),
+    })
+    assert.equal(local.status, 0, 'clean local repo must not be punished')
+    assert.equal(JSON.parse(local.stdout).findings.length, 0)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
 void test('cli: init --apply requires --name', () => {
   const root = tempRoot()
   try {
@@ -210,6 +273,54 @@ void test('cli: init --apply requires --name', () => {
 
     assert.equal(result.status, 2)
     assert.match(result.stderr, /requires --name/)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('cli: init rejects traversal names with exit 2 and no writes', () => {
+  const root = tempRoot()
+  try {
+    const result = run(['init', '--root', root, '--name', '../../escape', '--apply'])
+
+    assert.equal(result.status, 2)
+    assert.match(result.stderr, /invalid name/)
+    assert.equal(fs.existsSync(path.join(root, 'apps')), false)
+    assert.equal(fs.existsSync(path.resolve(root, '../escape')), false)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+    fs.rmSync(path.resolve(root, '../escape'), { recursive: true, force: true })
+  }
+})
+
+void test('cli: audit runs gates by default, warns on stderr, redacts secrets, honors --no-gate-output', () => {
+  const root = tempRoot()
+  try {
+    fs.mkdirSync(path.join(root, 'src'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src', 'index.ts'), 'export const ready = true\n')
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'x' }))
+    fs.writeFileSync(
+      path.join(root, 'codecraft.config.json'),
+      JSON.stringify({
+        gates: [{ name: 'leak', run: `node -e "console.log('Authorization: Bearer abc.def.ghi'); process.exit(1)"` }],
+      }),
+    )
+
+    const warned = run(['audit', '--root', root, '--format', 'json'])
+    assert.equal(warned.status, 1)
+    assert.match(warned.stderr, /2\.0 will require --run-gates/)
+    const report = JSON.parse(warned.stdout)
+    assert.equal(report.summary.gateFailures, 1)
+    assert.ok(!/abc\.def\.ghi/.test(report.gates[0].output), 'gate secret must not survive into the report')
+    assert.equal(report.gates[0].redacted, 1)
+    assert.equal(report.warnings.length, 0, 'deprecation must not change the exit code via warnings')
+
+    const suppressed = run(['audit', '--root', root, '--format', 'json', '--no-gate-output'])
+    const report2 = JSON.parse(suppressed.stdout)
+    assert.match(report2.gates[0].output, /suppressed by --no-gate-output/)
+
+    const explicit = run(['audit', '--root', root, '--format', 'json', '--run-gates'])
+    assert.equal(JSON.parse(explicit.stdout).summary.gateFailures, 1)
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
   }

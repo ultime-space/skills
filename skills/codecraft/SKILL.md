@@ -45,6 +45,7 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 | 文件存储 / 上传评审 | `docs/shared/11-storage.md` | 方案建议与差距清单 |
 | 专项评估报告（安全 / 身份 / 存储） | `templates/specialist-report.md` + 对应 `docs/shared/09-security.md` / `docs/shared/10-auth.md` / `docs/shared/11-storage.md` | 报告（只读） |
 | 门禁配置 / 契约 | `docs/shared/04-gates.md` | 两层门禁与 Gate Contract |
+| 规范落地（宪法 → 项目 rules） | `scenarios/adopt-standards.md` + 宪法 | 规则与门禁映射、config、接入建议 |
 | 风格 / 模式速查 | `docs/frontend/03-style-map.md` / `docs/backend/12-style-map.md` | 速查表 |
 | 改代码 | 宪法 + 对应端族卡 + 项目门禁 | 变更 + 验证 |
 
@@ -67,7 +68,7 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 ## 模式
 
 - **Audit**：只读，出报告。
-- **Plan**：只读，出架构 / 升级计划。
+- **Plan**：只读，出架构 / 升级计划（CLI 的 `plan` 默认不执行项目命令，`--with-gates` 例外）。
 - **Apply**：改代码 + 跑门禁。
 
 ## 工作流
@@ -81,6 +82,7 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 ## 禁止
 
 - Audit / Plan 模式改文件。
+- 自动修改 CI 配置、pre-commit / hooks、`package.json` scripts 来接入门禁；只给接入建议，是否阻断由人确认。
 - 把业务架构 / 业务流程 / 领域规则写进代码架构报告；这些不在本 skill 范围。
 - 把前端族规则套到后端，或把后端族规则套到前端。
 - 把业务逻辑放进 Transport / Page / Controller；把事务放进 Repository。

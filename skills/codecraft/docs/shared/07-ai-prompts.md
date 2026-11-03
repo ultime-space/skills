@@ -168,6 +168,16 @@ npx @ultime/codecraft check --pack design-system --root .
 要求：按 templates/architecture-report.md 的结构；只做代码架构，不做业务架构；先不画图，用表格 / 列表；每条结论给文件:行号或命令；A17 / A21 写明盲区；0 findings 只写“静态未命中”；未知项单列。
 ```
 
+### 3.10 规范落地
+
+```text
+使用 Codecraft（<路径>/codecraft）。
+模式：Apply（产出 rules/ 与 config；不改业务代码）。
+范围：<项目根 / 目录>。
+任务：按 scenarios/adopt-standards.md 把宪法落到本项目：A1–A21 逐条判定（已满足 / 需落地 / 不适用），映射到机检 / 项目门禁 / review 三层，产出 rules/ 增量与 codecraft.config.json。
+要求：不复制宪法正文；ignore 带 reason 与 expires；接入从 check（只报告）开始；不自动改 CI 配置 / hooks，阻断策略由人确认。
+```
+
 ## 4. 说法上的要点
 
 - 先说模式，不要让 AI 猜。

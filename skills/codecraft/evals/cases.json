@@ -18,6 +18,12 @@
     "expect": { "exit": 0, "findings": { "A6": 1 } }
   },
   {
+    "name": "a6-promise-catch",
+    "root": "a6-promise-catch",
+    "args": ["--pack", "app", "--format", "json"],
+    "expect": { "exit": 0, "findings": { "A6": 2 }, "coverage": { "scanned": 1 } }
+  },
+  {
     "name": "ignore-active",
     "root": "ignore-active",
     "args": ["--pack", "app", "--format", "json"],

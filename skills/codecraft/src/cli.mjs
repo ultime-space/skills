@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process'
 import { check } from './check.mjs'
 import { loadConfig, runGates } from './gates.mjs'
 import { buildPlan, summarizePlan } from './plan.mjs'
-import { applyInitPlan, buildInitPlan } from './init.mjs'
+import { applyInitPlan, assertValidName, buildInitPlan } from './init.mjs'
 import { applyIgnores } from './ignore.mjs'
 
 const PACKAGE = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
@@ -28,6 +28,8 @@ Options:
   --exclude <glob>         Skip files when scanning (repeatable; e.g. "evals/fixtures/**")
   --no-gates               Skip gates in audit / plan
   --with-gates             Run configured gates in plan
+  --run-gates              Explicitly run configured gates (default in 1.x audit; will be required in 2.0)
+  --no-gate-output         Omit gate output from the report
   --fail-fast              Stop gates after the first failure
   --name <name>            Scaffold name (required with --apply)
   --apply                  Write the scaffold; existing paths are skipped
@@ -88,6 +90,14 @@ export function main(argv) {
       console.error('codecraft: init --apply requires --name <name>\n  next: add --name <demo>')
       return 2
     }
+    if (args.name) {
+      try {
+        assertValidName(args.name)
+      } catch (error) {
+        console.error(`codecraft: ${error.message}`)
+        return 2
+      }
+    }
     const plan = buildInitPlan(root, pack === 'design-system' ? 'library' : pack, args.name)
     const applied = args.apply ? applyInitPlan(root, plan) : null
     const meta = {
@@ -116,6 +126,7 @@ export function main(argv) {
     boundaries: config.config.boundaries,
     exclude,
   })
+  const coverage = result.coverage
   let changed = null
   let scoped = result.findings
   if (args.changed || args.since) {
@@ -125,11 +136,33 @@ export function main(argv) {
       console.error(`codecraft: ${error.message}`)
       return 2
     }
-    const files = new Set(changed)
+    // 按包精确匹配：library findings 相对包目录（absBase），不能靠后缀，否则跨包同名路径会误判。
+    // macOS 等系统下 root 可能经符号链接（/tmp → /private/tmp），统一换算成相对 realRoot 的路径再比较。
+    const realRoot = fs.realpathSync(root)
+    const changedRel = new Set(changed)
+    const prefixCache = new Map()
     scoped = scoped.filter((finding) => {
+      const base = String(finding.absBase ?? root)
+      if (!prefixCache.has(base)) {
+        let rel = ''
+        try {
+          rel = path.relative(realRoot, fs.realpathSync(base))
+        } catch {
+          rel = ''
+        }
+        prefixCache.set(base, rel && rel !== '.' ? rel.split(path.sep).join('/') : '')
+      }
+      const prefix = prefixCache.get(base)
       const file = finding.file.replace(/\\/g, '/')
-      return files.has(file) || [...files].some((candidate) => candidate.endsWith(`/${file}`))
+      return changedRel.has(prefix ? `${prefix}/${file}` : file)
     })
+    // CI 检出的是干净工作区，--changed 无变更 = 全部 findings 被过滤 = 静默变绿；显式失败并指向 --since。
+    if (args.changed && !args.since && changed.length === 0 && process.env.CI) {
+      console.error(
+        'codecraft: --changed found no changed files (CI checkouts are clean); use --since <base-ref> to compare against a base branch',
+      )
+      return 2
+    }
   }
   const severity = args.ci ? 'error' : args.severity
   const findings = scoped.map((finding) => ({ ...finding, severity }))
@@ -143,6 +176,13 @@ export function main(argv) {
   const gates = shouldRunGates(command, args)
     ? runGates(root, config.config.gates ?? [], { failFast: args.failFast })
     : []
+  const gateOutput = args.noGateOutput
+    ? gates.map((gate) => ({ ...gate, output: '(suppressed by --no-gate-output)' }))
+    : gates
+  // 弃用提示只进 stderr，不进 warnings——warnings 会触发 exit 2（用法错误语义），这里不改变退出码。
+  if (command === 'audit' && !args.noGates && config.config.gates?.length) {
+    console.error('codecraft: warning: audit runs configured gates by default in 1.x; 2.0 will require --run-gates')
+  }
   const plan = command === 'plan' ? buildPlan(activeFindings) : []
   const meta = {
     version: VERSION,
@@ -162,6 +202,7 @@ export function main(argv) {
     warnings,
     plan: plan.length,
     gates: gates.length,
+    coverage,
   }
 
   if (args.format === 'json') {
@@ -169,19 +210,20 @@ export function main(argv) {
       JSON.stringify(
         {
           ...meta,
+          coverage,
           findings: activeFindings,
           ignored: filtered.ignored,
           exceptions: filtered.exceptions,
           plan,
-          gates,
+          gates: gateOutput,
           summary: {
             files: result.files,
             findings: activeFindings.length,
             ignored: filtered.ignored.length,
             expired: filtered.expired.length,
             plan: plan.length,
-            gates: gates.length,
-            gateFailures: gates.filter((gate) => gate.exitCode !== 0).length,
+            gates: gateOutput.length,
+            gateFailures: gateOutput.filter((gate) => gate.exitCode !== 0).length,
           },
         },
         null,
@@ -191,9 +233,9 @@ export function main(argv) {
   } else if (args.format === 'sarif') {
     console.log(formatSarif(meta, activeFindings))
   } else if (command === 'plan') {
-    console.log(formatPlan(meta, activeFindings, plan, gates))
+    console.log(formatPlan(meta, activeFindings, plan, gateOutput))
   } else {
-    console.log(formatReport(meta, activeFindings, filtered.ignored, filtered.expired, gates))
+    console.log(formatReport(meta, activeFindings, filtered.ignored, filtered.expired, gateOutput))
   }
 
   const failed =
@@ -226,6 +268,8 @@ function parseArgs(argv) {
     config: '',
     noGates: false,
     withGates: false,
+    runGates: false,
+    noGateOutput: false,
     failFast: false,
     name: '',
     apply: false,
@@ -246,6 +290,9 @@ function parseArgs(argv) {
     else if (arg === '--ci') args.ci = true
     else if (arg === '--no-gates') args.noGates = true
     else if (arg === '--with-gates') args.withGates = true
+    // 1.x 中 audit 默认执行 gates，--run-gates 是幂等空操作；2.0 起成为 audit 执行 gates 的必要条件。
+    else if (arg === '--run-gates') args.runGates = true
+    else if (arg === '--no-gate-output') args.noGateOutput = true
     else if (arg === '--fail-fast') args.failFast = true
     else if (arg === '--apply') args.apply = true
     else if (arg === '--changed') args.changed = true
@@ -611,6 +658,7 @@ function header(meta) {
     `- Rules: ${meta.rules.join(' / ')}`,
     `- Severity: ${meta.severity}`,
     `- Files: ${meta.files}`,
+    coverageLine(meta.coverage),
     `- Findings: ${meta.findings}`,
     `- Ignored: ${meta.ignored ?? 0}`,
     `- Expired exceptions: ${meta.expired ?? 0}`,
@@ -618,6 +666,21 @@ function header(meta) {
     `- Gates: ${meta.gates}`,
     '',
   ]
+}
+
+/** coverage 精简版：跳过与未支持扩展名一眼可查，避免把 0 findings 误读成全量通过。 */
+function coverageLine(coverage) {
+  if (!coverage) return `- Coverage: （unavailable）`
+  const parts = [
+    `scanned ${coverage.scanned}`,
+    `tests skipped ${coverage.skippedTests}`,
+    `minified skipped ${coverage.skippedMinified}`,
+    `excluded ${coverage.skippedByExclude}`,
+  ]
+  const unsupported = coverage.unsupportedExtensions?.length
+    ? `, unsupported: ${coverage.unsupportedExtensions.join(' ')}`
+    : ''
+  return `- Coverage: ${parts.join(', ')}${unsupported}`
 }
 
 function title(mode) {
@@ -640,6 +703,9 @@ function gateLines(gates) {
     lines.push('', `### Gate: ${gate.name}（exit ${gate.exitCode}）`, '', '~~~text')
     lines.push(gate.output || '(no output)')
     lines.push('~~~')
+    if (gate.redacted) {
+      lines.push('', `- ${gate.redacted} suspected secret(s) redacted from this output.`)
+    }
   }
   return lines
 }

@@ -56,6 +56,18 @@ for (const testCase of CASES) {
       if (testCase.expect.warnings != null && report.warnings?.length !== testCase.expect.warnings) {
         problems.push(`warnings ${report.warnings?.length ?? 0}, expected ${testCase.expect.warnings}`)
       }
+      if (testCase.expect.coverage) {
+        if (!report.coverage) {
+          problems.push('coverage missing from report')
+        } else {
+          for (const [key, value] of Object.entries(testCase.expect.coverage)) {
+            const actual = report.coverage[key]
+            if (JSON.stringify(actual) !== JSON.stringify(value)) {
+              problems.push(`coverage.${key} ${JSON.stringify(actual)}, expected ${JSON.stringify(value)}`)
+            }
+          }
+        }
+      }
     }
   }
 

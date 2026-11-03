@@ -48,9 +48,9 @@
 | Rule | Pack | 检查 |
 |---|---|---|
 | A2 | library / design-system | 包不 import apps；相对路径不逃逸；workspace 依赖必须声明 |
-| A6 | all | 空 catch / 静默失败 |
+| A6 | all | 空 catch / 静默 Promise handler（文本级；`.catch(() => {})` 等空 handler、仅注释、仅返回 `null` / `undefined` / `{}`；注释不构成豁免） |
 | A11 | library / design-system | 生成物必须有“勿手改 / 派生”标记 |
-| A17 | app | `pages / components / behavior` 不 import `external/` / `generated/`；生成类型按文件头（`本文件由…生成` / `勿手改` / `@generated`）自动识别；自定义路径用 `boundaries` 补充 |
+| A17 | app | **所有内部文件**不 import `external/` / `generated/`（Wrapper / API / adapters 目录与 `allowedImporters` 放行）；生成类型按文件头（`本文件由…生成` / `勿手改` / `@generated`）自动识别；自定义路径用 `boundaries` 补充 |
 | A21 | all | 高置信密钥模式（私钥 / AWS / 阿里云 `LTAI` / GitHub / Slack / API key）；配置与后端源码中的明文 `password` / `secret` / `apiKey` / `accessKey` 赋值；环境变量引用与占位符不报 |
 | A21 | design-system | 包内公开文档（README / USAGE / CHANGELOG / contract）不引用内部 `docs/` |
 
@@ -60,10 +60,11 @@ A4（单一收口）是结构判断，仍由 review / 项目门禁负责，不�
 
 ```bash
 codecraft check --changed --ci                  # PR 只拦变更文件
+codecraft check --since origin/main --ci        # 以 merge-base 为基准，CI 检出干净工作区时用这条
 codecraft check --changed --format sarif > codecraft.sarif
 ```
 
-`--changed` / `--since` 只过滤 findings；底层仍做全量扫描。SARIF 可直接上传 GitHub Code Scanning。
+`--changed` / `--since` 只过滤 findings；底层仍做全量扫描。CI 检出的是干净工作区，此时单独 `--changed` 无变更文件会以 2 退出并提示改用 `--since <base>`。SARIF 可直接上传 GitHub Code Scanning。
 
 ## 5. 执行顺序
 
@@ -78,14 +79,17 @@ codecraft check --changed --format sarif > codecraft.sarif
 
 ## 6. 安全
 
-- gates 是任意命令，只能来自可信配置。
+- gates 是任意命令，只能来自可信配置；不要对 fork PR 或不可信仓库跑 `audit`。
+- `audit` 在 1.x 默认执行 gates（stderr 有 2.0 迁移提示）；**2.0 起需要显式 `--run-gates`**。
+- gate 输出进入报告前做高置信脱敏（私钥 / 令牌 / Authorization / 带凭据连接串 → `[REDACTED]`，命中数记入 `redacted`）；`--no-gate-output` 可整体省略输出。
+- gate 继承完整 `process.env`：它能读到 CI 里的全部环境变量，这是「只能来自可信配置」的原因之一；本工具不收紧 env（会打断真实 gate），项目侧用最小权限的 CI 凭据。
 - 执行前打印命令；`--ci` 下非交互。
-- 不把密钥写进 config；用环境变量。
+- 不把密钥写进 config；用环境变量或 secret manager。
 - 不让 gate 修改工作区，除非明确是 Apply 模式。
 
 ## 7. Codecraft 的职责
 
 - `check`：只跑内置规则。
-- `audit`：内置规则 + config gates，汇总成一份报告。
+- `audit`：内置规则 + config gates（1.x 默认执行 gates；2.0 需 `--run-gates`），汇总成一份报告。
 - `plan`：只读升级计划；默认不跑 gates，`--with-gates` 才跑。
 - `init`：dry-run 脚手架，只输出目录 / 文件 / 配置；不跑业务门禁。

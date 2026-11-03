@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
-import { applyInitPlan, buildInitPlan } from '../src/init.mjs'
+import { applyInitPlan, buildInitPlan, isValidName } from '../src/init.mjs'
 
 function tempRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-init-'))
@@ -87,5 +87,47 @@ void test('apply is idempotent: existing paths are skipped, not overwritten', ()
     assert.equal(fs.readFileSync(readme, 'utf8'), 'edited\n')
   } finally {
     fs.rmSync(root, { recursive: true, force: true })
+  }
+})
+
+void test('name validation rejects traversal, separators, dots and overlong names', () => {
+  const badNames = [
+    '../escape',
+    '../../escape',
+    '/tmp/escape',
+    'a/b',
+    'a\\b',
+    '.',
+    '..',
+    '.hidden',
+    'a'.repeat(65),
+    'C:\\escape',
+  ]
+  for (const bad of badNames) {
+    assert.equal(isValidName(bad), false, bad)
+    assert.throws(() => buildInitPlan('/nonexistent-codecraft-root', 'app', bad), /invalid name/, bad)
+  }
+  // 空名在 dry-run 是合法占位（<app>），不走校验；isValidName 仍判定为无效。
+  assert.equal(isValidName(''), false)
+  assert.doesNotThrow(() => buildInitPlan('/nonexistent-codecraft-root', 'app', ''))
+})
+
+void test('name validation accepts ordinary names', () => {
+  for (const good of ['demo', 'my-pkg', 'app.v2', 'Pkg_1', 'a'.repeat(64)]) {
+    assert.equal(isValidName(good), true, good)
+  }
+})
+
+void test('applyInitPlan refuses entries outside root (defense in depth)', () => {
+  const root = tempRoot()
+  try {
+    const plan = buildInitPlan(root, 'app', 'demo')
+    plan.entries.push({ path: '../escaped', type: 'dir' })
+
+    assert.throws(() => applyInitPlan(root, plan), /escapes root/)
+    assert.equal(fs.existsSync(path.resolve(root, '../escaped')), false)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+    fs.rmSync(path.resolve(root, '../escaped'), { recursive: true, force: true })
   }
 })
