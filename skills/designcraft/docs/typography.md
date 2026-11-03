@@ -1,6 +1,6 @@
 # 排版规范（提炼）
 
-> 源：Ultime `docs/design-system/05-typography.md`。本文件是面向 AI 的提炼，理由、验证方法与多语言 profile 以源为准。
+> 源：Ultime `docs/design-system/design.md` §5。本文件是面向 AI 的提炼，理由、验证方法与多语言 profile 以源为准。
 > 适用：字号取档、文字角色对齐、排版评审。
 > 评审步骤见 [`scenarios/review-typography.md`](../scenarios/review-typography.md)。
 
@@ -85,18 +85,19 @@
 
 原子值管「落在哪一档」，角色管「哪些值可以打包」。角色**不新增 token**。
 
-| 角色 | 字号 | 字重 | 行高 | 字距 | 墨 |
-|---|---|---|---|---|---|
-| `display` | 32 | 600 | `lh.1` | 0 | primary |
-| `page` | 24 | 600 | `lh.1` | 0 | primary |
-| `card` | 18 | 600 | `lh.2` | 0 | primary |
-| `nav` | 16 | 600 | `lh.1` | 0 | primary |
-| `row` | 16 | 500 | `lh.1` | 0 | primary |
-| `body` | 16 | 400 | `lh.3` | 0 | secondary |
-| `desc` | 14 | 400 | `lh.3` | 0 | secondary |
-| `meta` | 12 | 400 | `lh.2` | `ls.3` | tertiary |
-| `mini` | 10 | 500 | `lh.1` | 0 | tertiary |
+| 角色 | 字号 | 字重 | 行高 | 字距 | 墨 | 对比门槛 |
+|---|---|---|---|---|---|---|
+| `display` | 32 | 600 | `lh.1` | 0 | primary | 3.0 |
+| `page` | 24 | 600 | `lh.1` | 0 | primary | 3.0 |
+| `card` | 18 | 600 | `lh.2` | 0 | primary | 4.5 |
+| `nav` | 16 | 600 | `lh.1` | 0 | primary | 4.5 |
+| `row` | 16 | 500 | `lh.1` | 0 | primary | 4.5 |
+| `body` | 16 | 400 | `lh.3` | 0 | secondary | 4.5 |
+| `desc` | 14 | 400 | `lh.3` | 0 | secondary | 4.5 |
+| `meta` | 12 | 400 | `lh.2` | `ls.3` | tertiary | 4.5 |
+| `mini` | 10 | 500 | `lh.1` | 0 | tertiary | 4.5 |
 
+- 大字号只认 WCAG 的两个阈值：≥24px 常规，或 ≥18.67px 粗体；`card` 18/600 按 4.5 处理。
 - `nav` / `row` / `body` 同为 16 档，是原生 `h4` / `p` 的行为；差异靠字重与区域隔离。
 - 墨档目标见 [color.md §3](./color.md)；`tertiary` 按普通文字门槛使用，不是图元档。
 - 页面只认角色：`font` 简写、`font-size`、`font-weight`、`line-height`、`letter-spacing` 只定义在角色层。

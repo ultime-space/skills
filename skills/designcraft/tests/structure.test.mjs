@@ -62,7 +62,7 @@ void test('VERSION, package.json and CHANGELOG agree', () => {
 void test('README and docs index mention the current version family', () => {
   const version = read('VERSION').trim()
   assert.ok(read('README.md').includes(version), `README.md misses current version ${version}`)
-  assert.ok(read('docs/README.md').includes('0.2.x'), 'docs/README.md should use the 0.2.x family')
+  assert.ok(read('docs/README.md').includes('0.3.x'), 'docs/README.md should use the 0.3.x family')
 })
 
 void test('required files exist', () => {
@@ -117,6 +117,9 @@ void test('color.md keeps the current targets and drops stale claims', () => {
   for (const stale of ['0.65', '0.55', '离极', '镜像对称', '步长 0.10', '透明度是值位']) {
     assert.ok(!color.includes(stale), `color.md still contains stale claim: ${stale}`)
   }
-  assert.ok(color.includes('tone.{族}.on'), 'color.md must name the independent on dimension')
-  assert.ok(color.includes('独立'), 'color.md must state that on is independent')
+  assert.ok(
+    color.includes('tone.{族}.solid.foreground'),
+    'color.md must name foreground as the solid pairing slot',
+  )
+  assert.ok(color.includes('不是独立维度'), 'color.md must state that foreground is a solid slot')
 })

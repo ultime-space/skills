@@ -1,6 +1,6 @@
 # 颜色规范（提炼）
 
-> 源：Ultime `docs/design-system/03-color.md`（源快照 2026-11-04）。本文件是面向 AI 的提炼；公式、目标值与验证方法以源为准。
+> 源：Ultime `docs/design-system/design.md` §3（源快照 2026-11-04）。本文件是面向 AI 的提炼；公式、目标值与验证方法以源为准。
 > 适用：主色选择、色族派生评审、深浅配对、对比度判定。
 > 评审步骤见 [`scenarios/review-color.md`](../scenarios/review-color.md)；品牌色见 [`scenarios/configure-brand-color.md`](../scenarios/configure-brand-color.md)。
 
@@ -20,7 +20,8 @@
 
 ```text
 色相 H + 锚点明度 L + 彩度系数 C → 锚点色
-  ├─ 填充 fill：按 onSide × onColors × on 目标反解
+  ├─ 实心填充：按 onSide × onColors × solidTarget 反解
+  ├─ solid 配对前景：foreground（不透明实色）
   ├─ 浅底 soft / border / text：按目标反解
   └─ 深底三件套 + 交互五态
 ```
@@ -29,7 +30,7 @@
 
 - 锚点不等于最终填充：锚点只给色相与彩度上限，明度由目标反解。
 - `chromaRatio = 0` 是默认（墨色，不承载品牌）；需要品牌色时同时给 `primaryHue` 与 `chromaRatio`。
-- 实心填充按 `on` 的目标 **4.5** 反解；纯图元 / 大字面可按 **3.0**。
+- 实心填充按 `foreground` 的目标 **4.5** 反解；纯图元 / 大字面可按 **3.0**。
 
 ## 3 中性墨：目标是值位，alpha 是产物
 
@@ -62,13 +63,13 @@ tone.{族}.{底}[.{用途}.{强度}][.{状态}]
 强度：weak / base / strong
 状态：rest / hover / focus / pressed / selected / disabled / dragged / drop-target
 
-tone.{族}.on        ← 配对前景：只配 solid，无强度 / 状态
+tone.{族}.solid.foreground   ← 实心填充上的前景色（文字 / 图标），无强度 / 状态
 ```
 
 - `fill` 只配 `solid` / `soft`，可带状态。
 - `ink` / `line` 配三个底、各三档强度，不随交互变。
-- **`on` 是独立的配对维度**（family × on），不是 `solid` 底下的第四种用途；名字是 `tone.{族}.on`，不是 `tone.{族}.solid.on`。
-- **`ink` 与 `on` 不是二选一**：`ink` 是色族自己的文字色（`weak / base / strong` 是可选派生档），`on` 是「这块实心面上放什么字能读」的配对前景。solid 上两者可以并存。
+- **`foreground` 是 `solid` 的配对槽位**，不是独立维度，也不是 `-on` 后缀；路径是 `tone.{族}.solid.foreground`。
+- **`ink` 与 `foreground` 不是二选一**：`ink` 是色族自己的文字色（`weak / base / strong`），`foreground` 是「这块实心面上放什么字能读」的配对前景。solid 上两者可以并存，但**彩色实心面必须用 `foreground`**；`ink` 只用于中性面。
 
 **语义色墨用实色，不用 alpha**：半透明会去饱和（红变粉、危险感变弱）。中性墨没有色相要保，所以用 alpha。
 
@@ -78,22 +79,25 @@ tone.{族}.on        ← 配对前景：只配 solid，无强度 / 状态
 |---|---|---|---|
 | 中性 `ink` | `canvas / raised / overlay / inset` | 主 / 次 / 辅 / 禁 | **7.2 / 6 / 5 / 2.0** |
 | 族墨 `ink` | `solid / soft / bare` | 强 / 中 / 弱 | **7.2 / 6 / 5** |
-| `on` | `solid` | 每族一档 | **4.5** |
+| `foreground` | `solid` | 每族一档 | **4.5** |
 
 **产出边界**：
 
-- core：中性 `ink`、目标表、色族 `ink` 的 base、`on` 的方向 / 目标参数。
-- 语义表：色族 `ink` 的 `weak / strong`、`on` 的 token 组装。
+- core：中性 `ink`、目标表、色族 `ink` 三档、`foreground`。
+- 语义表：只做路径映射，不做第二次派生。
 - 组件：只消费，不定义颜色值。
+
+**彩色实心面是点缀**：主文字用不透明 `foreground`；`ink` 不能搬到彩色实心面（实验最高约 3.8:1）。需要次级信息时用 `foreground` + alpha，按最坏声明底审计，项目决定是否登记为辅助信息或移出面外；core 不承诺所有填充都能放次级文字。
 
 ## 6 深浅配对与品牌色
 
 - **`onSide` 按模式声明**：浅色模式配近白字（填充偏深），深色模式配近黑字（填充偏浅）；同一模式内全部族、全部状态同向。
-- **不使用 `auto`**：方向是项目决策，不做运行时推断。
-- **`fill` 与 `on` 都是模式值**，浅端按白字目标反解、深端按黑字目标反解。
+- **不使用 `auto`**：方向是项目决策，不做运行时推断。只启用一侧模式的项目，只审启用侧。
+- **`fill` 与 `foreground` 都是模式值**，浅端按白字目标反解、深端按黑字目标反解。
+- **`foreground` 用同一 L 配方**：默认端点为纯极（`#FFFFFF` / `#000000`），两端 `Δ = 0`；`Δ ≤ 2–3`，不要求两端对比度相等，各自过 4.5 门槛。8-bit sRGB 下 Δ ≤ 3 基本等于纯极，偏离会让 danger 这类最紧的族跌破 4.5。
 - **品牌色可达性**：白字 4.5 要求填充相对亮度 ≤ 0.183；黑字 4.5 要求 ≥ 0.175；中间 `0.175–0.183` 是死区，两头都不达标。
-- 色相 / 彩度在两端无法同时满足时，配置器给**警告 + 建议**（调明度、降彩度、换邻近色相），不静默翻转方向，也不把「一族白字一族黑字」当成品。
-- **`on` 不随交互状态变化**：状态方向按 away-from-on 移动，`on` 本身保持不变。
+- 色相 / 彩度在两端无法同时满足时，配置器给**警告 + 建议**（调明度、降彩度、换邻近色相），不静默翻转方向，也不把「一族白字一族黑字」当成品；自动调整只动明度，不改色相。
+- **`foreground` 不随交互状态变化**：状态方向按 away-from-foreground 移动，`foreground` 本身保持不变。
 - **模式是可嵌套作用域**：`[data-theme]` 可写在任意容器；局部模式块的根必须不透明。
 
 ## 7 门槛与审计
@@ -104,10 +108,10 @@ tone.{族}.on        ← 配对前景：只配 solid，无强度 / 状态
 | 大字号文本（约 24px 常规 / 18.67px 粗体） | ≥ 3.0:1 |
 | 识别控件、状态或理解图形所需的非文本信息 | 与相邻颜色 ≥ 3.0:1 |
 
-- **目标是设计值，门槛是下限**：目标 7.2 / 6 / 5（中性、族墨）、4.5（`on`）；门槛 4.5 / 3 / 2。
-- 审计四级：`pass`（≥ 目标）、`warn`（≥ 门槛但 < 目标）、`deviation`（< 门槛，需登记）、`unverified`（未知底，不假装通过）。
-- 项目档位：`standard`（默认，`deviation` 只报 warn）、`strict`（`deviation` 即失败）、`expressive`（可在门槛以上下调目标，manifest 标注）。
-- `contrastAllow` 登记例外（配对 / 理由 / 负责人 / 复核日期），到期回到 `warn`。
+- **目标是设计值，门槛是下限**：目标 7.2 / 6 / 5（中性、族墨）、4.5（`foreground`）；门槛 4.5 / 3 / 2。
+- 审计四级：`pass`（≥ 目标）、`warn`（≥ 门槛但 < 目标）、`deviation`（< 门槛）、`unverified`（未知底，不假装通过）。
+- **颜色项不阻断构建**：结构合同（引用闭包、无 `oklch()` 字面量、产物同源）仍阻断；颜色 `deviation` 只报告并写入 manifest。不设 `strict` / `expressive` 两套判定。
+- `contrastAllow` 登记例外（配对 / 理由 / 负责人 / 复核日期）；到期复核由项目 CI / 配置器检查，core 只记录字段。
 - APCA 只做 `info` 列（Lc），不作门槛；WCAG 2.2 仍是合规基线。
 - **审计范围只到 core**：core 产物、语义表、配置器。上层项目靠文档与指南，不在合同审计范围内。
 
@@ -120,7 +124,7 @@ tone.{族}.on        ← 配对前景：只配 solid，无强度 / 状态
 
 ## 9 评审口径
 
-**core 合同可机检**：中性墨目标与最弱面；族墨 `ink` / `on` 的目标；产物无 `oklch()` 字面量；`color-mix()` 全为 `in oklab`；偏色只在 seed。
+**core 合同可机检**：中性墨目标与最弱面；族墨 `ink` / `foreground` 的目标；产物无 `oklch()` 字面量；`color-mix()` 全为 `in oklab`；偏色只在 seed。
 
 **项目自检（不是 core 合同）**：页面选择器里的四件套；kit 里的 hex 只出现在 fallback；具体背景上的实际对比度。
 

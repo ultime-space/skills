@@ -122,10 +122,11 @@ Designcraft 是内部规范提炼，不复制外部正文。设计时对照过�
 
 ## 版本
 
+- `0.3.0`：`on` 更名为 `foreground`，补 L 等距与彩色实心面边界；排版补大字号门槛。
 - `0.2.1`：首次通过 GitHub Actions + Trusted Publishing 发布，验证 CI 发版链路；无功能变更。
 - `0.2.0`：颜色模型按新目标重写；补齐 skill 结构与 CI。
 - `0.1.0`：初始化，覆盖排版与颜色两篇。
-- 规范源在 Ultime 仓库的 `docs/design-system/`；源更新后同步提炼并发版。
+- 规范源是 Ultime 内部的 `docs/design-system/design.md`（不对外分发）；本 skill 是对外载体。源更新后按需同步，不要求逐条镜像。
 
 ## 许可
 

@@ -1,6 +1,6 @@
 {
   "name": "@ultime/designcraft",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "面向设计系统的视觉规范（Designcraft），作为可安装的 skill 包：排版、颜色与取档建议。",
   "keywords": [
     "ai",

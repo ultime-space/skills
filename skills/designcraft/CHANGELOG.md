@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- `docs/color.md`：`on` 更名为 `foreground`，改为 `tone.{族}.solid.foreground` 配对槽位；补 L 等距（`Δ ≤ 2–3`）、彩色实心面只作点缀、`ink` 不用于彩色实心面、颜色审计不阻断。
+- `docs/typography.md`：补角色对比门槛（仅 `display` / `page` 走 3.0）。
+- 同步源文档：`docs/design-system/design.md`（§3 / §5）。
+
 ## 0.2.1
 
 - 首次通过 GitHub Actions + Trusted Publishing 发布，验证 CI 发版链路；无功能变更。
