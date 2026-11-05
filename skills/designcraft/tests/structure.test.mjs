@@ -15,16 +15,54 @@ const REQUIRED = [
   'CONTRIBUTING.md',
   'SECURITY.md',
   'docs/README.md',
-  'docs/typography.md',
+  'docs/foundations.md',
   'docs/color.md',
+  'docs/typography.md',
+  'docs/space-shape.md',
+  'docs/layout.md',
+  'docs/depth.md',
+  'docs/motion.md',
+  'docs/states.md',
+  'docs/data-graphics-content.md',
+  'docs/composition.md',
+  'docs/review.md',
+  'docs/style.md',
   'scenarios/review-typography.md',
   'scenarios/review-color.md',
+  'scenarios/review-structure.md',
+  'scenarios/review-depth.md',
+  'scenarios/review-motion.md',
+  'scenarios/review-states.md',
+  'scenarios/review-content.md',
+  'scenarios/review-critique.md',
+  'scenarios/compose-page.md',
+  'scenarios/compose-component.md',
+  'scenarios/build-style.md',
   'scenarios/configure-brand-color.md',
   'scenarios/check-contrast-audit.md',
   'prompts/output.md',
   'templates/review-report.md',
   'templates/brand-color-check.md',
+  'templates/design-spec.md',
+  'templates/critique-report.md',
+  'templates/style-brief.md',
   'evals/golden-tasks.md',
+]
+
+const PURE_KNOWLEDGE_DIRS = ['docs', 'scenarios', 'prompts', 'templates']
+const FORBIDDEN_TERMS = [
+  'core',
+  'kit',
+  'viewer',
+  'token',
+  'seed',
+  'manifest',
+  'pnpm',
+  'configurator',
+  '门禁',
+  'Ultime',
+  '@ultime',
+  'packages/',
 ]
 
 function read(rel) {
@@ -61,8 +99,10 @@ void test('VERSION, package.json and CHANGELOG agree', () => {
 
 void test('README and docs index mention the current version family', () => {
   const version = read('VERSION').trim()
+  const family = version.split('.').slice(0, 2).join('.')
+
   assert.ok(read('README.md').includes(version), `README.md misses current version ${version}`)
-  assert.ok(read('docs/README.md').includes('0.3.x'), 'docs/README.md should use the 0.3.x family')
+  assert.ok(read('docs/README.md').includes(`${family}.x`), `docs/README.md should use the ${family}.x family`)
 })
 
 void test('required files exist', () => {
@@ -108,6 +148,28 @@ void test('every docs file is reachable from SKILL.md', () => {
   assert.deepEqual(missing, [], `SKILL.md routing misses: ${missing.join(', ')}`)
 })
 
+void test('every docs page except the index declares its source', () => {
+  for (const file of markdownFiles(path.join(ROOT, 'docs'))) {
+    const rel = path.relative(ROOT, file).split(path.sep).join('/')
+    if (rel === 'docs/README.md') continue
+    assert.match(fs.readFileSync(file, 'utf8'), /^> 源：/m, `${rel} must declare its source`)
+  }
+})
+
+void test('docs, scenarios, prompts and templates stay pure knowledge', () => {
+  for (const dir of PURE_KNOWLEDGE_DIRS) {
+    for (const file of markdownFiles(path.join(ROOT, dir))) {
+      const text = fs.readFileSync(file, 'utf8')
+      for (const term of FORBIDDEN_TERMS) {
+        assert.ok(
+          !text.includes(term),
+          `${path.relative(ROOT, file)} must not contain product/implementation term: ${term}`,
+        )
+      }
+    }
+  }
+})
+
 void test('color.md keeps the current targets and drops stale claims', () => {
   const color = read('docs/color.md')
 
@@ -117,9 +179,6 @@ void test('color.md keeps the current targets and drops stale claims', () => {
   for (const stale of ['0.65', '0.55', '离极', '镜像对称', '步长 0.10', '透明度是值位']) {
     assert.ok(!color.includes(stale), `color.md still contains stale claim: ${stale}`)
   }
-  assert.ok(
-    color.includes('tone.{族}.solid.foreground'),
-    'color.md must name foreground as the solid pairing slot',
-  )
-  assert.ok(color.includes('不是独立维度'), 'color.md must state that foreground is a solid slot')
+  assert.ok(color.includes('配对前景'), 'color.md must name the paired foreground')
+  assert.ok(color.includes('不是独立维度'), 'color.md must state that the paired foreground is a slot')
 })

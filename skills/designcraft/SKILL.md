@@ -1,62 +1,79 @@
 ---
 name: designcraft
-description: 面向设计系统的视觉规范（Designcraft）。用于颜色、排版、空间、动效与表面的设计评审、取档建议和规范落地检查；不写代码架构，不做业务建模。Design system visual standards for color, typography, space, motion and surface.
+description: 面向设计系统的设计知识：原则、语言、流程、颜色、排版、空间与形状、布局。用于设计评审、取档建议与设计规格；不写代码架构，不做业务建模。
 ---
 
 # Designcraft
 
-> 方向：设计系统与视觉规范。当前覆盖排版与颜色；空间、动效、表面待补。
-> 定位：把视觉判断从「看起来差不多」变成「能引用判据、能算回去」。
+> 方向：设计系统知识。当前覆盖设计原则、设计语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、评审与风格。
+> 定位：把视觉判断从「看起来差不多」变成「能引用判据、能算回去、能给出建议」。
 
 ## 范围
 
 | 项 | 内容 |
 |---|---|
-| 覆盖 | 字号与场景阶梯、字重、行高、字距、文字角色；色彩空间、色族派生、对比合同、深浅配对、取色与搭配 |
-| 可复用 | 任意设计系统 / 组件库的视觉评审、取档、对比度核对 |
-| 不适用 | 代码规范与代码架构（用 Codecraft）；业务建模；纯视觉美化 |
-| 不在范围 | 品牌创作、插画、图标绘制；上层项目的页面级审计 |
+| 覆盖 | 设计原则与语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、评审与风格 |
+| 可复用 | 任意设计系统 / 组件库的设计评审、取档、对比度核对、页面结构、层级、状态、设计规格与风格 brief |
+| 不适用 | 代码规范与代码架构（用 Codecraft）；文档组织（用 Docscraft）；业务建模 |
+| 不在范围 | 品牌创作、插画、图标绘制；强制检查与阻断性结论；具体实现与工具命令 |
 
 ## 目录
 
 | 目录 | 放什么 |
 |---|---|
-| `docs/` | 面向 AI 的规范提炼：排版、颜色、索引 |
-| `scenarios/` | 排版评审、颜色评审、品牌色配置、审计分级 |
+| `docs/` | 面向 AI 的设计知识：基础、颜色、排版、空间与形状、布局、表面与光影、动效、状态、数据 / 图形 / 内容、构图、评审、风格 |
+| `scenarios/` | 各维度评审、内容评审、设计批评、页面 / 组件设计规格、风格构建、品牌色配置、评审分级 |
 | `prompts/` | 输出格式 |
-| `templates/` | 评审报告、品牌色检查表 |
+| `templates/` | 评审报告、品牌色检查表、设计规格、批评报告、风格 brief |
 | `evals/` | 黄金任务 |
 
 ## 读法（按任务路由）
 
 | 任务 | 先读 | 产出 |
 |---|---|---|
+| 设计任务的前置判断 / 流程 | `docs/foundations.md` | 设计决策与输出建议 |
 | 排版评审 | `docs/typography.md` + `scenarios/review-typography.md` | 评审报告 |
 | 颜色评审 / 对比度 | `docs/color.md` + `scenarios/review-color.md` | 评审报告 |
+| 间距 / 尺寸 / 圆角 / 边界 | `docs/space-shape.md` + `scenarios/review-structure.md` | 评审报告 |
+| 页面结构 / 栅格 / 响应式 | `docs/layout.md` + `scenarios/review-structure.md` | 评审报告 |
+| 表面 / 层级 / 光影 | `docs/depth.md` + `scenarios/review-depth.md` | 评审报告 |
+| 动效 / 反馈 | `docs/motion.md` + `scenarios/review-motion.md` | 评审报告 |
+| 交互状态 | `docs/states.md` + `scenarios/review-states.md` | 评审报告 |
+| 数据 / 图形 / 内容 | `docs/data-graphics-content.md` + `scenarios/review-content.md` | 评审报告 |
+| 构图 / 场景 | `docs/composition.md` + `scenarios/review-critique.md` | 评审 / 批评报告 |
+| 设计批评 | `docs/review.md` + `scenarios/review-critique.md` | 批评报告 |
+| 页面设计规格 | `docs/composition.md` + `docs/layout.md` + `scenarios/compose-page.md` | 设计规格 |
+| 组件设计规格 | `docs/space-shape.md` + `docs/states.md` + `scenarios/compose-component.md` | 设计规格 |
+| 构建风格 | `docs/style.md` + `scenarios/build-style.md` | 风格 brief |
 | 配置品牌色 | `docs/color.md` + `scenarios/configure-brand-color.md` | 可达性结论 + 建议 |
 | 审计分级 / 边界 | `docs/color.md` + `scenarios/check-contrast-audit.md` | 分级说明 |
 | 规范来源与同步 | `docs/README.md` | 同步结论 |
-| 输出格式 | `prompts/output.md` | 报告 / 清单 |
+| 输出格式 | `prompts/output.md` | 报告 / 清单 / 规格 |
 
 ## 先读
 
-1. 项目 seed / 主题 / tokens
-2. `docs/typography.md` 或 `docs/color.md`
-3. 相关 `scenarios/`
-4. 输出按 `prompts/output.md`；模板见 `templates/`
+1. 项目现状、平台、模式、密度与内容最坏情况。
+2. `docs/foundations.md`，确认范围与判断方式。
+3. 相关维度文档与 `scenarios/`。
+4. 输出按 `prompts/output.md`；模板见 `templates/`。
 
 ## 模式
 
 - **Audit**：只读评审，不改文件。
 - **Plan**：给取档 / 调整方案，不改文件。
-- **Apply**：只改文档或报告，不改代码与 token。
+- **Compose**：从 brief 出设计规格，不写代码。
+- **Critique**：设计批评，给分数、证据与建议；不改变规范结论。
+- **Style**：选择 / 组合风格，输出风格 brief；只给建议与警告。
+- **Apply**：只改文档或报告，不改代码与设计值。
+
+本 skill 只给知识、报告与建议；使用者可以选择遵循，也可以选择不完全遵循，不做强制检查。
 
 ## 工作流
 
-1. 确认范围：模式 / 平台 / 声明底 / 目标。
-2. 找判据：先定位是排版、颜色还是配对。
+1. 确认范围：模式 / 平台 / 场景 / 目标。
+2. 找判据：先定位是原则、语言、颜色、排版、空间形状还是布局。
 3. 换算：对比度换到 sRGB 相对亮度；透明 / 叠层先合成。
-4. 给最近可行档；没有就标「偏好」或「需要上层覆盖」。
+4. 给最近可行档；没有就标「偏好」或「需要项目自定义」。
 5. 输出按 `prompts/output.md`，不写实现状态。
 
 ## 禁止
@@ -65,11 +82,12 @@ description: 面向设计系统的视觉规范（Designcraft）。用于颜色�
 - 不把 alpha 当设计值；目标是值位，alpha 是产物。
 - 不把未知底判成通过；图片 / 动态色标 `unverified`。
 - 不在 Audit / Plan 改文件。
-- 不写实现状态；以项目 roadmap 为准。
+- 不写实现状态；不引用产品名、实现术语、工具命令。
+- 不把建议写成强制检查；不下阻断性结论。
 - 不复制源正文；提炼只做删减与压缩。
 
 ## 与其它 skill 的边界
 
-- **Codecraft**：代码规范、架构、门禁。
+- **Codecraft**：代码规范、架构与工程检查。
 - **Docscraft**：文档分层、真源治理、ADR。
-- **Designcraft**：视觉规范、设计评审、取档与对比度。
+- **Designcraft**：设计知识、视觉评审、取档与设计规格。

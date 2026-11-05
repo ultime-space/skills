@@ -1,6 +1,6 @@
 # Designcraft
 
-面向设计系统的视觉规范 skill：排版、颜色与取档建议。让 AI 的视觉判断能引用判据，而不是凭感觉。
+面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
 
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./LICENSE)
@@ -16,7 +16,7 @@ npx skills add ultime-space/skills --skill designcraft
 装好后对 AI 说：
 
 ```text
-用 Designcraft 检查这个页面的排版和配色，只读，不改文件。
+用 Designcraft 检查这个页面的排版、配色和间距，只读，不改文件。
 ```
 
 > 带上 `Designcraft` 这个名字最稳；只启用 skill 而不点名时，agent 未必进入该模式。
@@ -38,7 +38,14 @@ npx skills add ultime-space/skills --skill designcraft
 
 ```text
 用 Designcraft 评审这组颜色配对，Audit 模式，只读。
-背景：<画布 / 卡片 / soft / solid>；文字：<token 或色值>；给出目标、实测和分级。
+背景：<画布 / 抬升面 / 浮层面 / 凹陷面 / soft / solid>；文字：<颜色值>；给出目标、实测和分级。
+```
+
+**结构评审**
+
+```text
+用 Designcraft 评审这个页面的间距、控件高度、密度、热区、圆角和边界，Audit 模式，只读。
+范围：<移动 / 平板 / 桌面>；重点看是否落在档位、compact 是否兜底热区、是否只有一个滚动容器。
 ```
 
 **配置品牌色**
@@ -48,22 +55,23 @@ npx skills add ultime-space/skills --skill designcraft
 要求：浅色白字、深色黑字，目标 4.5；给出两端可达值和调整建议。
 ```
 
-**审计分级**
+**评审分级**
 
 ```text
-用 Designcraft 按 scenarios/check-contrast-audit.md 说明这次审计的分级与边界，只读。
-重点：哪些是 core 合同，哪些是项目自检，哪些是未知底。
+用 Designcraft 按 scenarios/check-contrast-audit.md 说明这次评审的分级与边界，只读。
+重点：哪些是可评审项，哪些是项目自检，哪些是未知底。
 ```
 
 更多场景见 [`scenarios/`](./scenarios/) 与 [`prompts/output.md`](./prompts/output.md)。
 
 ## 适用
 
-- 设计稿 / 组件样式的排版与配色评审
+- 设计稿 / 组件样式的颜色、排版、间距、尺寸、圆角与边界评审
 - 品牌色在深浅两端的可达性检查
 - 对比度目标、门槛、分级的对齐
-- 设计 token 的取档与语义角色检查
-- 给 AI 一个稳定的视觉判断入口
+- 设计值的取档与语义角色检查
+- 页面结构、滚动归属、栅格与响应式的设计建议
+- 给 AI 一个稳定的设计判断入口
 
 ## 不适用
 
@@ -71,6 +79,7 @@ npx skills add ultime-space/skills --skill designcraft
 - 文档组织与真源治理：用 Docscraft
 - 业务建模、纯视觉美化
 - 品牌创作、插画、图标绘制
+- 强制检查与阻断性结论：本 skill 只给报告与建议
 
 ## 结构
 
@@ -79,19 +88,41 @@ designcraft/
 ├── SKILL.md
 ├── docs/
 │   ├── README.md
+│   ├── foundations.md
+│   ├── color.md
 │   ├── typography.md
-│   └── color.md
+│   ├── space-shape.md
+│   ├── layout.md
+│   ├── depth.md
+│   ├── motion.md
+│   ├── states.md
+│   ├── data-graphics-content.md
+│   ├── composition.md
+│   ├── review.md
+│   └── style.md
 ├── scenarios/
 │   ├── review-typography.md
 │   ├── review-color.md
+│   ├── review-structure.md
+│   ├── review-depth.md
+│   ├── review-motion.md
+│   ├── review-states.md
+│   ├── review-content.md
+│   ├── review-critique.md
+│   ├── compose-page.md
+│   ├── compose-component.md
+│   ├── build-style.md
 │   ├── configure-brand-color.md
 │   └── check-contrast-audit.md
 ├── prompts/output.md
 ├── templates/
 │   ├── review-report.md
-│   └── brand-color-check.md
+│   ├── brand-color-check.md
+│   ├── design-spec.md
+│   ├── critique-report.md
+│   └── style-brief.md
 ├── evals/golden-tasks.md
-├── tests/                 结构、版本对齐、相对链接、SKILL 路由、目标值与旧口径
+├── tests/                 结构、版本对齐、相对链接、SKILL 路由、来源头、纯知识检查
 ├── scripts/               release-check（版本 / CHANGELOG / 打包文件）
 ├── package.json
 ├── VERSION
@@ -101,7 +132,7 @@ designcraft/
 ## 验证
 
 ```bash
-npm test              # 结构、版本对齐、相对链接、SKILL 路由、目标值与旧口径
+npm test              # 结构、版本对齐、相对链接、SKILL 路由、来源头、纯知识检查
 npm run release-check # 版本 / CHANGELOG / 打包文件
 npm pack --dry-run    # 检查发布内容
 ```
@@ -110,11 +141,11 @@ npm pack --dry-run    # 检查发布内容
 
 1. **判据可引用**：结论必须回到 `docs/` 的规则或可反解的约束；给不出就标「偏好」。
 2. **目标先行**：对比度目标 / 档位是设计值，alpha 与色值是产物，不反过来用 alpha 定义档位。
-3. **边界清晰**：core 合同只审 core / 语义表 / 配置器；上层项目靠文档与指南，不把页面问题算进 core 发版门槛。
+3. **边界清晰**：只给设计知识、报告与建议；不做强制检查，不替使用者做决定。
 
 ## 参考与方法来源
 
-Designcraft 是内部规范提炼，不复制外部正文。设计时对照过：
+Designcraft 是设计规范提炼，不复制外部正文。设计时对照过：
 
 - WCAG 2.2：1.4.3 对比度（最低）、1.4.6 对比度（增强）、1.4.11 非文本对比
 - Material Design 3：颜色与对比度实践
@@ -122,11 +153,16 @@ Designcraft 是内部规范提炼，不复制外部正文。设计时对照过�
 
 ## 版本
 
+- `0.8.1`：表面补一级面容器可读性风险口径；半透明可用，按最坏背景验证合成对比度，不强制实色。
+- `0.8.0`：动效补充可打断、来去路径、常用动效模式与曲线选择；补对应 evals；版本与文档索引同步到 0.8.x。
+- `0.7.0`：新增风格体系、风格构建场景与风格 brief；新增风格 evals；版本与文档索引同步到 0.7.x。
+- `0.6.0`：新增数据 / 图形 / 内容、构图、评审；新增页面 / 组件设计规格与设计批评场景、模板；版本与文档索引同步到 0.6.x。
+- `0.5.0`：新增表面与光影、动效与反馈、交互状态；补对应场景与 evals；版本与文档索引同步到 0.5.x。
+- `0.4.0`：新增设计原则 / 语言 / 流程、空间与形状、布局；重写颜色与排版；统一为纯设计知识，去除产品名、实现术语、工具命令与强制检查表述。
 - `0.3.0`：`on` 更名为 `foreground`，补 L 等距与彩色实心面边界；排版补大字号门槛。
 - `0.2.1`：首次通过 GitHub Actions + Trusted Publishing 发布，验证 CI 发版链路；无功能变更。
 - `0.2.0`：颜色模型按新目标重写；补齐 skill 结构与 CI。
 - `0.1.0`：初始化，覆盖排版与颜色两篇。
-- 规范源是 Ultime 内部的 `docs/design-system/design.md`（不对外分发）；本 skill 是对外载体。源更新后按需同步，不要求逐条镜像。
 
 ## 许可
 

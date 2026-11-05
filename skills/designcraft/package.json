@@ -1,7 +1,7 @@
 {
   "name": "@ultime/designcraft",
-  "version": "0.3.0",
-  "description": "面向设计系统的视觉规范（Designcraft），作为可安装的 skill 包：排版、颜色与取档建议。",
+  "version": "0.8.1",
+  "description": "面向设计系统的设计知识（Designcraft），作为可安装的 skill 包：原则、颜色、排版、空间与形状、布局、表面与光影、动效、状态、内容、构图、评审与风格。",
   "keywords": [
     "ai",
     "skill",
@@ -9,6 +9,8 @@
     "design-tokens",
     "typography",
     "color",
+    "spacing",
+    "layout",
     "agent-skills"
   ],
   "author": "Ultime contributors",
