@@ -35,7 +35,7 @@
 ## 反例
 
 - 进入 200ms、离开 300ms。
-- 用 600ms + infinite 做 loading。
-- 对 `height` / `margin` 做过渡。
+- 用 600ms 循环做 loading。
+- 对高度或外边距做过渡。
 - 退出序列也 stagger。
 - 减少动效下把循环时长清零，但无限循环仍在跑。

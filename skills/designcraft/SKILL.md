@@ -47,7 +47,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | 构建风格 | `docs/style.md` + `scenarios/build-style.md` | 风格 brief |
 | 配置品牌色 | `docs/color.md` + `scenarios/configure-brand-color.md` | 可达性结论 + 建议 |
 | 审计分级 / 边界 | `docs/color.md` + `scenarios/check-contrast-audit.md` | 分级说明 |
-| 规范来源与同步 | `docs/README.md` | 同步结论 |
+| 知识库索引 | `docs/README.md` | 阅读顺序与单一归属 |
 | 输出格式 | `prompts/output.md` | 报告 / 清单 / 规格 |
 
 ## 先读
@@ -84,7 +84,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 - 不在 Audit / Plan 改文件。
 - 不写实现状态；不引用产品名、实现术语、工具命令。
 - 不把建议写成强制检查；不下阻断性结论。
-- 不复制源正文；提炼只做删减与压缩。
+- 不新增知识库没有的规则；数值、公式与档位表要与正文一致，并随版本更新。
 
 ## 与其它 skill 的边界
 

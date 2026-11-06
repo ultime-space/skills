@@ -122,7 +122,7 @@ designcraft/
 │   ├── critique-report.md
 │   └── style-brief.md
 ├── evals/golden-tasks.md
-├── tests/                 结构、版本对齐、相对链接、SKILL 路由、来源头、纯知识检查
+├── tests/                 结构、版本对齐、相对链接、SKILL 路由、适用范围头、纯知识检查
 ├── scripts/               release-check（版本 / CHANGELOG / 打包文件）
 ├── package.json
 ├── VERSION
@@ -132,7 +132,7 @@ designcraft/
 ## 验证
 
 ```bash
-npm test              # 结构、版本对齐、相对链接、SKILL 路由、来源头、纯知识检查
+npm test              # 结构、版本对齐、相对链接、SKILL 路由、适用范围头、纯知识检查
 npm run release-check # 版本 / CHANGELOG / 打包文件
 npm pack --dry-run    # 检查发布内容
 ```
@@ -145,7 +145,7 @@ npm pack --dry-run    # 检查发布内容
 
 ## 参考与方法来源
 
-Designcraft 是设计规范提炼，不复制外部正文。设计时对照过：
+Designcraft 是面向 AI 的设计知识，不复制外部正文。设计时对照过：
 
 - WCAG 2.2：1.4.3 对比度（最低）、1.4.6 对比度（增强）、1.4.11 非文本对比
 - Material Design 3：颜色与对比度实践
@@ -153,6 +153,8 @@ Designcraft 是设计规范提炼，不复制外部正文。设计时对照过�
 
 ## 版本
 
+- `0.9.1`：状态叠墨改为目标反解，语义色四状态，`pressed` 统一；P9 / P12 对齐；画布对称带补 1.26；动效角色表改档号；排版补 `small` / `row` 说明。
+- `0.9.0`：面改为层级 + 填充 + 形态；光影改为全局光 / 环境光两套系统与五个光槽；受光边跟方位角、方向高光必须有环境底；投影改为三层结构；扁平补组合轴与反例。
 - `0.8.1`：表面补一级面容器可读性风险口径；半透明可用，按最坏背景验证合成对比度，不强制实色。
 - `0.8.0`：动效补充可打断、来去路径、常用动效模式与曲线选择；补对应 evals；版本与文档索引同步到 0.8.x。
 - `0.7.0`：新增风格体系、风格构建场景与风格 brief；新增风格 evals；版本与文档索引同步到 0.7.x。

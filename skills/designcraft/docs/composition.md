@@ -1,6 +1,5 @@
 # 组合原则与场景
 
-> 源：设计规范 §13（快照 2026-11-05）。本文件是面向 AI 的提炼，不是规范真源。
 > 适用：页面级构图判断、场景取舍、设计批评的前置检查。
 > 评审步骤见 [`scenarios/review-critique.md`](../scenarios/review-critique.md)。
 

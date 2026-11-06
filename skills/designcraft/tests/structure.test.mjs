@@ -63,6 +63,8 @@ const FORBIDDEN_TERMS = [
   'Ultime',
   '@ultime',
   'packages/',
+  '设计规范',
+  'spec/',
 ]
 
 function read(rel) {
@@ -148,11 +150,11 @@ void test('every docs file is reachable from SKILL.md', () => {
   assert.deepEqual(missing, [], `SKILL.md routing misses: ${missing.join(', ')}`)
 })
 
-void test('every docs page except the index declares its source', () => {
+void test('every docs page except the index declares its scope', () => {
   for (const file of markdownFiles(path.join(ROOT, 'docs'))) {
     const rel = path.relative(ROOT, file).split(path.sep).join('/')
     if (rel === 'docs/README.md') continue
-    assert.match(fs.readFileSync(file, 'utf8'), /^> 源：/m, `${rel} must declare its source`)
+    assert.match(fs.readFileSync(file, 'utf8'), /^> 适用：/m, `${rel} must declare its scope`)
   }
 })
 
@@ -164,6 +166,45 @@ void test('docs, scenarios, prompts and templates stay pure knowledge', () => {
         assert.ok(
           !text.includes(term),
           `${path.relative(ROOT, file)} must not contain product/implementation term: ${term}`,
+        )
+      }
+    }
+  }
+})
+
+void test('docs, scenarios, prompts and templates avoid CSS property names', () => {
+  const CSS_TERMS = [
+    '`opacity`',
+    '`transform`',
+    '`overflow`',
+    '`box-shadow`',
+    '`line-height`',
+    '`font-size`',
+    '`font-weight`',
+    '`letter-spacing`',
+    '`margin`',
+    '`padding`',
+    '`inset`',
+    '`gap`',
+    '`clip-path`',
+    '`transition: all`',
+    '`100vw`',
+    '`100dvh`',
+    '`:focus-visible`',
+    '`oklch()`',
+    '`inline-flex`',
+    '`solid`',
+    '`dashed`',
+    '`dotted`',
+    '`infinite`',
+  ]
+  for (const dir of PURE_KNOWLEDGE_DIRS) {
+    for (const file of markdownFiles(path.join(ROOT, dir))) {
+      const text = fs.readFileSync(file, 'utf8')
+      for (const term of CSS_TERMS) {
+        assert.ok(
+          !text.includes(term),
+          `${path.relative(ROOT, file)} must use design language instead of CSS term: ${term}`,
         )
       }
     }
