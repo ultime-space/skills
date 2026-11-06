@@ -8,6 +8,9 @@
 [![npm](https://img.shields.io/npm/v/@ultime/docscraft?label=%40ultime%2Fdocscraft&color=black)](https://www.npmjs.com/package/@ultime/docscraft)
 [![node](https://img.shields.io/node/v/@ultime/docscraft?label=node)](https://www.npmjs.com/package/@ultime/docscraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./skills/docscraft/LICENSE)
+[![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
+[![node](https://img.shields.io/node/v/@ultime/designcraft?label=node)](https://www.npmjs.com/package/@ultime/designcraft)
+[![license](https://img.shields.io/badge/license-MIT-black)](./skills/designcraft/LICENSE)
 
 ---
 
@@ -19,6 +22,9 @@ npx skills add ultime-space/skills --skill='*'
 
 # 只装 Codecraft
 npx skills add ultime-space/skills --skill codecraft
+
+# 只装 Designcraft
+npx skills add ultime-space/skills --skill designcraft
 
 # 全局安装
 npx skills add ultime-space/skills --skill='*' -g
@@ -61,11 +67,11 @@ npx skills add ultime-space/skills --skill codecraft
 ### B · npm + skills-npm（多项目 / 团队）
 
 ```bash
-npm i -D @ultime/codecraft @ultime/docscraft skills-npm
+npm i -D @ultime/codecraft @ultime/docscraft @ultime/designcraft skills-npm
 npx skills-npm setup
 ```
 
-每次 `npm install` 会把两个包（`node_modules/@ultime/codecraft`、`node_modules/@ultime/docscraft`）同步到 `.agents/skills/` 及检测到的 agent 目录。需要 Node.js >= 22.20。
+每次 `npm install` 会把三个包（`node_modules/@ultime/codecraft`、`node_modules/@ultime/docscraft`、`node_modules/@ultime/designcraft`）同步到 `.agents/skills/` 及检测到的 agent 目录。需要 Node.js >= 22.20。
 
 ### C · 手动指针（不复制文件）
 
@@ -98,12 +104,21 @@ skills/
     │   ├── templates/   init --apply 的骨架 + 架构报告模板
     │   ├── tests/       node:test 用例
     │   └── evals/       CLI eval fixtures + golden tasks（人工回归）
-    └── docscraft/       文档组织与 AI 上下文治理
+    ├── docscraft/       文档组织与 AI 上下文治理
+    │   ├── SKILL.md
+    │   ├── docs/        原则、分层、类型、AI 上下文、防漂移、规则治理、ADR、术语表
+    │   ├── scenarios/   文档审计 / 重整 / 写 ADR / 复查规则
+    │   ├── prompts/     输出格式
+    │   ├── templates/   AGENTS / rules / ADR
+    │   ├── tests/       包结构与链接校验
+    │   └── evals/       golden tasks（人工回归）
+    └── designcraft/     设计系统设计知识
         ├── SKILL.md
-        ├── docs/        原则、分层、类型、AI 上下文、防漂移、规则治理、ADR、术语表
-        ├── scenarios/   文档审计 / 重整 / 写 ADR / 复查规则
+        ├── docs/        原则、颜色、排版、空间与形状、深度、动效、状态、内容、构图、评审、风格
+        ├── scenarios/   组件 / 页面组合、品牌色、风格 brief、各类评审
         ├── prompts/     输出格式
-        ├── templates/   AGENTS / rules / ADR
+        ├── templates/   设计规范 / 评审报告 / 风格 brief
+        ├── scripts/     发布与结构检查
         ├── tests/       包结构与链接校验
         └── evals/       golden tasks（人工回归）
 ```
@@ -134,6 +149,11 @@ npm pack --dry-run             # 检查发布内容
 cd ../docscraft
 npm test                       # 结构、版本对齐、相对链接与路由路径
 npm pack --dry-run
+
+cd ../designcraft
+npm test                       # 结构、版本对齐、相对链接与场景路径
+npm run release-check          # 发布前检查
+npm pack --dry-run
 ```
 
 发布走 tag：`package.json` 版本与 tag 对齐后推送，GitHub Actions 用 npm Trusted Publishing（OIDC）发布，不存 token。
@@ -144,9 +164,12 @@ git push origin codecraft-v<version>
 
 git tag docscraft-v<version>
 git push origin docscraft-v<version>
+
+git tag designcraft-v<version>
+git push origin designcraft-v<version>
 ```
 
-版本变更记录见 [Codecraft CHANGELOG](./skills/codecraft/CHANGELOG.md) 与 [Docscraft CHANGELOG](./skills/docscraft/CHANGELOG.md)。
+版本变更记录见 [Codecraft CHANGELOG](./skills/codecraft/CHANGELOG.md)、[Docscraft CHANGELOG](./skills/docscraft/CHANGELOG.md) 与 [Designcraft CHANGELOG](./skills/designcraft/CHANGELOG.md)。
 
 ---
 
