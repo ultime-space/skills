@@ -85,8 +85,8 @@ const SECRET_KEY_CODE = /(?:^|[._-])(password|passwd|pwd|secret|appsecret|api[._
 const SECRET_KEY_EXCLUDE = /(url|uri|type|name|expires?|expiry|ttl|header|prefix|suffix|length|count|timeout)$/i
 const SECRET_PLACEHOLDER =
   /^(?:\$\{.*\}|\$[A-Za-z_][A-Za-z0-9_]*|#\{.*\}|%.*%|<.*>|\*+|-+|null|true|false|none|undefined|todo.*|xxx+|[a-z]*example[a-z]*|placeholder.*|your[-_].*|change[-_]?me|process\.env\..*|os\.environ.*|System\..*|getenv.*)$/i
-/** 只认内部文档特征：向上一级找根 docs，或 Ultime 的内部目录名；包自带的 docs/ 不算。 */
-const DOC_PATH = /(?:^|[\s(`'"])(?:(?:\.\.\/)+docs\/|(?:docs\/)?(?:开发计划|设计系统|工程机制)\/)/
+/** 只认内部文档特征：向上一级找根 docs；包自带的 docs/ 不算。 */
+const DOC_PATH = /(?:^|[\s(`'"])(?:\.\.\/)+docs\//
 
 const IMPORT_PATTERNS = [
   /\bfrom\s+['"]([^'"]+)['"]/g,
@@ -526,7 +526,7 @@ function collectImports(text) {
 function isGeneratedCandidate(file) {
   const base = path.basename(file)
   if (/\.generated\.[^.]+$/.test(base)) return true
-  if (['tokens.css', 'tokens.dtcg.json', 'tokens.js', 'tokens.d.ts'].includes(base)) {
+  if (/^tokens\.(css|js|ts)$/.test(base) || /^tokens\..*\.json$/.test(base)) {
     return true
   }
   return file.split(path.sep).includes('generated') && GENERATED_EXTENSIONS.has(path.extname(base))

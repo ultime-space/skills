@@ -57,6 +57,35 @@ void test('relative markdown links resolve', () => {
   }
 })
 
+void test('knowledge files stay package-neutral', () => {
+  const terms = [
+    'Ultime',
+    '@ultime/core',
+    '@ultime/kit',
+    '@ultime/viewer',
+    '@ultime/studio',
+    '@ultime/cli',
+    'packages/core',
+    'packages/kit',
+    'packages/viewer',
+    'tokens.dtcg.json',
+    '开发计划',
+  ]
+  for (const dir of ['docs', 'scenarios', 'templates', 'adapters', 'prompts']) {
+    const full = path.join(ROOT, dir)
+    if (!fs.existsSync(full)) continue
+    for (const file of markdownFiles(full)) {
+      const text = fs.readFileSync(file, 'utf8')
+      for (const term of terms) {
+        assert.ok(
+          !text.includes(term),
+          `${path.relative(ROOT, file)} must not contain other-package term: ${term}`,
+        )
+      }
+    }
+  }
+})
+
 void test('SKILL.md routing paths exist', () => {
   const refs = new Set()
   for (const match of read('SKILL.md').matchAll(

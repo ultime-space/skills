@@ -446,7 +446,7 @@ void test('design-system A21: package docs must not reference internal docs', ()
   const root = tempRoot()
   try {
     write(root, 'packages/ui/package.json', JSON.stringify({ name: '@x/ui' }))
-    write(root, 'packages/ui/README.md', '见 `docs/开发计划/x.md`\n见 `../docs/guide.md`\n自带文档：`docs/guide.md`\n')
+    write(root, 'packages/ui/README.md', '见 `../docs/plan/x.md`\n见 `../docs/guide.md`\n自带文档：`docs/guide.md`\n')
 
     const designSystem = check(root, { pack: 'design-system' }).findings
     const library = check(root, { pack: 'library' }).findings
@@ -500,7 +500,7 @@ void test('exclude: library pack skips generated candidates and package docs', (
   try {
     write(root, 'packages/ui/package.json', JSON.stringify({ name: '@x/ui' }))
     write(root, 'packages/ui/dist/tokens.css', 'body { color: red }\n')
-    write(root, 'packages/ui/README.md', '见 `docs/开发计划/x.md`\n')
+    write(root, 'packages/ui/README.md', '见 `../docs/plan/x.md`\n')
 
     const filtered = check(root, {
       pack: 'design-system',

@@ -258,7 +258,7 @@ codecraft <command> [options]
 
 ```bash
 codecraft check --root .
-codecraft check --pack library --root ../../packages/core
+codecraft check --pack library --root ../packages/ui
 codecraft check --pack design-system
 codecraft check --format json --ci
 codecraft check --changed --ci                    # 只看变更 / 未跟踪文件
