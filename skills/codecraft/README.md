@@ -6,7 +6,7 @@
 - 版本：见 [VERSION](./VERSION)
 - npm：[@ultime/codecraft](https://www.npmjs.com/package/@ultime/codecraft)
 - 许可：MIT（[LICENSE](./LICENSE)）
-- 环境：Node.js >= 20；零运行时依赖
+- 环境：Node.js >= 22.18；零运行时依赖
 - 形态：规则文档 + 场景 + 适配器 + CLI + 脚手架
 
 ## 这是什么
@@ -456,7 +456,7 @@ evals/        CLI eval fixtures + golden tasks（人工回归）
 - **`check` / `audit` / `plan` 有什么区别？** `check` 只跑内置规则；`audit` 额外跑 config 里的 gates；`plan` 只读，把 findings 转成计划，默认不跑 gates。
 - **为什么不自动跑 typecheck / test？** 门禁由项目提供，Codecraft 只编排，避免第二套实现。
 - **monorepo 为什么被判成 app / library？** 有 `pages/`、`app/`、`manifest.json + pages.json`、Taro / uni-app / Vue CLI 标记、单页 Web 入口或嵌套应用时按 `app`；有 `packages/` 或 `src/` 时按 `library`；仍不确定就显式传 `--pack`。
-- **支持后端吗？** 支持，读 `docs/backend/` 一轨；后端轨不绑定运行时与框架，CLI 本身仍需 Node.js >= 20。后端审计按 `docs/backend/13-audit.md` 人工补齐，不把 CLI 的 `0 findings` 当通过。
+- **支持后端吗？** 支持，读 `docs/backend/` 一轨；后端轨不绑定运行时与框架，CLI 本身仍需 Node.js >= 22.18。后端审计按 `docs/backend/13-audit.md` 人工补齐，不把 CLI 的 `0 findings` 当通过。
 - **同一个仓库前后端都有，怎么审计？** 分两次跑：先说明端与目录（`client/` / `server/`），每次只读该端族卡与审计文件；不要在一次报告里混用两端判定。
 - **支持哪些文件？** A2 / A6 / A11 / A17 扫描 JS/TS 相关扩展名与 `package.json`；A21 额外扫描配置与后端源码（`.yml` / `.yaml` / `.env` / `.properties` / `.xml` / `.java` / `.kt` 等）里的明文密钥。其它语言仍不在检查范围。
 

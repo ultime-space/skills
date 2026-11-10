@@ -7,7 +7,7 @@
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./skills/codecraft/LICENSE)
 
-> 三个包同一套运行环境（Node.js >= 20）与同一份许可（MIT），版本各自独立。
+> 三个包同一套运行环境（Node.js >= 22.18）与同一份许可（MIT），版本各自独立。
 
 ---
 
@@ -29,7 +29,7 @@ npx skills add ultime-space/skills --skill='*' -g
 
 - 不传 `-a` 时，CLI 会检测本机 agent 并让你多选；agent 支持由 `skills` CLI 维护，本仓不枚举。
 - 非交互场景用 `-a <agent>`，例如 `-a claude-code`。
-- 需要 Node.js >= 22.20（`skills` CLI 的要求）。
+- 需要 Node.js >= 22.20（`skills` CLI 的要求；三个包本身要求 >= 22.18）。
 
 装好后对 AI 说：
 
@@ -68,7 +68,7 @@ npm i -D @ultime/codecraft @ultime/docscraft @ultime/designcraft skills-npm
 npx skills-npm setup
 ```
 
-每次 `npm install` 会把三个包（`node_modules/@ultime/codecraft`、`node_modules/@ultime/docscraft`、`node_modules/@ultime/designcraft`）同步到 `.agents/skills/` 及检测到的 agent 目录。需要 Node.js >= 22.20。
+每次 `npm install` 会把三个包（`node_modules/@ultime/codecraft`、`node_modules/@ultime/docscraft`、`node_modules/@ultime/designcraft`）同步到 `.agents/skills/` 及检测到的 agent 目录。需要 Node.js >= 22.20（`skills` CLI 的要求；包本身 >= 22.18）。
 
 ### C · 手动指针（不复制文件）
 
