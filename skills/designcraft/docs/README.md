@@ -17,7 +17,7 @@
 | [states](./states.md) | 交互态、数据态、异步态、状态组合、输入环境 |
 | [data-graphics-content](./data-graphics-content.md) | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 |
 | [composition](./composition.md) | 构图原则、场景对照、构图评审问题 |
-| [patterns](./patterns.md) | 内容关系、结构变体、四项代价、结构方案、组合与冲突 |
+| [patterns](./patterns.md) | 内容关系、结构变体、五项代价、结构方案、页面族约定、组合与冲突 |
 | [review](./review.md) | 规范评审与设计批评、流程、证据、分级、边界 |
 | [style](./style.md) | 风格 = 维度组合、系统原生风格、流行 recipe、警告与 style brief |
 
@@ -40,7 +40,7 @@
 | 状态语义、状态组合、输入环境 | `states.md` |
 | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 | `data-graphics-content.md` |
 | 构图原则、场景对照 | `composition.md` |
-| 结构变体、四项代价、组合与冲突 | `patterns.md` |
+| 结构变体、五项代价、页面族约定、组合与冲突 | `patterns.md` |
 | 评审流程、两条轨道、分级与边界 | `review.md` |
 | 风格家族、风格 recipe、风格警告 | `style.md` |
 
