@@ -2,11 +2,14 @@
 
 > 定位：给贡献者与 AI 的最短协作规则；规范正文在 `docs/`。
 
-## 工作流
+## Git 流程
 
-1. 从 `main` 切分支：`feat/<主题>` / `fix/<主题>`。
-2. 开发完成后 `git rebase main`，再合并回 `main`；主分支不保留中间提交。
-3. 一次提交一件事；提交信息用 `type(scope): subject`，正文写「为什么」。
+1. 从 `main` 切 `feat/<主题>` / `fix/<主题>` / `docs-<主题>`。
+2. 开发完成后 `git rebase main`；一次提交一件事，提交信息用 `type(scope): subject`，正文写「为什么」。
+3. push 分支并开 PR；CI 必须通过，评论必须解决。
+4. 用 rebase / squash 合并，删除分支；`main` 不保留中间提交。
+5. 不直接 push `main`，不 force push、不删除 `main`；`main` 受保护，管理员也一样。
+6. 发布按包版本打 tag，由 CI 执行；tag 规则见仓库保护设置。
 
 ## 改动规则
 
@@ -26,6 +29,18 @@ npm pack --dry-run    # 查看实际打包文件
 - 新增 / 修改文档结构必须过 `npm test`；被引用的路径必须存在。
 - `release-check` 会按 npm 实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，例外写在 `ALLOW` 并注明理由。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
+
+## Review
+
+提交 PR 前自查五件事：
+
+- **文档**：README / 用法 / 示例是否仍准确；链接、版本、CHANGELOG 是否同步。
+- **注释**：只写为什么、约束、反直觉处；不复述代码。
+- **冗余**：同一事实只有一份正文；新增说明先改真源，其他位置只留指针。
+- **缺漏**：新增能力是否有入口、示例与验证命令。
+- **漂移**：`package.json` / README / `CHANGELOG` / VERSION 版本是否一致。
+
+机械检查交给 CI；人审看架构、边界、语义与取舍。
 
 ## 发布前自检
 
