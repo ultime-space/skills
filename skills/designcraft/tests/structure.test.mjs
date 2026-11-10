@@ -25,6 +25,7 @@ const REQUIRED = [
   'docs/states.md',
   'docs/data-graphics-content.md',
   'docs/composition.md',
+  'docs/patterns.md',
   'docs/review.md',
   'docs/style.md',
   'scenarios/review-typography.md',
@@ -40,12 +41,14 @@ const REQUIRED = [
   'scenarios/build-style.md',
   'scenarios/configure-brand-color.md',
   'scenarios/check-contrast-audit.md',
+  'scenarios/refine.md',
   'prompts/output.md',
   'templates/review-report.md',
   'templates/brand-color-check.md',
   'templates/design-spec.md',
   'templates/critique-report.md',
   'templates/style-brief.md',
+  'templates/option-set.md',
   'evals/golden-tasks.md',
 ]
 
@@ -207,6 +210,22 @@ void test('docs, scenarios, prompts and templates avoid CSS property names', () 
           `${path.relative(ROOT, file)} must use design language instead of CSS term: ${term}`,
         )
       }
+    }
+  }
+})
+
+void test('pattern entries keep the five required fields', () => {
+  const blocks = read('docs/patterns.md')
+    .split(/^### /m)
+    .slice(1)
+    .filter((block) => /^P\d+/.test(block))
+
+  assert.ok(blocks.length >= 10, `patterns.md should declare at least 10 entries, got ${blocks.length}`)
+
+  for (const field of ['**适用**', '**结构**', '**代价**', '**反例**', '**窄屏**']) {
+    for (const block of blocks) {
+      const name = block.split('\n')[0].trim()
+      assert.ok(block.includes(field), `${name} misses ${field}`)
     }
   }
 })

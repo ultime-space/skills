@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0
+
+- 新增 `docs/patterns.md`：结构方案库。先按内容关系（单条 / 同构集合 / 比较集合 / 主辅 / 序列 / 录入 / 异构聚合）定可选上限，再按目标与最坏内容选变体，代价只记可比较性、一屏信息量、定位成本与最坏内容风险。
+- 收录结构方案：详情页分层、长内容披露位置、同构集合单元形态与密度、集合分组、表格与卡片列表的取舍、多列数据窄屏退法、主辅并置与退法、序列结构、表单标签位置与栏数、异构卡片聚合。
+- 收录状态姿态：空态三语义、表单错误两处呈现、加载姿态；状态语义仍由 `docs/states.md` 拥有，本文件只讲摆放。
+- 新增 `scenarios/refine.md`：Refine 模式。已有页面只调结构、排列、主次与密度，出 2–3 套方案；A 排列级默认开放，B 结构级需同意。
+- 新增 `templates/option-set.md` 与 `prompts/output.md` 的「方案集」格式。
+- `SKILL.md`：模式表新增 Refine，路由表新增结构方案一行；`docs/README.md` 补索引与归属，并注明方案库是经验而非规则。
+- 新增 evals：同构集合方案、详情页与长文案、仪表盘密度、方案集边界。
+- 结构测试新增 `docs/patterns.md`、`scenarios/refine.md`、`templates/option-set.md` 必需文件与「每条方案保留五个字段」检查。
+
 ## 0.9.2
 
 - 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。

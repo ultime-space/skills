@@ -1,6 +1,6 @@
 # Designcraft
 
-面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
+面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、结构方案、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
 
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./LICENSE)
@@ -25,7 +25,7 @@ npx skills add ultime-space/skills --skill designcraft
 
 ## 常用场景怎么说
 
-先说模式（Audit / Plan / Apply）、范围、声明底。下面可以直接复制。
+先说模式（Audit / Plan / Compose / Refine / Style / Apply）、范围、声明底。下面可以直接复制。
 
 **排版评审**
 
@@ -62,6 +62,13 @@ npx skills add ultime-space/skills --skill designcraft
 重点：哪些是可评审项，哪些是项目自检，哪些是未知底。
 ```
 
+**结构方案（Refine）**
+
+```text
+用 Designcraft 按 scenarios/refine.md 给这一页 2–3 套结构方案，Refine 模式。
+内容固定：<字段与条目数量>；现状：单列列表，用户说太平、没重点；范围：只改排列与密度，不改顺序。
+```
+
 更多场景见 [`scenarios/`](./scenarios/) 与 [`prompts/output.md`](./prompts/output.md)。
 
 ## 适用
@@ -71,6 +78,7 @@ npx skills add ultime-space/skills --skill designcraft
 - 对比度目标、门槛、分级的对齐
 - 设计值的取档与语义角色检查
 - 页面结构、滚动归属、栅格与响应式的设计建议
+- 已有页面的结构方案：同一份内容换成哪几种排法、各付什么代价
 - 给 AI 一个稳定的设计判断入口
 
 ## 不适用
@@ -98,6 +106,7 @@ designcraft/
 │   ├── states.md
 │   ├── data-graphics-content.md
 │   ├── composition.md
+│   ├── patterns.md
 │   ├── review.md
 │   └── style.md
 ├── scenarios/
@@ -113,14 +122,16 @@ designcraft/
 │   ├── compose-component.md
 │   ├── build-style.md
 │   ├── configure-brand-color.md
-│   └── check-contrast-audit.md
+│   ├── check-contrast-audit.md
+│   └── refine.md
 ├── prompts/output.md
 ├── templates/
 │   ├── review-report.md
 │   ├── brand-color-check.md
 │   ├── design-spec.md
 │   ├── critique-report.md
-│   └── style-brief.md
+│   ├── style-brief.md
+│   └── option-set.md
 ├── evals/golden-tasks.md
 ├── tests/                 结构、版本对齐、相对链接、SKILL 路由、适用范围头、纯知识检查
 ├── scripts/               release-check（版本 / CHANGELOG / 打包文件）
@@ -139,22 +150,27 @@ npm pack --dry-run    # 查看实际打包文件
 
 `release-check` 会读取 npm 的实际打包清单，逐文件扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，需要例外时在 `ALLOW` 里写明理由，不用注释绕过。
 
-## 三条底线
+## 四条底线
 
 1. **判据可引用**：结论必须回到 `docs/` 的规则或可反解的约束；给不出就标「偏好」。
 2. **目标先行**：对比度目标 / 档位是设计值，alpha 与色值是产物，不反过来用 alpha 定义档位。
 3. **边界清晰**：只给设计知识、报告与建议；不做强制检查，不替使用者做决定。
+4. **方案不是规则**：结构方案只报代价与偏好开关，不写成规范条款，也不给唯一答案。
 
 ## 参考与方法来源
 
 Designcraft 是面向 AI 的设计知识，不复制外部正文。设计时对照过：
 
 - WCAG 2.2：1.4.3 对比度（最低）、1.4.6 对比度（增强）、1.4.11 非文本对比
-- Material Design 3：颜色与对比度实践
+- Material Design 3：颜色与对比度实践、列表与卡片、典型布局
+- 政府服务与电商后台的公开设计体系：表格、摘要列表、资源列表、空态与错误汇总的结构条件
 - APCA / WCAG 3 草案：仅作评估参考，不作当前门槛
+
+方案库只取结构与适用条件，不复制文案、截图或视觉资产；站点文案的许可未逐项核实，因此不转述原文。
 
 ## 版本
 
+- `0.10.0`：新增结构方案库、Refine 模式、方案集模板与对应 evals；方案库按内容关系与四项代价组织，是经验而非规则。
 - `0.9.2`：新增发布内容检查，按实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件。
 - `0.9.1`：状态叠墨改为目标反解，语义色四状态，`pressed` 统一；P9 / P12 对齐；画布对称带补 1.26；动效角色表改档号；排版补 `small` / `row` 说明。
 - `0.9.0`：面改为层级 + 填充 + 形态；光影改为全局光 / 环境光两套系统与五个光槽；受光边跟方位角、方向高光必须有环境底；投影改为三层结构；扁平补组合轴与反例。
