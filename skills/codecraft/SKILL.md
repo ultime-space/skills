@@ -68,9 +68,13 @@ description: 面向 JS/TS 的代码规范与代码架构设计（Codecraft）。
 
 ## 模式
 
-- **Audit**：只读，出报告（CLI 的 `audit` 默认只跑静态规则，gates 需 `--run-gates`）。
-- **Plan**：只读，出架构 / 升级计划（CLI 的 `plan` 默认不执行项目命令，`--with-gates` 例外）。
-- **Apply**：改代码 + 跑门禁。
+| 模式 | 读写 | 产物 |
+|---|---|---|
+| **Audit** | 只读 | 审计报告（CLI 的 `audit` 默认只跑静态规则，gates 需 `--run-gates`） |
+| **Plan** | 只读 | 架构 / 升级计划（CLI 的 `plan` 默认不执行项目命令，`--with-gates` 例外） |
+| **Apply** | 可改代码并跑门禁，需明确要求 | 改动后的代码与验证结果 |
+
+默认出报告；只有明确要求才改代码。
 
 ## 工作流
 

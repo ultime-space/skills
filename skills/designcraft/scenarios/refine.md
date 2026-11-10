@@ -6,14 +6,14 @@
 
 ## 触发与不触发
 
-| 请求 | 走哪个模式 |
-|---|---|
-| 点名改哪里（「把间距调大」） | 直接按 Plan 改，不启动本场景 |
-| 从 brief 出新页面 | [`compose-page.md`](./compose-page.md) |
-| 已有页面，只调结构、排列、层级、密度 | **本场景** |
-| 判断是否合规 | [`review-critique.md`](./review-critique.md) |
-| 选风格 | [`build-style.md`](./build-style.md) |
-| 只换颜色、圆角、装饰 | 不算结构方案；按风格与评审处理 |
+| 请求 | 模式 | 场景 |
+|---|---|---|
+| 点名改哪里（「把间距调大」） | Plan | 直接给调整，不启动本场景 |
+| 从 brief 出新页面 | Plan | [`compose-page.md`](./compose-page.md) |
+| 已有页面，只调结构、排列、层级、密度 | Plan | **本场景** |
+| 判断是否合规 | Audit | [`review-critique.md`](./review-critique.md) |
+| 选风格 | Plan | [`build-style.md`](./build-style.md) |
+| 只换颜色、圆角、装饰 | — | 不算结构方案；按风格与评审处理 |
 
 ## 输入
 

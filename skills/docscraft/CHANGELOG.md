@@ -4,6 +4,7 @@
 
 - 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。
 - README / CONTRIBUTING 补检查说明与例外写法。
+- `SKILL.md` 模式改为统一表（Audit / Plan / Apply × 读写 × 产物），明确默认出报告，Apply 需明确要求。
 
 ## 0.4.0 - 2026-11-04
 
