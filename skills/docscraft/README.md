@@ -107,7 +107,7 @@ docscraft/
 │   └── adr.md
 ├── evals/golden-tasks.md
 ├── tests/                 结构、术语与清单覆盖测试
-├── scripts/               release-check（版本 / CHANGELOG / 打包文件）
+├── scripts/               release-check（版本 / CHANGELOG / 打包清单 + 内容扫描）
 ├── package.json
 ├── VERSION
 └── CHANGELOG.md
@@ -117,9 +117,11 @@ docscraft/
 
 ```bash
 npm test              # 结构、版本对齐、相对链接、SKILL 路由路径、路由覆盖、清单覆盖
-npm run release-check # 版本 / CHANGELOG / 打包文件
-npm pack --dry-run    # 检查发布内容
+npm run release-check # 版本 / CHANGELOG / 打包清单 + 发布内容扫描
+npm pack --dry-run    # 查看实际打包文件
 ```
+
+`release-check` 会读取 npm 的实际打包清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，需要例外时在 `ALLOW` 里写明理由。
 
 改动文档结构或新增场景时，同步更新 `SKILL.md` 路由表；测试会检查被引用的路径是否存在，以及 `docs/contracts/01-checklist.md` 是否覆盖 `docs/guides/00-drift-guards.md` 的全部漂移类型。
 

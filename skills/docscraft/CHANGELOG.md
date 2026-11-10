@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 - 2026-11-10
+
+- 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。
+- README / CONTRIBUTING 补检查说明与例外写法。
+
 ## 0.4.0 - 2026-11-04
 
 - `docs/contracts/00-ai-context.md`：补 Agent Skills 标准与预算（frontmatter 必填 / 可选字段、目录约定、三级渐进披露、`skills-ref validate`）与「AGENTS.md vs SKILL.md」选择判据。

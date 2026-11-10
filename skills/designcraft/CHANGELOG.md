@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2
+
+- 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。
+- README / CONTRIBUTING 补检查说明与例外写法。
+
 ## 0.9.1
 
 - `docs/color.md`：状态叠墨改为目标 1.08 / 1.12 / 1.03 + alpha 反解；语义色改为四个状态；`active` 统一为 `pressed`；补 focus 不计入 fill 状态。

@@ -2,6 +2,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { collectPackageFindings } from './check-package-content.mjs'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8')
@@ -42,6 +43,12 @@ for (const file of requiredFiles) {
 for (const dir of requiredDirs) {
   if (!fs.existsSync(path.join(ROOT, dir))) problems.push(`missing ${dir}/`)
   if (!pkg.files.includes(dir)) problems.push(`package.json files[] misses ${dir}`)
+}
+
+try {
+  problems.push(...collectPackageFindings(ROOT))
+} catch (error) {
+  problems.push(`package content check failed: ${error.message}`)
 }
 
 if (problems.length) {

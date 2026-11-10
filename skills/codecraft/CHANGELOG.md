@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 - 2026-11-10
+
+- 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。
+- 占位夹具 `evals/fixtures/a21-placeholders/.env` 在 `ALLOW` 中登记理由，避免被密钥规则误拦。
+- CONTRIBUTING 补检查说明与例外写法。
+
 ## 2.0.1 - 2026-11-09
 
 - 清理其他产品内容：A21 只识别向上一级的根 `docs/`，不再硬编码内部目录名；生成物识别改用 `tokens.*` 模式。

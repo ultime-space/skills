@@ -18,11 +18,12 @@
 
 ```bash
 npm test              # 结构、版本对齐、相对链接、SKILL 路由、适用范围头、纯知识检查
-npm run release-check # 版本 / CHANGELOG / 打包文件
-npm pack --dry-run    # 检查发布内容
+npm run release-check # 版本 / CHANGELOG / 打包清单 + 发布内容扫描
+npm pack --dry-run    # 查看实际打包文件
 ```
 
 - 新增 / 修改文档结构必须过 `npm test`；被引用的路径必须存在。
+- `release-check` 会按 npm 实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，例外写在 `ALLOW` 并注明理由。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
 
 ## 版本号
