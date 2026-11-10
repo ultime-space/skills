@@ -79,6 +79,14 @@ codecraft check --changed --format sarif > codecraft.sarif
 
 `--changed` / `--since` 只过滤 findings；底层仍做全量扫描。CI 检出的是干净工作区，此时单独 `--changed` 无变更文件会以 2 退出并提示改用 `--since <base>`。SARIF 可直接上传 GitHub Code Scanning。
 
+### 4.3 存量接入（baseline）
+
+- `baseline` 记录已接受的存量 findings；启用后只对**新增**问题失败；
+- `--update-baseline` 只在本地 / 迁移期使用；CI 不允许生成，否则等于把新问题写进豁免；
+- 只减不增：已有基线时拒绝新增条目，确需重建用 `--force`，并在 PR 说明原因；
+- baseline 不替代 `ignore`：单点例外仍用 `rule` / `file` / `reason` / `expires` 登记，到期复核；
+- 基线文件随仓提交；升级工具后若指纹漂移，重新生成并单独提交。
+
 ## 5. 执行顺序
 
 1. 快速静态（内置规则、lint）；
