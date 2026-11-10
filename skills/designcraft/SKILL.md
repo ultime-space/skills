@@ -13,7 +13,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | 项 | 内容 |
 |---|---|
 | 覆盖 | 设计原则与语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、结构方案、评审与风格 |
-| 可复用 | 任意设计系统 / 组件库的设计评审、取档、对比度核对、页面结构、层级、状态、设计规格、结构方案与风格 brief |
+| 可复用 | 任意设计系统 / 组件库的设计评审、取档、对比度核对、页面结构、层级、状态、设计规格、结构方案与风格方案集 |
 | 不适用 | 代码规范与代码架构（用 Codecraft）；文档组织（用 Docscraft）；业务建模 |
 | 不在范围 | 品牌创作、插画、图标绘制；强制检查与阻断性结论；具体实现与工具命令；导航与信息架构、多步流程 |
 
@@ -24,7 +24,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | `docs/` | 面向 AI 的设计知识：基础、颜色、排版、空间与形状、布局、表面与光影、动效、状态、数据 / 图形 / 内容、构图、结构方案、评审、风格 |
 | `scenarios/` | 各维度评审、内容评审、设计批评、页面 / 组件设计规格、风格构建、品牌色配置、评审分级、结构方案 |
 | `prompts/` | 输出格式 |
-| `templates/` | 评审报告、品牌色检查表、设计规格、批评报告、风格 brief、方案集 |
+| `templates/` | 评审报告、品牌色检查表、设计规格、批评报告、风格方案集、方案集 |
 | `evals/` | 黄金任务 |
 
 ## 读法（按任务路由）
@@ -45,7 +45,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | 设计批评 | `docs/review.md` + `scenarios/review-critique.md` | 批评报告 |
 | 页面设计规格 | `docs/composition.md` + `docs/layout.md` + `scenarios/compose-page.md` | 设计规格 |
 | 组件设计规格 | `docs/space-shape.md` + `docs/states.md` + `scenarios/compose-component.md` | 设计规格 |
-| 构建风格 | `docs/style.md` + `scenarios/build-style.md` | 风格 brief |
+| 构建风格 | `docs/style.md` + `scenarios/build-style.md` | 风格方案集 |
 | 配置品牌色 | `docs/color.md` + `scenarios/configure-brand-color.md` | 可达性结论 + 建议 |
 | 审计分级 / 边界 | `docs/color.md` + `scenarios/check-contrast-audit.md` | 分级说明 |
 | 知识库索引 | `docs/README.md` | 阅读顺序与单一归属 |
@@ -65,7 +65,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 - **Compose**：从 brief 出设计规格，不写代码。
 - **Refine**：已有页面只调结构、排列、主次与密度，出方案集；不改内容与合规结论。
 - **Critique**：设计批评，给分数、证据与建议；不改变规范结论。
-- **Style**：选择 / 组合风格，输出风格 brief；只给建议与警告。
+- **Style**：选择 / 组合风格，输出 2–3 套风格方案与取舍；只给建议与警告，保留使用者选择权。
 - **Apply**：只改文档或报告，不改代码与设计值。
 
 本 skill 只给知识、报告与建议；使用者可以选择遵循，也可以选择不完全遵循，不做强制检查。
