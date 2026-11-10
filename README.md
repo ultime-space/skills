@@ -3,14 +3,11 @@
 面向 AI 编程的 skill 集合。每个 skill 自包含：规则、适配器、版本都在各自目录内；安装交给 [`skills`](https://github.com/vercel-labs/skills) CLI，不在本仓维护 agent 列表。
 
 [![npm](https://img.shields.io/npm/v/@ultime/codecraft?label=%40ultime%2Fcodecraft&color=black)](https://www.npmjs.com/package/@ultime/codecraft)
-[![node](https://img.shields.io/node/v/@ultime/codecraft?label=node)](https://www.npmjs.com/package/@ultime/codecraft)
-[![license](https://img.shields.io/badge/license-MIT-black)](./skills/codecraft/LICENSE)
 [![npm](https://img.shields.io/npm/v/@ultime/docscraft?label=%40ultime%2Fdocscraft&color=black)](https://www.npmjs.com/package/@ultime/docscraft)
-[![node](https://img.shields.io/node/v/@ultime/docscraft?label=node)](https://www.npmjs.com/package/@ultime/docscraft)
-[![license](https://img.shields.io/badge/license-MIT-black)](./skills/docscraft/LICENSE)
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
-[![node](https://img.shields.io/node/v/@ultime/designcraft?label=node)](https://www.npmjs.com/package/@ultime/designcraft)
-[![license](https://img.shields.io/badge/license-MIT-black)](./skills/designcraft/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-black)](./skills/codecraft/LICENSE)
+
+> 三个包同一套运行环境（Node.js >= 20）与同一份许可（MIT），版本各自独立。
 
 ---
 
