@@ -10,7 +10,7 @@
 2. 开发完成后 `git rebase main`，再合并回 `main`；主分支不保留中间提交。
 3. 一次提交一件事；提交信息用 `type(scope): subject`，正文写「为什么」。
 
-## 改规则
+## 改动规则
 
 - 先改本地底稿，确认后再改 `docs/`；不在本仓保留调研来源。
 - 规则改动必须同时更新：规则正文、`evals/golden-tasks.md`、相关测试。
@@ -31,7 +31,7 @@ node bin/codecraft.mjs check --root <项目>
 - `release-check` 会按 npm 实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，例外写在 `ALLOW` 并注明理由。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
 
-## 版本号
+## 版本
 
 只按 semver，不按「感觉重要」升 major：
 
