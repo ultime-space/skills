@@ -1,6 +1,6 @@
 {
   "name": "@ultime/codecraft",
-  "version": "2.0.3",
+  "version": "3.0.1",
   "description": "面向 JS/TS 的代码规范与架构设计（前端与 JS/TS 后端分轨），作为可安装的 skill 包。",
   "keywords": [
     "ai",
@@ -56,6 +56,6 @@
     "prepublishOnly": "npm test && npm run release-check && npm run self-check"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.18"
   }
 }

@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     defaults:
       run:
         working-directory: skills/codecraft
@@ -16,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
 
       - run: npm test
       - run: npm run eval
@@ -25,6 +29,10 @@ jobs:
 
   docscraft:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     defaults:
       run:
         working-directory: skills/docscraft
@@ -33,13 +41,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
 
       - run: npm test
       - run: npm pack --dry-run
 
   designcraft:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     defaults:
       run:
         working-directory: skills/designcraft
@@ -48,7 +60,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
 
       - run: npm test
       - run: npm run release-check
