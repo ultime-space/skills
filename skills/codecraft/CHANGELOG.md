@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.3 - 2026-11-10
+
+- 发布内容不再包含 `evals/`（含夹具与占位 `.env`）；`release-check` 明确区分包内目录与仓库开发目录，开发目录误入 `files` 会失败。
+- README 标注发布边界：`tests/` / `evals/` / `scripts/` 只在仓库内。
+
 ## 2.0.2 - 2026-11-10
 
 - 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。

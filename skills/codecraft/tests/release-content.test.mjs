@@ -27,15 +27,17 @@ test('内容检查：例外按文件与规则放行', () => {
   assert.equal(scanText('b.md', '/Users/alice/project', allow).length, 1)
 })
 
-test('文件检查：测试、依赖、编辑器与密钥', () => {
+test('文件检查：测试、eval、依赖、编辑器与密钥', () => {
   assert.equal(scanFileName('tests/a.md').length, 1)
+  assert.equal(scanFileName('evals/golden-tasks.md').length, 1)
   assert.equal(scanFileName('node_modules/a.js').length, 1)
   assert.equal(scanFileName('.trae/a.md').length, 1)
-  assert.equal(scanFileName('evals/fixtures/.env').length, 1)
+  assert.equal(scanFileName('fixtures/.env').length, 1)
   assert.equal(scanFileName('docs/a.md').length, 0)
 })
 
 test('文件检查：例外按路径放行', () => {
-  const allow = [{ file: 'evals/fixtures/.env', rule: 'secret', reason: 'test' }]
-  assert.equal(scanFileName('evals/fixtures/.env', allow).length, 0)
+  const allow = [{ file: 'fixtures/.env', rule: 'secret', reason: 'test' }]
+  assert.equal(scanFileName('fixtures/.env', allow).length, 0)
+  assert.equal(scanFileName('other/.env', allow).length, 1)
 })

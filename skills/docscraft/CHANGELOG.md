@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2 - 2026-11-10
+
+- 发布内容不再包含 `evals/`；`release-check` 校验开发目录不进 `files`。
+- README 标注发布边界：`evals/` / `tests/` / `scripts/` 只在仓库内。
+- 包级文档模型把 `agent.md` 并入 `AGENTS.md`：入口与操作约束同一份，减少文件数与重复红线。
+- 文档名统一：能力表由 `skills.md` 改为 `SKILLS.md`，包根进入约定名（`llms.txt` 按外部约定保持小写）。
+- 补发布边界：`llms.txt` / `SKILLS.md` 随包发布，`AGENTS.md` / `rules/` 留仓。
+
 ## 0.4.1 - 2026-11-10
 
 - 新增发布内容检查 `scripts/check-package-content.mjs`：读取 `npm pack` 实际清单，扫描内部仓库路径、内部包名、本地绝对路径与敏感文件；`release-check` 与 `prepublishOnly` 同步执行。
