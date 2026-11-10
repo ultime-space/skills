@@ -2,6 +2,7 @@
 
 > 适用：页面级构图判断、场景取舍、设计批评的前置检查。
 > 评审步骤见 [`scenarios/review-critique.md`](../scenarios/review-critique.md)。
+> 视觉重量、光学对齐、文字轴与护角见 [optical-alignment](./optical-alignment.md)；本文件只保留构图原则与场景。
 
 ## 1 构图原则
 

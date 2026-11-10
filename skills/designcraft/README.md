@@ -1,6 +1,6 @@
 # Designcraft
 
-面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、结构方案、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
+面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、光学对齐、结构方案、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
 
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./LICENSE)
@@ -46,6 +46,13 @@ npx skills add ultime-space/skills --skill designcraft
 ```text
 用 Designcraft 评审这个页面的间距、控件高度、密度、热区、圆角和边界，Audit 模式，只读。
 范围：<移动 / 平板 / 桌面>；重点看是否落在档位、compact 是否兜底热区、是否只有一个滚动容器。
+```
+
+**光学对齐**
+
+```text
+用 Designcraft 检查这套图标和圆角卡片的光学对齐，Audit 模式，只读。
+范围：<图标组 / 卡片列表 / 表单控件>；重点看可见轮廓、文字轴与护角、控件与首行文字。
 ```
 
 **配置品牌色**
@@ -128,6 +135,7 @@ designcraft/
 │   ├── states.md
 │   ├── data-graphics-content.md
 │   ├── composition.md
+│   ├── optical-alignment.md
 │   ├── patterns.md
 │   ├── project-types.md
 │   ├── review.md
@@ -197,8 +205,9 @@ Designcraft 是面向 AI 的设计知识，不复制外部正文。设计时对�
 
 ## 版本
 
-当前版本 `0.11.1`（见 [VERSION](./VERSION)）。
+当前版本 `0.12.0`（见 [VERSION](./VERSION)）。
 
+- `0.12.0`：新增光学对齐主题 `docs/optical-alignment.md`：几何 / 墨迹 / 质量中心三套基准、视觉重量、图标组、文字轴与圆角护角、审计与边界；构图 / 排版 / 空间形状只留指针；模糊—质心是可选验证。
 - `0.11.1`：发布内容收紧——`evals/` 不再随包发布，`release-check` 校验开发目录不进 `files`。
 - `0.11.0`：新增类型倾向层 `docs/project-types.md`：8 类项目 × 10 类页面角色，覆盖首页与二级页；平台硬限制与适老硬要求单独成节；类型只调权重，角色任务优先；不写成模板或硬规则。
 - `0.10.0`：新增结构方案库、结构方案场景与方案集模板、五项代价与页面族约定；模式收敛为 Audit / Plan / Apply；方案库按内容关系组织，是经验而非规则。

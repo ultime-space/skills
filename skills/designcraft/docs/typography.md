@@ -147,6 +147,8 @@
 
 ## 10 行内图标与文字对齐
 
+> 图标组、文字与圆角容器、控件与首行文字的对齐见 [optical-alignment](./optical-alignment.md)；本节只管行内图标与文字的垂直对位。
+
 目标：图标在行盒内与文字视觉居中，等效于 `align-items: center`，但保持行内流动。
 
 ```css
