@@ -113,6 +113,8 @@ docscraft/
 └── CHANGELOG.md
 ```
 
+> 发布边界：npm 包只含 `SKILL.md` / `docs` / `scenarios` / `prompts` / `templates` 与附属文件；`evals/` / `tests/` / `scripts/` 只在仓库内，不随包发布。
+
 ## 验证
 
 ```bash

@@ -435,6 +435,8 @@ templates/    init --apply 骨架 + 架构报告 / 体检报告 / 架构设计 /
 evals/        CLI eval fixtures + golden tasks（人工回归）
 ```
 
+> 发布边界：npm 包只含 `SKILL.md` / `docs` / `scenarios` / `adapters` / `prompts` / `src` / `bin` / `templates` 与附属文件；`tests/` / `evals/` / `scripts/` 只在仓库内，不随包发布。
+
 ## 版本与稳定承诺
 
 - semver；当前版本见 [VERSION](./VERSION)。

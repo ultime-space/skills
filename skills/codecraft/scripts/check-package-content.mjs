@@ -39,6 +39,7 @@ const TEXT_EXTENSIONS = new Set([
 /** 文件层：这些路径不应出现在发布物里。 */
 const FORBIDDEN_FILES = [
   { id: 'tests', pattern: /(^|\/)tests?\//, hint: '测试文件不随包发布' },
+  { id: 'evals', pattern: /(^|\/)evals?\//, hint: '评测用例与夹具不随包发布' },
   { id: 'node_modules', pattern: /(^|\/)node_modules\//, hint: '依赖目录不随包发布' },
   { id: 'vcs', pattern: /(^|\/)\.git\//, hint: '版本库目录不随包发布' },
   { id: 'editor', pattern: /(^|\/)\.(?:trae|vscode|idea)\//, hint: '编辑器配置不随包发布' },
@@ -67,11 +68,8 @@ const CONTENT_RULES = [
 
 /** 按文件放行的内容；每条例外都要写理由。 */
 const ALLOW = [
-  {
-    file: 'evals/fixtures/a21-placeholders/.env',
-    rule: 'secret',
-    reason: 'A21 的占位夹具，只含空值与变量引用，不含凭据',
-  },
+  // 示例：
+  // { file: 'README.md', rule: 'internal-package', reason: '安装示例需要引用自身包名' },
 ]
 
 function packFiles(root) {

@@ -34,16 +34,20 @@ for (const heading of headings) {
 }
 
 const requiredFiles = ['SKILL.md', 'README.md', 'VERSION', 'CHANGELOG.md']
-const requiredDirs = ['docs', 'scenarios', 'prompts', 'templates']
+const packagedDirs = ['docs', 'scenarios', 'prompts', 'templates']
+/** 仓库开发目录：必须存在，但不进 npm 包。 */
+const repoDirs = ['evals', 'tests', 'scripts']
 
-for (const file of requiredFiles) {
-  if (!fs.existsSync(path.join(ROOT, file))) problems.push(`missing ${file}`)
+for (const dir of repoDirs) {
+  if (!fs.existsSync(path.join(ROOT, dir))) problems.push(`missing ${dir}/`)
+  if (pkg.files.includes(dir)) problems.push(`package.json files[] 不应包含开发目录 ${dir}/`)
 }
-for (const dir of requiredDirs) {
+for (const dir of packagedDirs) {
   if (!fs.existsSync(path.join(ROOT, dir))) problems.push(`missing ${dir}/`)
   if (!pkg.files.includes(dir)) problems.push(`package.json files[] misses ${dir}`)
 }
 for (const file of requiredFiles) {
+  if (!fs.existsSync(path.join(ROOT, file))) problems.push(`missing ${file}`)
   if (!pkg.files.includes(file)) problems.push(`package.json files[] misses ${file}`)
 }
 
