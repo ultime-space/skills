@@ -27,6 +27,15 @@ npm pack --dry-run    # 查看实际打包文件
 - `release-check` 会按 npm 实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，例外写在 `ALLOW` 并注明理由。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
 
+## 发布前自检
+
+1. `VERSION` / `package.json` / `CHANGELOG.md` 版本一致（`npm test` 会校验）。
+2. `npm test` 通过。
+3. `npm run release-check` 通过。
+4. `npm pack --dry-run` 确认打包清单只含预期文件。
+5. 独立代理回归：至少覆盖入口、列表、详情、官网各一个样本；只给 skill 文件与页面路径，不给口头解释，不读既有评测记录。
+6. 发布由维护者执行；先确认该版本未发布，再发布。
+
 ## 版本
 
 只按 semver：

@@ -26,6 +26,7 @@ const REQUIRED = [
   'docs/data-graphics-content.md',
   'docs/composition.md',
   'docs/patterns.md',
+  'docs/project-types.md',
   'docs/review.md',
   'docs/style.md',
   'scenarios/review-typography.md',
@@ -227,6 +228,94 @@ void test('pattern entries keep the five required fields', () => {
       const name = block.split('\n')[0].trim()
       assert.ok(block.includes(field), `${name} misses ${field}`)
     }
+  }
+})
+
+void test('project-types.md declares 8 type cards and 10 role cards with required fields', () => {
+  const text = read('docs/project-types.md')
+  const blocks = text.split(/^### /m).slice(1)
+  const typeBlocks = blocks.filter((block) => /^T\d+\s/.test(block))
+  const roleBlocks = blocks.filter((block) => /^R\d+\s/.test(block))
+
+  assert.equal(typeBlocks.length, 8, `expected 8 type cards, got ${typeBlocks.length}`)
+  assert.equal(roleBlocks.length, 10, `expected 10 role cards, got ${roleBlocks.length}`)
+  assert.ok(text.split('\n').length <= 320, 'project-types.md should stay within the complexity budget')
+
+  const typeFields = ['**目标与阶段**', '**首屏**', '**典型二级页**', '**倾向**', '**常见错误**', '**不适用**']
+  const roleFields = [
+    '**要回答**',
+    '**必需元素**',
+    '**常见结构**',
+    '**对应条目**',
+    '**平台差异**',
+    '**常见错误**',
+    '**业务可自定**',
+  ]
+
+  for (const block of typeBlocks) {
+    const name = block.split('\n')[0].trim()
+    const body = block.split('\n## ')[0]
+    const bullets = body.split('\n').filter((line) => line.startsWith('- '))
+    assert.ok(bullets.length <= 6, `${name} exceeds the type card line budget`)
+    for (const field of typeFields) {
+      assert.ok(body.includes(field), `${name} misses ${field}`)
+    }
+    for (const term of ['必须', '禁止']) {
+      assert.ok(!body.includes(term), `${name} should stay a tendency, not a rule: ${term}`)
+    }
+  }
+
+  for (const block of roleBlocks) {
+    const name = block.split('\n')[0].trim()
+    const body = block.split('\n## ')[0]
+    const bullets = body.split('\n').filter((line) => line.startsWith('- '))
+    assert.ok(bullets.length <= 7, `${name} exceeds the role card line budget`)
+    for (const field of roleFields) {
+      assert.ok(body.includes(field), `${name} misses ${field}`)
+    }
+    for (const term of ['必须', '禁止']) {
+      assert.ok(!body.includes(term), `${name} should stay a tendency, not a rule: ${term}`)
+    }
+  }
+})
+
+void test('project-types.md supports read-only details and compound types', () => {
+  const text = read('docs/project-types.md')
+  const r4 = text.split(/^### /m).find((block) => block.startsWith('R4 '))
+  const s1 = read('docs/patterns.md')
+    .split(/^### /m)
+    .find((block) => block.startsWith('S1 '))
+
+  assert.ok(r4?.includes('只读详情'), 'R4 should allow a read-only detail without a main action')
+  assert.ok(r4?.includes('明确出口'), 'R4 should ask for an explicit exit when there is no main action')
+  assert.ok(s1?.includes('只读详情'), 'S1 should cover read-only details')
+  assert.ok(text.includes('类型可复合'), 'project-types.md should explain compound types')
+  assert.ok(text.includes('不叠加卡片'), 'compound types should not stack type cards')
+})
+
+void test('project-types.md only cites existing structure entries', () => {
+  const patterns = read('docs/patterns.md')
+  const ids = new Set([...read('docs/project-types.md').matchAll(/S(\d+)/g)].map((match) => `S${match[1]}`))
+
+  assert.ok(ids.size > 0, 'project-types.md should map role cards to structure entries')
+  for (const id of ids) {
+    assert.match(patterns, new RegExp(`^### ${id} `, 'm'), `project-types.md cites missing entry ${id}`)
+  }
+})
+
+void test('project-types.md separates platform limits from experience', () => {
+  const text = read('docs/project-types.md')
+
+  for (const term of [
+    '## 4 平台运行时约束',
+    '## 5 规范硬要求',
+    '## 6 适老与无障碍：经验与写法',
+    '小程序',
+    'WCAG',
+    '不能互换',
+    '业务可自定',
+  ]) {
+    assert.ok(text.includes(term), `project-types.md misses ${term}`)
   }
 })
 

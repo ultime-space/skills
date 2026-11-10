@@ -1,7 +1,7 @@
 # Designcraft 文档
 
-> 定位：面向 AI 的设计知识库，覆盖设计原则、设计语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、结构方案、评审与风格。
-> 状态：0.10.x；版本与变更见 [CHANGELOG](../CHANGELOG.md)。
+> 定位：面向 AI 的设计知识库，覆盖设计原则、设计语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、结构方案、项目类型与页面角色、评审与风格。
+> 状态：0.11.x；版本与变更见 [CHANGELOG](../CHANGELOG.md)。
 
 ## 索引
 
@@ -18,10 +18,11 @@
 | [data-graphics-content](./data-graphics-content.md) | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 |
 | [composition](./composition.md) | 构图原则、场景对照、构图评审问题 |
 | [patterns](./patterns.md) | 内容关系、结构变体、五项代价、结构方案、页面族约定、组合与冲突 |
+| [project-types](./project-types.md) | 8 类项目倾向、10 类页面角色、平台约束、规范硬要求与适老经验 |
 | [review](./review.md) | 规范评审与设计批评、流程、证据、分级、边界 |
 | [style](./style.md) | 风格 = 维度组合、系统原生风格、流行 recipe、警告与 style brief |
 
-> 无障碍没有独立文档：内容分散在 `color.md`、`states.md`、`motion.md`、`space-shape.md`、`review.md`。
+> 无障碍没有独立文档：硬要求见 `project-types.md` 第 4–5 节；其余内容分散在 `color.md`、`states.md`、`motion.md`、`space-shape.md`、`review.md`。
 
 ## 单一归属
 
@@ -41,6 +42,7 @@
 | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 | `data-graphics-content.md` |
 | 构图原则、场景对照 | `composition.md` |
 | 结构变体、五项代价、页面族约定、组合与冲突 | `patterns.md` |
+| 项目类型倾向、页面角色任务、平台约束、规范硬要求与适老经验 | `project-types.md` |
 | 评审流程、两条轨道、分级与边界 | `review.md` |
 | 风格家族、风格 recipe、风格警告 | `style.md` |
 
@@ -50,4 +52,5 @@
 - 版本变更记录在 [CHANGELOG](../CHANGELOG.md)；历史查 commit。
 - 数值、公式与档位表可以完整落地，如内圆角 = 外圆角 − 内衬、投影三层几何、面阶目标；不新增本目录没有的规则。
 - **不写实现契约**：产品名、代码接口、内部字段、工具命令；这些由实现侧拥有。
-- `patterns.md` 是经验方案，不是规则正文：不给判据、不做合规结论；与规则冲突时以规则为准，方案只说明代价。
+- `patterns.md` 与 `project-types.md` 的类型卡、角色卡是经验，不是规则正文：不给判据、不做合规结论；`project-types.md` 第 4–5 节是平台约束与规范摘录，只用于检查，不写成阻断结论。
+- `project-types.md` 只回答「先解决什么」，`patterns.md` 回答「怎么排」，`composition.md` 回答「构图维度怎么取向」；三者不互相复制正文。
