@@ -27,6 +27,18 @@ npm pack --dry-run    # 查看实际打包文件
 - `release-check` 会按 npm 实际打包清单扫描内部路径、内部包名、本地绝对路径与敏感文件；规则在 `scripts/check-package-content.mjs`，例外写在 `ALLOW` 并注明理由。
 - 不提交密钥、客户名、内部路径；发现疑似凭据立即停止并提示轮换。
 
+## Review
+
+提交 PR 前自查五件事：
+
+- **文档**：README / 用法 / 示例是否仍准确；链接、版本、CHANGELOG 是否同步。
+- **注释**：只写为什么、约束、反直觉处；不复述代码。
+- **冗余**：同一事实只有一份正文；新增说明先改真源，其他位置只留指针。
+- **缺漏**：新增能力是否有入口、示例与验证命令。
+- **漂移**：`package.json` / README / `CHANGELOG` / VERSION 版本是否一致。
+
+机械检查交给 CI；人审看架构、边界、语义与取舍。
+
 ## 发布前自检
 
 1. `VERSION` / `package.json` / `CHANGELOG.md` 版本一致（`npm test` 会校验）。
