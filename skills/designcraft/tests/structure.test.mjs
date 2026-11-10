@@ -293,6 +293,28 @@ void test('project-types.md supports read-only details and compound types', () =
   assert.ok(text.includes('不叠加卡片'), 'compound types should not stack type cards')
 })
 
+void test('foundations.md keeps P18 self-description', () => {
+  const foundations = read('docs/foundations.md')
+
+  assert.ok(foundations.includes('P18'), 'foundations.md should list P18')
+  assert.ok(foundations.includes('自描述'), 'P18 should be named self-description')
+  assert.ok(foundations.includes('可访问名称'), 'P18 should keep necessary accessible names')
+})
+
+void test('refine.md keeps the diagnosis gate and report boundary', () => {
+  const refine = read('scenarios/refine.md')
+  const output = read('prompts/output.md')
+  const template = read('templates/option-set.md')
+
+  for (const term of ['诊断三证', '默认套路', '没有值得改的结构问题', '交付校验', '不产出 HTML']) {
+    assert.ok(refine.includes(term), `refine.md misses ${term}`)
+  }
+  for (const term of ['诊断三证', '交付校验', '不产出 HTML']) {
+    assert.ok(output.includes(term), `prompts/output.md misses ${term}`)
+    assert.ok(template.includes(term), `templates/option-set.md misses ${term}`)
+  }
+})
+
 void test('project-types.md only cites existing structure entries', () => {
   const patterns = read('docs/patterns.md')
   const ids = new Set([...read('docs/project-types.md').matchAll(/S(\d+)/g)].map((match) => `S${match[1]}`))
