@@ -218,7 +218,7 @@ void test('pattern entries keep the five required fields', () => {
   const blocks = read('docs/patterns.md')
     .split(/^### /m)
     .slice(1)
-    .filter((block) => /^P\d+/.test(block))
+    .filter((block) => /^S\d+/.test(block))
 
   assert.ok(blocks.length >= 10, `patterns.md should declare at least 10 entries, got ${blocks.length}`)
 
