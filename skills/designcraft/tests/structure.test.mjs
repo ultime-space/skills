@@ -25,6 +25,7 @@ const REQUIRED = [
   'docs/states.md',
   'docs/data-graphics-content.md',
   'docs/composition.md',
+  'docs/optical-alignment.md',
   'docs/patterns.md',
   'docs/project-types.md',
   'docs/review.md',

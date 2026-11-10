@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0 - 2026-11-10
+
+- 新增 `docs/optical-alignment.md`：几何 / 墨迹 / 质量中心三套基准、视觉重量、图标组、文字轴与圆角护角、控件与列表、审计与边界。
+- `docs/composition.md`、`docs/typography.md`、`docs/space-shape.md` 增加指针，不复制正文；光学对齐由新文档统一拥有。
+- `SKILL.md` 增加光学对齐路由与覆盖范围；`docs/README.md` 增加索引、单一归属与 0.12.x 版本家族。
+- 结构测试必需文件同步；`VERSION` / `package.json` / `README.md` 版本对齐。
+- 模糊—质心只作为可选验证，不写成必检流程；没有工具时用眯眼 / 缩小视图判断。
+
 ## 0.11.1 - 2026-11-10
 
 - 发布内容不再包含 `evals/`；`release-check` 校验开发目录不进 `files`。
