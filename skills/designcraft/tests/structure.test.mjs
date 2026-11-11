@@ -29,6 +29,7 @@ const REQUIRED = [
   'docs/patterns.md',
   'docs/project-types.md',
   'docs/review.md',
+  'docs/perceived-quality.md',
   'docs/style.md',
   'scenarios/review-typography.md',
   'scenarios/review-color.md',
@@ -38,6 +39,7 @@ const REQUIRED = [
   'scenarios/review-states.md',
   'scenarios/review-content.md',
   'scenarios/review-critique.md',
+  'scenarios/review-quality.md',
   'scenarios/compose-page.md',
   'scenarios/compose-component.md',
   'scenarios/build-style.md',
@@ -353,4 +355,18 @@ void test('color.md keeps the current targets and drops stale claims', () => {
   }
   assert.ok(color.includes('配对前景'), 'color.md must name the paired foreground')
   assert.ok(color.includes('不是独立维度'), 'color.md must state that the paired foreground is a slot')
+})
+
+void test('perceived-quality keeps the diagnosis contract', () => {
+  const doc = read('docs/perceived-quality.md')
+
+  for (const term of ['质量推断', '六类', '诊断单', '先修缺陷', '不新增设计维度']) {
+    assert.ok(doc.includes(term), `perceived-quality.md misses ${term}`)
+  }
+
+  const scenario = read('scenarios/review-quality.md')
+
+  for (const term of ['主信号', '完成度', '修改顺序', '不产出风格配方', '不下阻断性结论']) {
+    assert.ok(scenario.includes(term), `review-quality.md misses ${term}`)
+  }
 })
