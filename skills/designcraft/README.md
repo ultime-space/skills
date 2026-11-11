@@ -1,6 +1,6 @@
 # Designcraft
 
-面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、光学对齐、结构方案、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
+面向设计系统的设计知识 skill：原则、语言、流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、光学对齐、结构方案、项目类型与页面角色、感知质量、评审与风格。让 AI 的判断能引用判据、能算回去，而不是凭感觉。
 
 [![npm](https://img.shields.io/npm/v/@ultime/designcraft?label=%40ultime%2Fdesigncraft&color=black)](https://www.npmjs.com/package/@ultime/designcraft)
 [![license](https://img.shields.io/badge/license-MIT-black)](./LICENSE)
@@ -55,6 +55,15 @@ npx skills add ultime-space/skills --skill designcraft
 范围：<图标组 / 卡片列表 / 表单控件>；重点看可见轮廓、文字轴与护角、控件与首行文字。
 ```
 
+**感知质量诊断**
+
+```text
+用 Designcraft 按 scenarios/review-quality.md 诊断这页为什么不够「高级」，Audit 模式，只读。
+品类：<…>；价格带：<…>；品牌承诺：<…>；受众：<…>；重点给主信号、缺陷清单与修改顺序。
+```
+
+感知质量诊断不产出风格配方，也不新增设计值；它把「高级感」还原成可观察信号，先修缺陷，再调主信号，最后才加装饰。品类、价格带、品牌承诺与受众决定哪种高级；缺失时先问，不要直接套黑金、衬线或大留白。
+
 **配置品牌色**
 
 ```text
@@ -106,6 +115,7 @@ Refine 只出方案集：结构线框在 Markdown 内，不产出 HTML、不改�
 - 页面结构、滚动归属、栅格与响应式的设计建议
 - 已有页面的结构方案：同一份内容换成哪几种排法、各付什么代价
 - 项目类型与页面角色的倾向判断：这类项目、这个页面通常先解决什么，什么情况下不成立
+- 感知质量与高级感诊断：为什么显得或不显得高级，哪些信号在支撑或抵消，先修什么
 - 页面族操作槽位的一致性检查：新增、条目操作、筛选、提交、危险操作是否固定在同一位置
 - 风格方向的多方案比较：每套的用意、优点、代价与不适合的场景
 - 给 AI 一个稳定的设计判断入口
@@ -114,7 +124,7 @@ Refine 只出方案集：结构线框在 Markdown 内，不产出 HTML、不改�
 
 - 代码架构与代码分层：用 Codecraft
 - 文档组织与真源治理：用 Docscraft
-- 业务建模、纯视觉美化
+- 业务建模、只加装饰不做诊断的纯视觉美化
 - 品牌创作、插画、图标绘制
 - 强制检查与阻断性结论：本 skill 只给报告与建议
 
@@ -139,6 +149,7 @@ designcraft/
 │   ├── patterns.md
 │   ├── project-types.md
 │   ├── review.md
+│   ├── perceived-quality.md
 │   └── style.md
 ├── scenarios/
 │   ├── review-typography.md
@@ -149,6 +160,7 @@ designcraft/
 │   ├── review-states.md
 │   ├── review-content.md
 │   ├── review-critique.md
+│   ├── review-quality.md
 │   ├── compose-page.md
 │   ├── compose-component.md
 │   ├── build-style.md
@@ -200,13 +212,15 @@ Designcraft 是面向 AI 的设计知识，不复制外部正文。设计时对�
 - Material Design 3：颜色与对比度实践、列表与卡片、典型布局
 - 政府服务与电商后台的公开设计体系：表格、摘要列表、资源列表、空态与错误汇总的结构条件
 - APCA / WCAG 3 草案：仅作评估参考，不作当前门槛
+- 视觉美学与溢价感研究：只取机制与条件，不把包装或广告结论直接写成界面规则
 
 方案库只取结构与适用条件，不复制文案、截图或视觉资产；站点文案的许可未逐项核实，因此不转述原文。
 
 ## 版本
 
-当前版本 `0.13.1`（见 [VERSION](./VERSION)）。
+当前版本 `0.14.0`（见 [VERSION](./VERSION)）。
 
+- `0.14.0`：新增感知质量主题 `docs/perceived-quality.md` 与 `scenarios/review-quality.md`：高级感还原为质量推断，六类可观察信号、调性权重、诊断流程与反例；评审章把「工艺」升级为「工艺与完成度」，风格章补「风格之后的感知质量」指针。
 - `0.13.1`：补渐变与圆角的应用经验——颜色章新增渐变判断顺序与经验区间；空间形状章补尺寸降档、连续曲率与过度圆角；风格章新增形状装饰选择。
 - `0.13.0`：最低 Node.js 提升到 22.18，与 Ultime 其它发布包统一消费端基线；开发端固定 Node 24，CI 增加 22 / 24 双版本验证。
 - `0.12.0`：新增光学对齐主题 `docs/optical-alignment.md`：几何 / 墨迹 / 质量中心三套基准、视觉重量、图标组、文字轴与圆角护角、审计与边界；构图 / 排版 / 空间形状只留指针；模糊—质心是可选验证。
