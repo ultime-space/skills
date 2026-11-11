@@ -33,7 +33,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 |---|---|---|
 | 设计任务的前置判断 / 流程 | `docs/foundations.md` | 设计决策与输出建议 |
 | 排版评审 | `docs/typography.md` + `scenarios/review-typography.md` | 评审报告 |
-| 颜色评审 / 对比度 | `docs/color.md` + `scenarios/review-color.md` | 评审报告 |
+| 颜色评审 / 对比度 / 渐变 | `docs/color.md` + `scenarios/review-color.md` | 评审报告 |
 | 间距 / 尺寸 / 圆角 / 边界 | `docs/space-shape.md` + `scenarios/review-structure.md` | 评审报告 |
 | 页面结构 / 栅格 / 响应式 | `docs/layout.md` + `scenarios/review-structure.md` | 评审报告 |
 | 表面 / 层级 / 光影 | `docs/depth.md` + `scenarios/review-depth.md` | 评审报告 |
