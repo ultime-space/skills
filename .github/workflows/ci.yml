@@ -24,6 +24,7 @@ jobs:
           package-manager-cache: false
 
       - run: npm test
+      - run: npm run release-check
       - run: npm run eval
       - run: npm run self-check
       - run: npm pack --dry-run
@@ -46,6 +47,7 @@ jobs:
           package-manager-cache: false
 
       - run: npm test
+      - run: npm run release-check
       - run: npm pack --dry-run
 
   designcraft:
@@ -68,3 +70,15 @@ jobs:
       - run: npm test
       - run: npm run release-check
       - run: npm pack --dry-run
+
+  boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check shared boundary scanners
+        run: |
+          diff skills/codecraft/scripts/check-package-content.mjs skills/designcraft/scripts/check-package-content.mjs
+          diff skills/codecraft/scripts/check-package-content.mjs skills/docscraft/scripts/check-package-content.mjs
+          diff skills/codecraft/tests/release-content.test.mjs skills/designcraft/tests/release-content.test.mjs
+          diff skills/codecraft/tests/release-content.test.mjs skills/docscraft/tests/release-content.test.mjs

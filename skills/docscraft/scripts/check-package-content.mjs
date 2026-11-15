@@ -19,6 +19,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)))
 
+/**
+ * 边界数据：只在这里维护当前内部包名与内部产品名。
+ * 测试不写具体产品，只验证「任意内部名会被拦、公开名不会被误拦」。
+ */
+export const INTERNAL_PACKAGES = ['checks', 'core', 'drafter', 'kit', 'studio', 'cli']
+export const INTERNAL_PRODUCT_NAMES = ['drafter', 'viewer']
+export const INTERNAL_TERMS = ['Ultime', 'tokens.dtcg.json', '开发计划']
+
+const PACKAGE_ALTERNATION = INTERNAL_PACKAGES.join('|')
+const PRODUCT_ALTERNATION = INTERNAL_PRODUCT_NAMES.join('|')
+
 const TEXT_EXTENSIONS = new Set([
   '.md',
   '.mdx',
@@ -56,13 +67,21 @@ const CONTENT_RULES = [
   },
   {
     id: 'internal-repo-path',
-    pattern: /(?:docs\/roadmap|docs\/design-system|docs\/references|packages\/(?:core|kit|viewer|studio|cli)|\.trae\/)/g,
+    pattern: new RegExp(
+      `(?:docs/roadmap|docs/design-system|docs/references|packages/(?:${PACKAGE_ALTERNATION})|\\.trae/)`,
+      'g',
+    ),
     hint: '内部仓库路径',
   },
   {
     id: 'internal-package',
-    pattern: /@ultime\/(?:core|kit|viewer|studio|cli)\b/g,
+    pattern: new RegExp(`@ultime/(?:${PACKAGE_ALTERNATION})\\b`, 'g'),
     hint: '内部包名',
+  },
+  {
+    id: 'internal-product-name',
+    pattern: new RegExp(`\\b(?:${PRODUCT_ALTERNATION})\\b`, 'gi'),
+    hint: '内部产品名',
   },
 ]
 
@@ -122,10 +141,10 @@ export function scanFileName(relative, allow = ALLOW) {
 }
 
 /** 内容层检查；导出给测试使用。 */
-export function scanText(relative, text, allow = ALLOW) {
+export function scanText(relative, text, allow = ALLOW, rules = CONTENT_RULES) {
   const findings = []
   text.split(/\r?\n/).forEach((line, index) => {
-    for (const rule of CONTENT_RULES) {
+    for (const rule of rules) {
       const matches = line.match(rule.pattern)
       if (!matches) continue
       if (isAllowed(allow, relative, rule.id)) continue
