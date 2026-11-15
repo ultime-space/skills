@@ -141,10 +141,12 @@ cd skills/codecraft
 npm test                       # node:test，无框架依赖
 npm run eval                   # CLI fixtures：A2 / A6 / A11 / A17 / A21 / ignore / SARIF
 npm run self-check             # 仓库自检；fixtures 含故意违规样本，用 --exclude 跳过
+npm run release-check          # 发布内容扫描
 npm pack --dry-run             # 检查发布内容
 
 cd ../docscraft
 npm test                       # 结构、版本对齐、相对链接与路由路径
+npm run release-check          # 发布内容扫描
 npm pack --dry-run
 
 cd ../designcraft
@@ -152,6 +154,10 @@ npm test                       # 结构、版本对齐、相对链接与场景�
 npm run release-check          # 发布前检查
 npm pack --dry-run
 ```
+
+- `release-check` 在三个包的 CI 与发布前都执行，覆盖内部路径、内部包名与裸内部产品名。
+- 三个包的 `scripts/check-package-content.mjs` 与 `tests/release-content.test.mjs` 保持同一份，由 `boundaries` job 校验。
+- 测试只断言行为与输出效果，用通用夹具；具体产品名只放在边界数据里。CHANGELOG 只写用户可感知变化。
 
 发布走 tag：`package.json` 版本与 tag 对齐后推送，GitHub Actions 用 npm Trusted Publishing（OIDC）发布，不存 token。
 
