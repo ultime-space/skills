@@ -240,6 +240,8 @@ npx codecraft check --root .
 | **Plan（计划）** | 否 | `plan` |
 | **Apply（执行）** | 是，需确认范围 | 人工按计划改；`init --apply` 只创建骨架 |
 
+Apply 模式先写失败测试再实现；阶段完成先 review 代码与文档，再跑门禁。
+
 ## CLI
 
 ```bash
