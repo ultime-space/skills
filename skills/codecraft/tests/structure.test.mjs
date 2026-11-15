@@ -4,6 +4,7 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { HELP } from '../src/cli.mjs'
+import { INTERNAL_PACKAGES, INTERNAL_TERMS } from '../scripts/check-package-content.mjs'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 
@@ -59,17 +60,8 @@ void test('relative markdown links resolve', () => {
 
 void test('knowledge files stay package-neutral', () => {
   const terms = [
-    'Ultime',
-    '@ultime/core',
-    '@ultime/kit',
-    '@ultime/drafter',
-    '@ultime/studio',
-    '@ultime/cli',
-    'packages/core',
-    'packages/kit',
-    'packages/drafter',
-    'tokens.dtcg.json',
-    '开发计划',
+    ...INTERNAL_TERMS,
+    ...INTERNAL_PACKAGES.flatMap((name) => [`@ultime/${name}`, `packages/${name}`]),
   ]
   for (const dir of ['docs', 'scenarios', 'templates', 'adapters', 'prompts']) {
     const full = path.join(ROOT, dir)
