@@ -11,6 +11,8 @@
 
 ## 三步循环
 
+> 前置：实现前先写失败测试；阶段完成先 review 代码与文档，再跑全量 check。
+
 1. **改前基线**：`codecraft check --format json`（记下 findings；有 Baseline 的项目直接 `check`）。
 2. **改后点检**：只验证触碰到的规则——`codecraft check --rules <触碰规则> --ci`（非 0 就继续修）。`--rules` 是 pack 的过滤器，config 的 pack 仍是唯一真源。
 3. **修完全量**：`codecraft check`（有 Baseline 加 `--baseline`）；`--compare <上次.json>` 可给出新增 / 消失的趋势。
