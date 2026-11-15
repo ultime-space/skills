@@ -16,11 +16,12 @@ jobs:
       run:
         working-directory: skills/codecraft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
+          package-manager-cache: false
 
       - run: npm test
       - run: npm run eval
@@ -37,11 +38,12 @@ jobs:
       run:
         working-directory: skills/docscraft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
+          package-manager-cache: false
 
       - run: npm test
       - run: npm pack --dry-run
@@ -56,11 +58,12 @@ jobs:
       run:
         working-directory: skills/designcraft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
+          package-manager-cache: false
 
       - run: npm test
       - run: npm run release-check
