@@ -49,6 +49,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | 页面设计规格 | `docs/composition.md` + `docs/layout.md` + `scenarios/compose-page.md` | 设计规格 |
 | 组件设计规格 | `docs/space-shape.md` + `docs/states.md` + `scenarios/compose-component.md` | 设计规格 |
 | 构建风格 | `docs/style.md` + `scenarios/build-style.md` | 风格方案集 |
+| 参考已有风格复刻 | `docs/style.md` + `scenarios/reproduce-style.md` | 风格特征、差异归因与缺口清单 |
 | 配置品牌色 | `docs/color.md` + `scenarios/configure-brand-color.md` | 可达性结论 + 建议 |
 | 审计分级 / 边界 | `docs/color.md` + `scenarios/check-contrast-audit.md` | 分级说明 |
 | 知识库索引 | `docs/README.md` | 阅读顺序与单一归属 |
@@ -72,6 +73,16 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 Compose（设计规格）、Refine（结构方案）、Critique（设计批评）、Style（风格方案）不再作为模式名，它们是 Plan 或 Audit 下的场景，文件仍在 `scenarios/`。
 
 本 skill 默认出报告；只有明确要求才落到文件。
+
+## 内容分块
+
+| 块 | 来源 | 更新方式 |
+|---|---|---|
+| 设计语言 | 设计系统的设计语言 | 每次设计语言更新重写；不保留第二份取值 |
+| 设计经验 | 设计系统的设计经验 | 每次设计经验更新重写 |
+| skill 独有（场景 / 输出格式 / 模板） | 本 skill | 唯一真源，不反向同步 |
+
+派生块按来源重写，原生块没有外部来源；设计系统更新时同批更新派生块与版本记录。
 
 ## 工作流
 
