@@ -1,7 +1,7 @@
 # Designcraft 文档
 
 > 定位：面向 AI 的设计知识库，覆盖设计原则、设计语言、设计流程、颜色、排版、空间与形状、布局、表面与光影、动效、交互状态、数据 / 图形 / 内容、构图、光学对齐、结构方案、项目类型与页面角色、感知质量、评审与风格。
-> 状态：0.15.x；版本与变更见 [CHANGELOG](../CHANGELOG.md)。
+> 状态：0.16.x；版本与变更见 [CHANGELOG](../CHANGELOG.md)。
 
 ## 索引
 
@@ -12,11 +12,11 @@
 | [typography](./typography.md) | 字号、场景阶梯、字重、行高、字距、角色、多语言、字体接入、行内图标 |
 | [space-shape](./space-shape.md) | 间距、控件高度、密度、热区、圆角、边界、焦点 |
 | [layout](./layout.md) | 页面结构、滚动归属、栅格、容器、断点、构图模式、响应式 |
-| [depth](./depth.md) | 面（层级 / 填充 / 形态）、半透明、分块、遮罩、未知底、材质；两套光系统、五个光槽、投影三层、边界与深度 |
+| [depth](./depth.md) | 面（层级 / 填充 / 厚度）、半透明、分块、遮罩、未知底、材质；两套光系统、五个光槽、投影三层、边界与深度 |
 | [motion](./motion.md) | 时长、循环、延迟、曲线、角色、编排、反馈、减少动效 |
 | [states](./states.md) | 交互态、数据态、异步态、状态组合、输入环境 |
 | [data-graphics-content](./data-graphics-content.md) | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 |
-| [composition](./composition.md) | 构图原则、场景对照、构图评审问题 |
+| [composition](./composition.md) | 构图原则、场景对照、构图评审问题、表面风格五维与四读法 |
 | [optical-alignment](./optical-alignment.md) | 几何 / 墨迹 / 质量中心三套基准、视觉重量、图标组、文字轴与圆角护角、审计 |
 | [patterns](./patterns.md) | 内容关系、结构变体、五项代价、结构方案、页面族约定、组合与冲突 |
 | [project-types](./project-types.md) | 8 类项目倾向、10 类页面角色、平台约束、规范硬要求与适老经验 |
@@ -47,12 +47,13 @@
 | 字号、字重、行高、字距、角色、多语言 | `typography.md` |
 | 间距、控件高度、密度、热区、圆角、边界、焦点 | `space-shape.md` |
 | 页面结构、栅格、容器、断点、响应式 | `layout.md` |
-| 面（层级 / 填充 / 形态）、半透明、分块、遮罩、未知底、材质 | `depth.md` |
+| 面（层级 / 填充 / 厚度）、半透明、分块、遮罩、未知底、材质 | `depth.md` |
 | 两套光系统、五个光槽、投影三层、光源、深度 | `depth.md` |
 | 时长、循环、延迟、曲线、编排、反馈、减少动效 | `motion.md` |
 | 状态语义、状态组合、输入环境 | `states.md` |
 | 数据色、图标尺寸与使用场景、图形 / 插画、内容设计 | `data-graphics-content.md` |
 | 构图原则、场景对照 | `composition.md` |
+| 表面风格五维与四读法 | `composition.md` §7 |
 | 光学对齐、视觉重量、图标组与文字轴 | `optical-alignment.md` |
 | 结构变体、五项代价、页面族约定、组合与冲突 | `patterns.md` |
 | 项目类型倾向、页面角色任务、平台约束、规范硬要求与适老经验 | `project-types.md` |
