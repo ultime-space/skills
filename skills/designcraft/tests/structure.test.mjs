@@ -43,6 +43,7 @@ const REQUIRED = [
   'scenarios/compose-page.md',
   'scenarios/compose-component.md',
   'scenarios/build-style.md',
+  'scenarios/reproduce-style.md',
   'scenarios/configure-brand-color.md',
   'scenarios/check-contrast-audit.md',
   'scenarios/refine.md',
@@ -355,6 +356,39 @@ void test('color.md keeps the current targets and drops stale claims', () => {
   }
   assert.ok(color.includes('配对前景'), 'color.md must name the paired foreground')
   assert.ok(color.includes('不是独立维度'), 'color.md must state that the paired foreground is a slot')
+})
+
+void test('reproduce-style keeps the reference reproduction contract', () => {
+  const scenario = read('scenarios/reproduce-style.md')
+  const style = read('docs/style.md')
+
+  for (const term of ['风格特征', '交互逻辑', '参数', '组合', '缺层', '不新增设计值']) {
+    assert.ok(scenario.includes(term), `reproduce-style.md misses ${term}`)
+  }
+  for (const term of ['参考复刻', '交互逻辑优先', '逐值', '缺层']) {
+    assert.ok(style.includes(term), `style.md misses ${term}`)
+  }
+})
+
+void test('SKILL and docs index declare content blocks', () => {
+  for (const file of ['SKILL.md', 'docs/README.md']) {
+    const text = read(file)
+    for (const term of ['内容分块', '派生', 'skill 独有']) {
+      assert.ok(text.includes(term), `${file} misses ${term}`)
+    }
+  }
+})
+
+void test('depth and review keep root surface and spacing scope', () => {
+  const depth = read('docs/depth.md')
+  const review = read('docs/review.md')
+
+  for (const term of ['先找层级容器', '根面']) {
+    assert.ok(depth.includes(term), `depth.md misses ${term}`)
+  }
+  for (const term of ['层级容器与根面', '间距档适用范围']) {
+    assert.ok(review.includes(term), `review.md misses ${term}`)
+  }
 })
 
 void test('perceived-quality keeps the diagnosis contract', () => {
