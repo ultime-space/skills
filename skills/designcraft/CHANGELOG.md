@@ -5,6 +5,7 @@
 - `SKILL.md` 新增修改任务入口：先查下限，再查维度，最后给建议；补改样式 / 弹出层（带遮罩 / 无遮罩）/ 排版 / 表面 / 响应式 / 间距的读法。
 - `scenarios/review-critique.md` 补默认排序：跨切 → 共享规则 → 任务 → 结构 → 对齐 → 层级 → 交互 → 适配；只是修改顺序，不是评分权重或硬门槛。
 - 新增 `evals/review-ordering/` 三份构造评审样本与回放说明；样本不是历史项目记录，不作为已验证结论。
+- 新增 `evals/review-ordering/real/` 三份真实页面评审样本（抽象命名，不含内部路径）；回放默认排序，历史修改顺序仍未做。
 - 补 `docs/USAGE.md` 与根 README「能做什么 / 使用说明」；`SKILL.md`、文档索引与结构测试同步。
 - 同步 `README.md`、`docs/README.md`、`VERSION`、`package.json` 到 0.18.x；文档与评测改动，无新增依赖与打包内容变化。
 
