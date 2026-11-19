@@ -55,6 +55,10 @@ const REQUIRED = [
   'templates/style-brief.md',
   'templates/option-set.md',
   'evals/golden-tasks.md',
+  'evals/review-ordering/README.md',
+  'evals/review-ordering/01-checkout.md',
+  'evals/review-ordering/02-dashboard.md',
+  'evals/review-ordering/03-settings.md',
 ]
 
 const PURE_KNOWLEDGE_DIRS = ['docs', 'scenarios', 'prompts', 'templates']
@@ -376,6 +380,53 @@ void test('SKILL and docs index declare content blocks', () => {
     for (const term of ['内容分块', '派生', 'skill 独有']) {
       assert.ok(text.includes(term), `${file} misses ${term}`)
     }
+  }
+})
+
+void test('review-critique keeps the default ordering', () => {
+  const text = read('scenarios/review-critique.md')
+
+  for (const term of [
+    '默认排序',
+    '先修缺陷',
+    '共享规则优先',
+    '跨切',
+    '共享规则',
+    '任务',
+    '结构',
+    '对齐',
+    '层级',
+    '交互',
+    '适配',
+  ]) {
+    assert.ok(text.includes(term), `review-critique.md misses ${term}`)
+  }
+})
+
+void test('review-ordering samples are labelled and complete', () => {
+  const index = read('evals/review-ordering/README.md')
+  assert.ok(index.includes('构造样本'), 'review-ordering index should label samples as constructed')
+
+  for (const file of ['01-checkout.md', '02-dashboard.md', '03-settings.md']) {
+    const text = read(`evals/review-ordering/${file}`)
+    for (const term of ['构造样本', '结论', '范围', '判据', '证据', '修改顺序']) {
+      assert.ok(text.includes(term), `${file} misses ${term}`)
+    }
+  }
+})
+
+void test('SKILL declares modification routing and self-check order', () => {
+  const skill = read('SKILL.md')
+
+  for (const term of [
+    '修改任务入口',
+    '先查下限',
+    '再查维度',
+    '最后给建议',
+    '改浮层 / 抽屉',
+    '改响应式 / 窄屏',
+  ]) {
+    assert.ok(skill.includes(term), `SKILL.md misses ${term}`)
   }
 })
 
