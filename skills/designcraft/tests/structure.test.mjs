@@ -432,6 +432,13 @@ void test('review-ordering real samples are labelled', () => {
   }
 })
 
+void test('color keeps the palette direction contract', () => {
+  const text = read('docs/color.md')
+  for (const term of ['配色方向（经验）', '冷暖', '轻重', '动静', 'CIELAB', 'OKLCH', '方向验证']) {
+    assert.ok(text.includes(term), `color.md misses ${term}`)
+  }
+})
+
 void test('SKILL declares modification routing and self-check order', () => {
   const skill = read('SKILL.md')
 

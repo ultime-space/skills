@@ -19,6 +19,7 @@
 | 我要… | 先读 | 产出 |
 |---|---|---|
 | 评审颜色 / 对比度 | `docs/color.md` + `scenarios/review-color.md` | 评审报告 |
+| 选配色方向 / 从情绪词到三轴 | `docs/color.md` | 方向、起点与收口检查 |
 | 评审排版 / 字号角色 | `docs/typography.md` + `scenarios/review-typography.md` | 评审报告 |
 | 评审间距 / 圆角 / 边界 | `docs/space-shape.md` + `scenarios/review-structure.md` | 评审报告 |
 | 评审表面 / 光影 | `docs/depth.md` + `scenarios/review-depth.md` | 评审报告 |
