@@ -95,7 +95,7 @@ Compose（设计规格）、Refine（结构方案）、Critique（设计批评�
 | 修改任务 | 先读 |
 |---|---|
 | 改样式 / 主题 | `docs/style.md` + `docs/depth.md` |
-| 改浮层 / 抽屉 | `docs/depth.md` + `docs/layout.md` + `docs/states.md` |
+| 改弹出层 / 遮罩（dialog / alert / sheet / modal；toast 通常无遮罩） | `docs/depth.md` + `docs/layout.md` + `docs/states.md` |
 | 改排版 / 字号 | `docs/typography.md` + `docs/data-graphics-content.md` |
 | 改表面 / 阴影 | `docs/depth.md` + `docs/space-shape.md` |
 | 改响应式 / 窄屏 | `docs/layout.md` + `docs/space-shape.md` + `docs/style.md` |
