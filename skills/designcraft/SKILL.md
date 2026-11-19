@@ -52,6 +52,7 @@ description: 面向设计系统的设计知识：原则、语言、流程、颜�
 | 参考已有风格复刻 | `docs/style.md` + `scenarios/reproduce-style.md` | 风格特征、差异归因与缺口清单 |
 | 配置品牌色 | `docs/color.md` + `scenarios/configure-brand-color.md` | 可达性结论 + 建议 |
 | 审计分级 / 边界 | `docs/color.md` + `scenarios/check-contrast-audit.md` | 分级说明 |
+| 使用说明 | `docs/USAGE.md` | 模式、任务路由、提示词与输出边界 |
 | 知识库索引 | `docs/README.md` | 阅读顺序与单一归属 |
 | 输出格式 | `prompts/output.md` | 报告 / 清单 / 规格 / 方案集 |
 
