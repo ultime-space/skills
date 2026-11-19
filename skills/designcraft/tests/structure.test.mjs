@@ -15,6 +15,7 @@ const REQUIRED = [
   'CONTRIBUTING.md',
   'SECURITY.md',
   'docs/README.md',
+  'docs/USAGE.md',
   'docs/foundations.md',
   'docs/color.md',
   'docs/typography.md',
