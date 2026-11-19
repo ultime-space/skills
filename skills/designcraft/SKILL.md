@@ -84,6 +84,23 @@ Compose（设计规格）、Refine（结构方案）、Critique（设计批评�
 
 派生块按来源重写，原生块没有外部来源；设计系统更新时同批更新派生块与版本记录。
 
+## 修改任务入口
+
+改样式、主题、浮层、排版、表面或响应式时，先查下限，再查维度，最后给建议；不要先看截图或代码。
+
+1. **先查下限**：对比度、焦点、热区、状态、窄屏、强制颜色、性能。
+2. **再查维度**：按任务读 2–3 篇，只取最近可行档；没有就标「需要项目自定义」。
+3. **最后给建议**：写依据、代价与不适用项；建议不写成强制检查。
+
+| 修改任务 | 先读 |
+|---|---|
+| 改样式 / 主题 | `docs/style.md` + `docs/depth.md` |
+| 改浮层 / 抽屉 | `docs/depth.md` + `docs/layout.md` + `docs/states.md` |
+| 改排版 / 字号 | `docs/typography.md` + `docs/data-graphics-content.md` |
+| 改表面 / 阴影 | `docs/depth.md` + `docs/space-shape.md` |
+| 改响应式 / 窄屏 | `docs/layout.md` + `docs/space-shape.md` + `docs/style.md` |
+| 改组件间距 / 圆角 | `docs/space-shape.md` + `docs/depth.md` |
+
 ## 工作流
 
 1. 确认范围：模式 / 平台 / 场景 / 目标。
