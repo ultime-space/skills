@@ -423,7 +423,7 @@ void test('SKILL declares modification routing and self-check order', () => {
     '先查下限',
     '再查维度',
     '最后给建议',
-    '改浮层 / 抽屉',
+    '改弹出层 / 遮罩',
     '改响应式 / 窄屏',
   ]) {
     assert.ok(skill.includes(term), `SKILL.md misses ${term}`)
