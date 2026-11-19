@@ -15,3 +15,5 @@
 - [`01-checkout.md`](./01-checkout.md)：表单、错误恢复、窄屏。
 - [`02-dashboard.md`](./02-dashboard.md)：数据层级、状态色、动效。
 - [`03-settings.md`](./03-settings.md)：危险操作、保存反馈、200% 放大。
+
+真实页面样本见 [`real/`](./real/README.md)：3 份实际页面评审，抽象命名，不含内部路径；同样不是历史项目报告。

@@ -60,6 +60,10 @@ const REQUIRED = [
   'evals/review-ordering/01-checkout.md',
   'evals/review-ordering/02-dashboard.md',
   'evals/review-ordering/03-settings.md',
+  'evals/review-ordering/real/README.md',
+  'evals/review-ordering/real/01-mobile-form.md',
+  'evals/review-ordering/real/02-component-gallery.md',
+  'evals/review-ordering/real/03-device-paper.md',
 ]
 
 const PURE_KNOWLEDGE_DIRS = ['docs', 'scenarios', 'prompts', 'templates']
@@ -411,6 +415,18 @@ void test('review-ordering samples are labelled and complete', () => {
   for (const file of ['01-checkout.md', '02-dashboard.md', '03-settings.md']) {
     const text = read(`evals/review-ordering/${file}`)
     for (const term of ['构造样本', '结论', '范围', '判据', '证据', '修改顺序']) {
+      assert.ok(text.includes(term), `${file} misses ${term}`)
+    }
+  }
+})
+
+void test('review-ordering real samples are labelled', () => {
+  const index = read('evals/review-ordering/real/README.md')
+  assert.ok(index.includes('不是历史项目报告'), 'real samples must state they are not historical reports')
+
+  for (const file of ['01-mobile-form.md', '02-component-gallery.md', '03-device-paper.md']) {
+    const text = read(`evals/review-ordering/real/${file}`)
+    for (const term of ['真实页面样本', '证据', '建议修改顺序']) {
       assert.ok(text.includes(term), `${file} misses ${term}`)
     }
   }
